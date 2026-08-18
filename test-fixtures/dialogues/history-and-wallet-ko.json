@@ -1,0 +1,75 @@
+{
+  "_members": [
+    {
+      "id": "me",
+      "name": "빅헤드"
+    },
+    {
+      "id": "m1",
+      "name": "수이수이"
+    },
+    {
+      "id": "m2",
+      "name": "수탉"
+    }
+  ],
+  "_actorId": "me",
+  "_currency": "JPY",
+  "_locale": "ko",
+  "_note": "Owner screenshot flows 2026-08-14: 사용내역/내 기록 answer with the list; 지갑 만들래 opens the create card with sentence slots.",
+  "turns": [
+    {
+      "user": "사용내역",
+      "expect": {
+        "intent": "QUERY_HISTORY",
+        "scope": "group"
+      }
+    },
+    {
+      "user": "내 사용내역 좀 보여줘",
+      "expect": {
+        "intent": "QUERY_HISTORY",
+        "scope": "mine"
+      }
+    },
+    {
+      "user": "내 기록",
+      "expect": {
+        "intent": "QUERY_HISTORY",
+        "scope": "mine"
+      }
+    },
+    {
+      "user": "지갑 만들래",
+      "expect": {
+        "intent": "ACTION_CREATE_WALLET"
+      }
+    },
+    {
+      "user": "엔화 현금 지갑 만들어줘",
+      "expect": {
+        "intent": "ACTION_CREATE_WALLET",
+        "currency": "JPY",
+        "walletType": "CASH"
+      }
+    },
+    {
+      "user": "수탉이랑 먹은거 다 보야줘",
+      "expect": {
+        "intent": "QUERY_HISTORY"
+      }
+    },
+    {
+      "user": "수탉이 낸 거 보여줘",
+      "expect": {
+        "intent": "QUERY_HISTORY"
+      }
+    },
+    {
+      "user": "어제 뭐 샀지",
+      "expect": {
+        "intent": "QUERY_HISTORY"
+      }
+    }
+  ]
+}

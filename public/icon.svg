@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Sem settled glyph (docs/BRAND.md §3): dot-matrix cross, mark-5152
+       lineage — big core dots, small satellites tapering out the arms.
+       Ink on marble; the single vermilion dot at the core is Sem. -->
+  <rect width="512" height="512" rx="96" fill="#f7f5f1"/>
+  <g fill="#1c1a17">
+    <circle cx="256" cy="198" r="40"/>
+    <circle cx="314" cy="256" r="40"/>
+    <circle cx="256" cy="314" r="40"/>
+    <circle cx="198" cy="256" r="40"/>
+    <circle cx="256" cy="140" r="22"/>
+    <circle cx="372" cy="256" r="22"/>
+    <circle cx="256" cy="372" r="22"/>
+    <circle cx="140" cy="256" r="22"/>
+    <circle cx="256" cy="83" r="13"/>
+    <circle cx="429" cy="256" r="13"/>
+    <circle cx="256" cy="429" r="13"/>
+    <circle cx="83" cy="256" r="13"/>
+  </g>
+  <circle cx="256" cy="256" r="40" fill="#d6482a"/>
+</svg>

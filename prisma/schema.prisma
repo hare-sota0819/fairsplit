@@ -1,0 +1,541 @@
+// FairSplit Prisma schema — Phase 1.
+//
+// Money conventions (see docs/DECISIONS.md "Money & precision policy"):
+// - Every money amount is BigInt integer minor units of its currency
+//   (JPY: 1 = 1 yen, USD: 1 = 1 cent). Never Float.
+// - Exchange rates are Decimal(24, 10), expressed as settlement-currency
+//   MAJOR units per 1 MAJOR unit of the foreign currency (e.g. 9.205 KRW/JPY).
+// - Currency columns hold ISO 4217 alpha codes; exponents come from the
+//   `currency-codes` package at runtime, never stored.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Connection URL lives in prisma.config.ts (Prisma 7 convention).
+datasource db {
+  provider = "postgresql"
+}
+
+enum RateMode {
+  AVG_COST
+  MARKET
+}
+
+// How a prepaid wallet holds its money. "Prepaid" is the axis that matters:
+// exchanged BEFORE spending, so it converts at that wallet's average cost —
+// whether the money sits as banknotes or on a travel card. Ordinary
+// credit/debit cards are not wallets at all; they are pay-as-you-go, modelled
+// as `Expense.walletId = null`.
+enum WalletType {
+  CASH
+  TRAVEL_CARD
+  OTHER_PREPAID
+}
+
+// How one receipt line is divided among the people who shared it. Whole
+// units where they go round, the line's money where they do not — 5 skewers
+// between 2 people. Recorded rather than inferred so the breakdown screen
+// can say which rule applied, and so `quantity` never has to hold 2.5.
+enum ItemSplitMode {
+  BY_QUANTITY
+  BY_AMOUNT
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  // Set only for email/password accounts (argon2id hash); OAuth-only users
+  // have null.
+  passwordHash  String?
+  // The language this person reads the app in. On the ACCOUNT rather than the
+  // device on purpose: one owner here runs three different OS languages across
+  // their laptop, tablet and phone, so following the browser would show one
+  // person three different apps. Values are the codes in src/i18n/locale.ts.
+  locale        String    @default("ko")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts            Account[]
+  sessions            Session[]
+  members             Member[]
+  createdGroups       Group[]
+  passwordResetTokens PasswordResetToken[]
+  receiptScans        ReceiptScan[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+// Unused while sessions are JWT (required by the Credentials provider), but
+// kept so the adapter schema stays canonical and database sessions remain an
+// option.
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// Password-reset flow: the DB stores only the sha256 of the emailed token.
+model PasswordResetToken {
+  tokenHash String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Group {
+  id                 String   @id @default(cuid())
+  name               String
+  // ISO 4217 code all balances settle in (e.g. "KRW").
+  settlementCurrency String
+  // ISO 4217 code the trip is spent in (e.g. "JPY"). A DEFAULT for entering
+  // money, never a restriction: any expense may use any currency. Null means
+  // "not decided", which is every group created before Phase 4C.
+  //
+  // DERIVED from tripCountry since Phase 4D-B — the user is asked where they
+  // are going, not what currency that country uses. Still stored rather than
+  // recomputed on read, so `defaultExpenseCurrency` and every group created
+  // before the country picker existed keep working unchanged.
+  tripCurrency       String?
+  // ISO 3166-1 alpha-2 of the destination (e.g. "JP"). The answer to "where
+  // are you going?"; the currency above falls out of it.
+  tripCountry        String?
+  // A city within tripCountry. A LABEL ONLY — it names the trip on screen and
+  // has no effect on any money, rate or date. Free text as far as the schema
+  // cares; the form offers a curated shortlist.
+  tripCity           String?
+  rateMode           RateMode @default(AVG_COST)
+  // Unguessable share-link token (crypto.randomBytes(16).toString('base64url')).
+  inviteCode         String   @unique
+  // Who created the group. The only account allowed to delete it; null once
+  // that account is gone (the group then ends when its last member leaves).
+  createdBy          User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById        String?
+  createdAt          DateTime @default(now())
+
+  members      Member[]
+  expenses     Expense[]
+  checkpoints  Checkpoint[]
+  receiptScans ReceiptScan[]
+  chatMessages ChatMessage[]
+  chatSessions ChatSession[]
+}
+
+model Member {
+  id                        String    @id @default(cuid())
+  name                      String
+  group                     Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId                   String
+  // Linked account. Null = a pre-created slot nobody has claimed yet.
+  user                      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId                    String?
+  // For pre-created slots: the invited identity that may claim this member
+  // (matched against the signing-in user's email, case-insensitive).
+  invitedEmail              String?
+  // Left the group. The row itself never goes away — expenses point at it as
+  // payer/enteredBy/participant and the person's balance must stay visible to
+  // whoever they owe — so this only severs access and hides them from pickers.
+  // Rejoining through the invite link clears it and restores the same row.
+  leftAt                    DateTime?
+  // Phase 3B: hide my wallet (remaining cash) from other members.
+  walletHidden              Boolean   @default(false)
+  // Onboarding: "log your exchanges" prompt skipped — never auto-ask again.
+  exchangePromptDismissedAt DateTime?
+  // Recalc notice cursor: exchange records created after this (by others)
+  // show the "balances updated" banner once.
+  lastSeenRecalcAt          DateTime?
+
+  wallets           Wallet[]
+  exchangeRecords   ExchangeRecord[]
+  expensesPaid      Expense[]            @relation("ExpensePayer")
+  expensesEntered   Expense[]            @relation("ExpenseEnteredBy")
+  expensesUpdated   Expense[]            @relation("ExpenseUpdatedBy")
+  expensesCancelled Expense[]            @relation("ExpenseCancelledBy")
+  expenseShares     ExpenseParticipant[]
+  expenseFunding    ExpenseFunding[]     @relation("ExpenseFundingMember")
+  itemAssignments   ItemAssignment[]
+  chatMessages      ChatMessage[]
+  chatSessions      ChatSession[]
+
+  @@unique([groupId, userId])
+  @@index([groupId])
+}
+
+// One pot of money a member holds. A member may hold several, including two
+// of the same currency (cash in the pocket AND a Travel Wallet card), which
+// is exactly why average cost is computed per wallet and not per member.
+model Wallet {
+  id        String     @id @default(cuid())
+  member    Member     @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId  String
+  type      WalletType
+  // User-editable ("Travel Wallet", "Cash", "Travelog card").
+  label     String
+  // ISO 4217 code the wallet holds. Immutable once it has records.
+  currency  String
+  createdAt DateTime   @default(now())
+
+  exchangeRecords ExchangeRecord[]
+  funding         ExpenseFunding[]
+
+  @@index([memberId])
+}
+
+// A top-up: money moved into one wallet at a known cost. Its currency is the
+// wallet's — the column stays for query convenience and is kept in sync by
+// the write path.
+model ExchangeRecord {
+  id             String   @id @default(cuid())
+  member         Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId       String
+  // Which wallet the money landed in. Average cost is per wallet.
+  wallet         Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  walletId       String
+  // What the member paid, in settlement-currency minor units.
+  amountPaid     BigInt
+  // What they received, in `currency` minor units.
+  amountReceived BigInt
+  // ISO 4217 code of the foreign currency received (== wallet.currency).
+  currency       String
+  timestamp      DateTime
+  createdAt      DateTime @default(now())
+
+  @@index([memberId, currency])
+  @@index([walletId])
+}
+
+model Expense {
+  id                    String    @id @default(cuid())
+  group                 Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId               String
+  title                 String
+  payer                 Member    @relation("ExpensePayer", fields: [payerId], references: [id], onDelete: Cascade)
+  payerId               String
+  // Total in `currency` minor units.
+  amount                BigInt
+  currency              String
+  timestamp             DateTime
+  // Market rate foreign -> settlement captured at input time; immutable
+  // afterwards (application-enforced: no update path may touch it).
+  marketRateSnapshot    Decimal   @db.Decimal(24, 10)
+  // True when no market rate could be reached at input time and the wallet's
+  // own average cost was stored above instead. The number is still the right
+  // one for THIS expense — a prepaid expense converts at its wallet's cost,
+  // not at the market — but it is not a market rate, so the two places that
+  // would read it as one (a group switched to MARKET mode, or this wallet
+  // losing its last top-up) must not pretend otherwise. The expense carries a
+  // banner asking for the real rate until someone supplies it.
+  marketRateProvisional Boolean   @default(false)
+  note                  String?
+  // Personal spending: shown in the payer's own spending, excluded from
+  // settlement.
+  isPersonal            Boolean   @default(false)
+  // Wallet "count your cash" corrections: personal prepaid expenses recording
+  // the counted-vs-computed diff, listed separately in the wallet detail.
+  isWalletAdjustment    Boolean   @default(false)
+  // Audit: who typed it in (entered-by != payer is normal), who last edited.
+  enteredBy             Member    @relation("ExpenseEnteredBy", fields: [enteredById], references: [id], onDelete: Restrict)
+  enteredById           String
+  updatedBy             Member?   @relation("ExpenseUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  updatedById           String?
+  // Soft delete: cancelled expenses leave all settlement/wallet math but
+  // stay in feeds, flagged. No hard delete path.
+  cancelledAt           DateTime?
+  cancelledBy           Member?   @relation("ExpenseCancelledBy", fields: [cancelledById], references: [id], onDelete: SetNull)
+  cancelledById         String?
+  // Object path of the receipt photo in the `receipts` storage bucket, keyed
+  // by group (`<groupId>/<uuid>.jpg`). Null for a hand-typed expense. Only
+  // the RESIZED image is ever stored — originals are never uploaded.
+  // The bucket is private; reads go through a short-lived signed URL minted
+  // after a group-membership check.
+  receiptImagePath      String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  items        ExpenseItem[]
+  participants ExpenseParticipant[]
+  funding      ExpenseFunding[]
+
+  @@index([groupId, timestamp])
+  // Supports the root-redirect query (src/app/page.tsx): the group whose
+  // expenses I most recently ENTERED, `findFirst` ordered by `createdAt`
+  // desc filtered through `enteredBy: { userId }` — runs on every signed-in
+  // hit to `/`.
+  @@index([enteredById, createdAt])
+}
+
+// Where one expense's money came from. ALWAYS at least one row, and the
+// amounts always sum to Expense.amount — the write path enforces both, and
+// the settlement engine refuses to price an expense whose portions do not
+// add up.
+//
+// This is a list rather than a column on Expense because a receipt does not
+// have to come out of one pocket: a travel card holding 50,000 JPY can pay
+// 50,000 of an 82,000 JPY dinner and the rest is cash. That is not a
+// cosmetic detail — the funding source decides the RATE, so pricing the
+// whole receipt at the card's average cost overcharges the group for money
+// that never touched the card (docs/BUGS.md 2026-08-04).
+model ExpenseFunding {
+  id                  String   @id @default(cuid())
+  expense             Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  expenseId           String
+  // The order the portions were named in. Position 0 is the primary source:
+  // the one screens name first and the one a bank-statement correction
+  // lands on.
+  position            Int      @default(0)
+  // This portion, in the EXPENSE currency's minor units.
+  amount              BigInt
+  // Who fronted THIS portion. Null means the expense's payer, which is what
+  // every portion meant before a receipt could be co-funded and is still what
+  // is stored for one — so no backfill was needed and none should be added.
+  //
+  // "My card ran out so Bob paid the rest" had nowhere to live: payerId was
+  // the only member money could come from. Entering it as a second expense
+  // makes one dinner look like two and divides the receipt's items wrongly.
+  funder              Member?  @relation("ExpenseFundingMember", fields: [funderId], references: [id], onDelete: Restrict)
+  funderId            String?
+  // Prepaid, drawn from this wallet (converts at its average cost and draws
+  // its balance down); null means pay-as-you-go — an ordinary card billed at
+  // purchase time, or money the payer exchanged themselves (ownRateSnapshot).
+  wallet              Wallet?  @relation(fields: [walletId], references: [id], onDelete: Restrict)
+  walletId            String?
+  // What the payer's bank actually billed for THIS portion, in settlement
+  // minor units (pay-as-you-go only; supersedes the snapshot in AVG_COST
+  // mode). Entered on the expense DETAIL screen once a statement posts —
+  // never in the entry wizard, where nobody has their bank app open
+  // mid-dinner.
+  actualChargedAmount BigInt?
+  // The rate the payer got when they exchanged this portion's money, for
+  // PREPAID spending they hold no wallet for. Same storage form as
+  // marketRateSnapshot (settlement major per 1 foreign major). Set only
+  // alongside walletId = null, which is the pairing that tells prepaid apart
+  // from pay-as-you-go. NOT a market-rate override: it is a number the app
+  // cannot look up, which is exactly why the user is asked for it.
+  ownRateSnapshot     Decimal? @db.Decimal(24, 10)
+
+  @@index([expenseId])
+  @@index([walletId])
+  @@index([funderId])
+}
+
+// Who shares the expense. Needed even for itemized receipts: unassigned
+// lines (tax, service charge) fall back to an equal split among these
+// members when no item subtotals exist.
+model ExpenseParticipant {
+  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  expenseId String
+  member    Member  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId  String
+
+  @@id([expenseId, memberId])
+}
+
+// A receipt line. The LINE TOTAL is always unitAmount * quantity — storing
+// the unit price is what makes that identity impossible to get wrong (the
+// Phase 4A bug: the form stored the typed unit price as a line total and
+// ignored quantity in every sum).
+model ExpenseItem {
+  id         String        @id @default(cuid())
+  expense    Expense       @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  expenseId  String
+  name       String
+  // ALWAYS an integer. A line that will not divide evenly is split by money
+  // instead (see splitMode); a fractional quantity is never stored.
+  quantity   Int           @default(1)
+  // Price of ONE unit, in the expense currency's minor units.
+  unitAmount BigInt
+  // Which rule divided this line. BY_QUANTITY is every line before Phase
+  // 4D-A and every line assigned by hand.
+  splitMode  ItemSplitMode @default(BY_QUANTITY)
+
+  assignments ItemAssignment[]
+
+  @@index([expenseId])
+}
+
+// Item <-> member many-to-many with the number of units that member had.
+// Under BY_QUANTITY the line total is split in proportion to these
+// quantities, so quantity 1 each on a single-unit item is the ordinary "we
+// shared it" equal split. Items with no assignment rows are "unassigned
+// lines" (tax, service charge) distributed proportionally to consumption at
+// settlement.
+model ItemAssignment {
+  item     ExpenseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId   String
+  member   Member      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId String
+  quantity Int         @default(1)
+  // BY_AMOUNT only: this member's share of the line in the expense
+  // currency's minor units. These sum EXACTLY to unitAmount * quantity, with
+  // the remainder handed to the non-payers. Null under BY_QUANTITY, where
+  // the share is derived from `quantity` instead.
+  amount   BigInt?
+
+  @@id([itemId, memberId])
+}
+
+// Cached provider quotes so repeated entries don't refetch. `date` is the
+// REQUESTED quote date (YYYY-MM-DD); `asOf` is the date the provider's answer
+// is actually FOR, which differs on every weekend and holiday. An entry whose
+// asOf < date is not final — the ECB may still publish for `date` — so it is
+// re-checked on a short TTL (src/lib/rates/cache-policy.ts).
+model RateCache {
+  date        String
+  base        String
+  quote       String
+  rate        Decimal  @db.Decimal(24, 10)
+  asOf        String
+  // The source's OWN timestamp at full precision, ISO 8601, when it
+  // publishes one (the live primary restamps every minute). Null for a
+  // daily-fixing source such as the ECB, which has nothing finer than
+  // `asOf`. Distinct from `fetchedAt`, which is when WE called.
+  asOfInstant String?
+  fetchedAt   DateTime @default(now())
+
+  @@id([date, base, quote])
+}
+
+// A checkpoint is a boundary timestamp, not a range: an expense belongs to
+// the nearest checkpoint whose timestamp is >= the expense timestamp.
+model Checkpoint {
+  id        String   @id @default(cuid())
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId   String
+  name      String
+  timestamp DateTime
+
+  @@unique([groupId, timestamp])
+}
+
+/**
+ * One receipt-parse attempt. Serves two purposes from the Phase 5 brief:
+ * the per-user daily scan limit (§181) counts today's rows, and the
+ * server-side token log (§183) makes real cost observable later.
+ * Rows are kept for FAILED attempts too. A parse that burned tokens and
+ * returned nothing still cost money, and a limit that only counted successes
+ * would let a stuck client retry forever.
+ */
+model ReceiptScan {
+  id             String   @id @default(cuid())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  // Which group the scan was for. Kept for cost attribution; nullable via
+  // SetNull so deleting a group does not erase the spend record.
+  group          Group?   @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  groupId        String?
+  // OK | UNREADABLE | RATE_LIMITED | TIMEOUT | PROVIDER_ERROR
+  outcome        String
+  // Usage as the provider reported it. Thinking tokens are billed as output
+  // but tracked separately, because they are invisible in the response and
+  // can dominate the bill.
+  inputTokens    Int      @default(0)
+  outputTokens   Int      @default(0)
+  thinkingTokens Int      @default(0)
+  latencyMs      Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+/**
+ * One persisted chat bubble — PRIVATE per member per group (assistant
+ * semantics, not a shared group room: two members in the same group never
+ * see each other's rows). Capped at the newest CHAT_HISTORY_CAP per member
+ * (src/lib/chat-history.ts); older rows are trimmed on write.
+ * No onDelete cascade beyond the default Restrict on `group`/`member`:
+ * `deleteGroupRows` (settings/actions.ts) must delete these rows AND the
+ * ChatSession rows before the members/group they point at, same lesson as
+ * `Expense.enteredById` — a RESTRICT fires inside the same cascade that
+ * deletes members (docs/SOLVED.md 2026-08-17: forgetting ChatSession broke
+ * group deletion for any group that had been chatted in).
+ */
+// One conversation thread in the chat — the reference-app-style session
+// (docs/PROMPT.md 2026-08-15). Private per member per group, like the
+// history rows it groups. `memory` carries the dialogue layer's
+// serialized salience state so 걔-references survive reopening a session
+// days later. Sessions are created LAZILY: the first persisted message
+// creates the row, so an opened-and-abandoned "new chat" never clutters
+// the list.
+model ChatSession {
+  id            String        @id @default(cuid())
+  groupId       String
+  group         Group         @relation(fields: [groupId], references: [id])
+  memberId      String
+  member        Member        @relation(fields: [memberId], references: [id])
+  title         String
+  // True once the user renamed it — auto-titling never overwrites a
+  // hand-given name.
+  titleEdited   Boolean       @default(false)
+  memory        Json?
+  createdAt     DateTime      @default(now())
+  lastMessageAt DateTime      @default(now())
+  messages      ChatMessage[]
+
+  @@index([memberId, groupId, lastMessageAt])
+}
+
+model ChatMessage {
+  id              String       @id @default(cuid())
+  groupId         String
+  group           Group        @relation(fields: [groupId], references: [id])
+  memberId        String
+  member          Member       @relation(fields: [memberId], references: [id])
+  // Nullable for pre-session rows only; the migration backfills every
+  // existing row into a per-member "이전 대화" session, and every new
+  // write supplies a session.
+  sessionId       String?
+  session         ChatSession? @relation(fields: [sessionId], references: [id])
+  role            String // 'user' | 'assistant'
+  kind            String // 'text' | 'image' | 'answer' | 'saved'
+  payload         Json
+  // Dedup key for a retried persist batch (docs/SOLVED.md 2026-08-14
+  // "Chat-indicator-currency T1 review round 1" double-persist fix):
+  // `appendChatMessages` pairs this with `createMany`'s `skipDuplicates` so
+  // a retry that resends a batch whose rows already landed (server
+  // committed, then the response was lost) inserts nothing a second time.
+  // Nullable + Postgres allows multiple NULLs in a unique index, so every
+  // row inserted before this migration (no client id) is unaffected; every
+  // new insert always supplies one.
+  clientMessageId String?
+  createdAt       DateTime @default(now())
+
+  @@unique([memberId, clientMessageId])
+  @@index([memberId, createdAt])
+  @@index([sessionId, createdAt])
+}

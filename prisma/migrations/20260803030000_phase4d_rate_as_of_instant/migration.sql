@@ -1,0 +1,11 @@
+-- Phase 4D-A: the live rate source publishes a minute-precise timestamp.
+--
+-- `asOf` (a date) was enough while every provider published one fixing a
+-- day. The new primary restamps every 60 seconds, so the date alone cannot
+-- say whether a cached quote is a minute or twenty hours old.
+--
+-- Additive and nullable: existing rows keep their date-only `asOf`, and the
+-- Frankfurter fallback goes on leaving this null because a daily fixing has
+-- nothing finer to report. No backfill — inventing an instant for a past
+-- daily fixing would be a fabricated timestamp.
+ALTER TABLE "RateCache" ADD COLUMN "asOfInstant" TEXT;

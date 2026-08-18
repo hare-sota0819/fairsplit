@@ -1,0 +1,2384 @@
+{
+  "_purpose": "GOAT calibration corpus (en). Hand-authored expectations for the WHOLE pipeline: classify() intent + parse() slots. Seeded from .superpowers/research/en-expressions.md (162 rows), crossed systematically over {amount form} x {pay verb} x {split form} x {noise}, and extended with every English sentence this branch's review rounds argued about.",
+  "_howToRead": "payer/participants name members; 'actor' is the person typing. A row with a `known` field is a PINNED MISS: `expect` records today's behavior and `known` says why it is not fixed. Never weaken a row to make it pass — fix the parser, or pin it with a justification.",
+  "_members": [
+    {
+      "id": "m-robin",
+      "name": "Robin"
+    },
+    {
+      "id": "m-sam",
+      "name": "Sam"
+    },
+    {
+      "id": "m-alex",
+      "name": "Alex"
+    },
+    {
+      "id": "m-jamie",
+      "name": "Jamie"
+    },
+    {
+      "id": "m-chris",
+      "name": "Chris"
+    }
+  ],
+  "_actorId": "m-robin",
+  "_currency": "USD",
+  "_locale": "en",
+  "rows": [
+    {
+      "text": "paid $45 for lunch",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "45",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "description": "for lunch"
+      }
+    },
+    {
+      "text": "taxi $20",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "20",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "description": "taxi"
+      }
+    },
+    {
+      "text": "gas 40 bucks me and Sam",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "40",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ]
+      }
+    },
+    {
+      "text": "hotel 300 split evenly among the 4 of us",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "300",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "spent 200 on groceries this trip",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "200",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "paid 45 for lunch",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": null,
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "a 2-digit bare number is a count, not money — the UI asks"
+    },
+    {
+      "text": "paid $45.60 for lunch",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "45.60",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "lunch was 30 quid, split it",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "30",
+        "currency": "GBP",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "$20 for the taxi",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "20",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "description": "for the taxi"
+      }
+    },
+    {
+      "text": "covered dinner, $60",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "60",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "I covered it, 25 bucks",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "25",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "spotted Sam $10",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "10",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ]
+      }
+    },
+    {
+      "text": "I fronted the hotel, 450",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "450",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "picked up the tab, $120",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "120",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "picked up the bill, $120",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "120",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "chipped in $15 for gas",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "15",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "treated everyone, $80",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "80",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "bought the tickets, $95",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "95",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Sam paid $45 for lunch",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "45",
+        "currency": "USD",
+        "payer": "Sam",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Sam covered dinner, $60",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "60",
+        "currency": "USD",
+        "payer": "Sam",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Alex bought the tickets, $95",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "95",
+        "currency": "USD",
+        "payer": "Alex",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Jamie fronted the hotel, $450",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "450",
+        "currency": "USD",
+        "payer": "Jamie",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Chris picked up the tab, $120",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "120",
+        "currency": "USD",
+        "payer": "Chris",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Sam treated us, $80",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "80",
+        "currency": "USD",
+        "payer": "Sam",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Sam spotted me $10",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "10",
+        "currency": "USD",
+        "payer": "Sam",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "taxi 20",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "a 2-digit bare number stays a count"
+    },
+    {
+      "text": "45 bucks, lunch",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "45",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "twenty bucks for the cab",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "20",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "forty-five dollars for lunch",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "45",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "45 dollars for lunch",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "45",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "five hundred bucks for the flight",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "500",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "a grand for the rental",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "5 grand for the rental",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "5000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "2 grand for the car rental",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "2000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "£8.50 for coffee",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "8.50",
+        "currency": "GBP",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "€12 for the museum",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "12",
+        "currency": "EUR",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "€150 hotel deposit",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "150",
+        "currency": "EUR",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "50 quid for the museum tickets",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "50",
+        "currency": "GBP",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "1500 yen for ramen",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1500",
+        "currency": "JPY",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "30000 won for dinner",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "30000",
+        "currency": "KRW",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "20 euros for the taxi",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "20",
+        "currency": "EUR",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "$0.99 for the app",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "0.99",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "99 cents for the app",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "known": "cent/cents is not in CURRENCY_WORDS_EN, and adding it there would be WRONG: that map takes a word to an ISO code, with no way to say the word also names the MINOR unit, so 99 cents would come back as 99 USD instead of 0.99. Sub-dollar amounts stay null (the UI asks) until the lexicon can carry a scale — a schema change, not a lexicon row. $0.99 for the app reads correctly."
+    },
+    {
+      "text": "uber was 22 bucks",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "22",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "the check came out to 80, split three ways",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": null,
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "80 is bare and 2-digit; the split keyword is what still opens the card, and the UI asks for the number"
+    },
+    {
+      "text": "we split the check for dinner three ways",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": null,
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "dinner $90 split three ways",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "90",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "lunch $30 with Sam",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "30",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ],
+        "description": "lunch"
+      },
+      "note": "the companion preposition binds into the person's span, so no stranded `with` survives"
+    },
+    {
+      "text": "paid $30 for lunch with Sam and Alex",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "30",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam",
+          "Alex"
+        ],
+        "description": "for lunch and"
+      },
+      "note": "MANDATED (T8): `and` is a conjunction, not a companion preposition, so it is NOT bound into a person span — the dangling coordinator is accepted and visible on the card."
+    },
+    {
+      "text": "I paid with cash",
+      "expect": {
+        "intent": "QUERY_MY_SPENDING",
+        "view": "paid",
+        "amount": null,
+        "description": "with",
+        "funding": "NEW_CASH_WALLET"
+      },
+      "known": "MANDATED (T8) as a description row: `with` here governs `cash`, not a name, so nothing binds it and it survives as a one-word description — cosmetic, and visible on the card. The INTENT is also a miss: the query ladder's MY_SPENDING AND-group is firstPerson + paidVerb, which this statement matches word for word (`I` + `paid`) even though it asks nothing. Requiring an interrogative marker across the whole query ladder is a classify-wide change with its own pinned corpus, out of scope for calibration."
+    },
+    {
+      "text": "With Sam, I paid $20",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "20",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ],
+        "description": ","
+      },
+      "note": "MANDATED (T8): commas are RETAINED as ordinary punctuation of the description, so a sentence that is nothing but people and money leaves the bare comma behind. Cosmetic."
+    },
+    {
+      "text": "hotel 120000 cash",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "120000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "funding": "NEW_CASH_WALLET"
+      },
+      "note": "the funding word is also what confirms the bare number is a price"
+    },
+    {
+      "text": "dinner 300 split evenly",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "300",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "lunch 12000 with Sam",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "12000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ]
+      },
+      "note": "a companion preposition binds the bare number to its purchase"
+    },
+    {
+      "text": "Which 2008 comedy had the tagline",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "A YEAR is not money. A bare number defaults to money; the two things that take it away are being year-shaped (4 digits, 1000-2100) with an English word after it, and a follower that claims it as a quantity. `comedy` confirms nothing, so the year rule stands."
+    },
+    {
+      "text": "born in 1770 in which city?",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      }
+    },
+    {
+      "text": "the moon is about 250,000 miles from earth",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "a measurement is not money"
+    },
+    {
+      "text": "is hal 9000 your boyfriend",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      }
+    },
+    {
+      "text": "my flight is at 1130",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1130",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "a clock time is not money",
+      "known": "Same class as \"we booked room 1204\": year-shaped, but nothing follows it, so no disqualifier applies. 0.6 confidence, card-visible. The alternative — refusing every terminal bare number — is the one shape chat uses most for prices."
+    },
+    {
+      "text": "we booked room 1204",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1204",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "A room number is not money — but nothing in the sentence says so. 1204 is year-shaped, and the year rule needs an English word AFTER the number to fire; here the number ends the message, so no disqualifier applies and it is read. See the known note for why refusing every terminal bare number is worse.",
+      "known": "A trailing unmarked number has no follower to disqualify it — the year rule needs an English word after the number, and there is none here. Refusing every terminal bare number instead would kill \"I fronted the hotel, 450\" and Korean's whole bare-amount convention, so this is reported at 0.6 confidence and shown on the confirm card."
+    },
+    {
+      "text": "how much do I owe",
+      "expect": {
+        "intent": "QUERY_MY_BALANCE",
+        "view": "amount"
+      }
+    },
+    {
+      "text": "what do I owe",
+      "expect": {
+        "intent": "QUERY_MY_BALANCE",
+        "view": "amount"
+      }
+    },
+    {
+      "text": "how much do I owe you",
+      "expect": {
+        "intent": "QUERY_MY_BALANCE",
+        "view": "amount"
+      }
+    },
+    {
+      "text": "what's my balance",
+      "expect": {
+        "intent": "QUERY_MY_BALANCE",
+        "view": "amount"
+      }
+    },
+    {
+      "text": "my balance",
+      "expect": {
+        "intent": "QUERY_MY_BALANCE",
+        "view": "amount"
+      }
+    },
+    {
+      "text": "who do I pay",
+      "expect": {
+        "intent": "QUERY_MY_BALANCE",
+        "view": "who"
+      }
+    },
+    {
+      "text": "who do I owe",
+      "expect": {
+        "intent": "QUERY_MY_BALANCE",
+        "view": "who"
+      }
+    },
+    {
+      "text": "who do I venmo",
+      "expect": {
+        "intent": "QUERY_MY_BALANCE",
+        "view": "who"
+      }
+    },
+    {
+      "text": "who do I zelle",
+      "expect": {
+        "intent": "QUERY_MY_BALANCE",
+        "view": "who"
+      }
+    },
+    {
+      "text": "does Sam owe me",
+      "expect": {
+        "intent": "QUERY_PAIRWISE",
+        "memberId": "Sam"
+      }
+    },
+    {
+      "text": "how much does Sam owe me",
+      "expect": {
+        "intent": "QUERY_PAIRWISE",
+        "memberId": "Sam"
+      }
+    },
+    {
+      "text": "am I square with Sam",
+      "expect": {
+        "intent": "QUERY_PAIRWISE",
+        "memberId": "Sam"
+      }
+    },
+    {
+      "text": "did Sam pay me back",
+      "expect": {
+        "intent": "QUERY_PAIRWISE",
+        "memberId": "Sam"
+      }
+    },
+    {
+      "text": "let's settle up with Alex",
+      "expect": {
+        "intent": "QUERY_PAIRWISE",
+        "memberId": "Alex"
+      }
+    },
+    {
+      "text": "how much have we spent",
+      "expect": {
+        "intent": "QUERY_GROUP_TOTAL",
+        "view": "total"
+      }
+    },
+    {
+      "text": "what's the total",
+      "expect": {
+        "intent": "QUERY_GROUP_TOTAL",
+        "view": "total"
+      }
+    },
+    {
+      "text": "group total",
+      "expect": {
+        "intent": "QUERY_GROUP_TOTAL",
+        "view": "total"
+      }
+    },
+    {
+      "text": "how much has the trip cost so far",
+      "expect": {
+        "intent": "QUERY_GROUP_TOTAL",
+        "view": "total"
+      }
+    },
+    {
+      "text": "who owes who",
+      "expect": {
+        "intent": "QUERY_GROUP_TOTAL",
+        "view": "transfers"
+      }
+    },
+    {
+      "text": "how much have I spent",
+      "expect": {
+        "intent": "QUERY_MY_SPENDING",
+        "view": "paid"
+      }
+    },
+    {
+      "text": "what have I spent",
+      "expect": {
+        "intent": "QUERY_MY_SPENDING",
+        "view": "paid"
+      }
+    },
+    {
+      "text": "how much have I paid in",
+      "expect": {
+        "intent": "QUERY_MY_SPENDING",
+        "view": "paid"
+      }
+    },
+    {
+      "text": "how much cash do I have left",
+      "expect": {
+        "intent": "QUERY_WALLET"
+      }
+    },
+    {
+      "text": "how much cash left",
+      "expect": {
+        "intent": "QUERY_WALLET"
+      }
+    },
+    {
+      "text": "what can you do",
+      "expect": {
+        "intent": "HELP"
+      }
+    },
+    {
+      "text": "help",
+      "expect": {
+        "intent": "HELP"
+      }
+    },
+    {
+      "text": "how do I use this",
+      "expect": {
+        "intent": "HELP"
+      }
+    },
+    {
+      "text": "what commands do you have",
+      "expect": {
+        "intent": "HELP"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "y",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "yep",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "yup",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "yeah",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "sure",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "k",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "kk",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "ok",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "okay",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "sounds good",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "go ahead",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "do it",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "bet",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "n",
+      "expect": {
+        "intent": "CONFIRM_NO_CANCEL"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "no",
+      "expect": {
+        "intent": "CONFIRM_NO_CANCEL"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "nope",
+      "expect": {
+        "intent": "CONFIRM_NO_CANCEL"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "nah",
+      "expect": {
+        "intent": "CONFIRM_NO_CANCEL"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "cancel",
+      "expect": {
+        "intent": "CONFIRM_NO_CANCEL"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "delete it",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "known": "NEGATE_TOKENS holds cancel / scratch that / never mind but not `delete`, so this asks instead of cancelling. Adding the token is a lexicon-row change that the authored-row-count invariant in lexicons/invariants.test.ts freezes for this task. The fallback is the safe one: with a card open, UNKNOWN offers confirm/cancel rather than acting."
+    },
+    {
+      "card": "confirm",
+      "text": "never mind",
+      "expect": {
+        "intent": "CONFIRM_NO_CANCEL"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "wait",
+      "expect": {
+        "intent": "UNKNOWN",
+        "hold": true
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "hold on",
+      "expect": {
+        "intent": "UNKNOWN",
+        "hold": true
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "make it $50",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "amount",
+        "slotAmount": "50"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "change the amount to $50",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "amount",
+        "slotAmount": "50"
+      },
+      "note": "Fix round 1 (sanctioned): naming the field now works. Before the ruling, \"change it to $50\" resolved and \"change the amount to $50\" booked a SECOND expense over the open card — the user who was MORE explicit got the worse outcome."
+    },
+    {
+      "card": "confirm",
+      "text": "Sam paid",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "payer",
+        "memberId": "Sam"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "remove Sam",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "participants",
+        "op": "remove",
+        "memberId": "Sam"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "without Alex",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "participants",
+        "op": "remove",
+        "memberId": "Alex"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "everyone but Sam",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "participants",
+        "op": "remove",
+        "memberId": "Sam"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "just me and Sam",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "participants",
+        "op": "only",
+        "memberIds": [
+          "actor",
+          "Sam"
+        ]
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "split it half",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": null,
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "known": "`half` is recognised as a split-modify only in a FRAGMENT (half / go halves / 50/50 all resolve). \"split it half\" carries a second split word and is not a fragment, so P5 takes it and opens an ask-amount card over the one already on screen. Same class as \"change the amount to $50\" — the fragment gate, not the vocabulary, is what declines."
+    },
+    {
+      "text": "cancel that trip",
+      "expect": {
+        "intent": "EDIT_EXPENSE",
+        "action": {
+          "kind": "cancel"
+        },
+        "reference": {
+          "window": "recent",
+          "keyword": "trip"
+        }
+      },
+      "note": "MANDATED: the EN morphology gap probe — `cancel that X` DOES resolve, with the keyword taken from the object"
+    },
+    {
+      "text": "we should cancel that dinner",
+      "expect": {
+        "intent": "EDIT_EXPENSE",
+        "action": {
+          "kind": "cancel"
+        },
+        "reference": {
+          "window": "recent",
+          "keyword": "dinner"
+        }
+      },
+      "note": "MANDATED: the modal `we should` does not stop the cancel from resolving"
+    },
+    {
+      "text": "delete yesterday's taxi",
+      "expect": {
+        "intent": "EDIT_EXPENSE",
+        "action": {
+          "kind": "cancel"
+        },
+        "reference": {
+          "window": "yesterday",
+          "keyword": "taxi"
+        }
+      }
+    },
+    {
+      "text": "add Sam to that dinner",
+      "expect": {
+        "intent": "EDIT_EXPENSE",
+        "action": {
+          "kind": "addParticipant",
+          "memberId": "Sam"
+        },
+        "reference": {
+          "window": "recent",
+          "keyword": "dinner"
+        }
+      }
+    },
+    {
+      "text": "remove Alex from that dinner",
+      "expect": {
+        "intent": "EDIT_EXPENSE",
+        "action": {
+          "kind": "removeParticipant",
+          "memberId": "Alex"
+        },
+        "reference": {
+          "window": "recent",
+          "keyword": "dinner"
+        }
+      }
+    },
+    {
+      "text": "change that to $40",
+      "expect": {
+        "intent": "EDIT_EXPENSE",
+        "action": {
+          "kind": "changeAmount",
+          "amount": "40",
+          "currency": "USD"
+        },
+        "reference": {
+          "window": "recent",
+          "keyword": null
+        }
+      }
+    },
+    {
+      "text": "lunch 3000 EVERYONE",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "3000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "split keywords are case-insensitive"
+    },
+    {
+      "text": "lunch 3000 all together evenly",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "3000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "description": "lunch"
+      }
+    },
+    {
+      "text": "dinner split 300 ways",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": null,
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "description": "dinner"
+      },
+      "note": "the N inside a split expression is a COUNT, never an amount"
+    },
+    {
+      "text": "lunch 300 3 ways",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "300",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "a real amount NEXT TO an n-ways phrase still survives"
+    },
+    {
+      "text": "drinks $35 me you and Sam",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "35",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ]
+      }
+    },
+    {
+      "text": "dinner $80 went dutch",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "80",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "dinner $80 going dutch",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "80",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "cab $30 went halves with Sam",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "30",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ]
+      }
+    },
+    {
+      "text": "20 bucks each",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "20",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "`each` is a 0.6-confidence split word: it opens no card on its own, but it does not have to here — the amount already did"
+    },
+    {
+      "text": "each receipt",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "note": "the other reading of `each` — an ordinary distributive, which must not open a card"
+    },
+    {
+      "text": "samsung tv $500",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "500",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "`sam` inside `samsung` never binds the member: a token is the maximal latin run"
+    },
+    {
+      "text": "tabloid $5",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "5",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "`tab` inside `tabloid` is not the pay phrase `picked up the tab`"
+    },
+    {
+      "text": "I got it",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "note": "0.6 confidence: the pay-verb reading of `got it` must not open a card on its own — it usually means `understood`"
+    },
+    {
+      "text": "i got the taxi 20 bucks split it with sam and jo",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "20",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "`split` is a FULL-confidence everyone-word, so it outranks the names — the opposite of the 0.6-confidence each/나눠 case"
+    },
+    {
+      "text": "paid 45 for lunch can you split it",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": null,
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "$45.60",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "45.60",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "description": ""
+      },
+      "note": "an amount and nothing else is still an entry"
+    },
+    {
+      "text": "45.60",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "a bare decimal with no currency evidence is not money"
+    },
+    {
+      "text": "15k for the flight",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "known": "The k/K thousand-shorthand (15k, 1.5k, 2.5k) is attested in the research file at LOW frequency and is not in the English number grammar. It reads null — the safe direction — rather than guessing between 15 and 15,000. \"a grand\" / \"5 grand\", the high-frequency slang unit, is supported."
+    },
+    {
+      "text": "half a million",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": null,
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "T5 ruling: \"half a X\" is suppressed to null rather than read as the whole X. The card still opens (half is a split word, and an ask-amount card is the right place to land) and the UI asks for the number."
+    },
+    {
+      "text": "1,234.56 dollars",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1234.56",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "two point five million dollars",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "2500000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "1.2.3",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "T5 crash regression: multi-dot digits must not throw"
+    },
+    {
+      "text": "10,00,000 rupees",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "Indian grouping is not parsed — null, never a wrong regrouping"
+    },
+    {
+      "card": "confirm",
+      "text": "half",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "split",
+        "split": "half"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "go halves",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "split",
+        "split": "half"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "50/50",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "split",
+        "split": "half"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "split evenly",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "split",
+        "split": "everyone"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "scratch that",
+      "expect": {
+        "intent": "CONFIRM_NO_CANCEL"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "change it to $50",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "amount",
+        "slotAmount": "50"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "make it 50 bucks",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "amount",
+        "slotAmount": "50"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "Alex paid",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "payer",
+        "memberId": "Alex"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "minus Chris",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "participants",
+        "op": "remove",
+        "memberId": "Chris"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "yessir",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "for sure",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "roger that",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "word",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "naw",
+      "expect": {
+        "intent": "CONFIRM_NO_CANCEL"
+      }
+    },
+    {
+      "card": "confirm",
+      "text": "not that",
+      "expect": {
+        "intent": "CONFIRM_NO_CANCEL"
+      }
+    },
+    {
+      "text": "dinner was $80",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "80",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "the bill was $80",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "80",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "breakfast $22 with Jamie",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "22",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Jamie"
+        ]
+      }
+    },
+    {
+      "text": "coffee $6 with Chris",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "6",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Chris"
+        ]
+      }
+    },
+    {
+      "text": "museum tickets €40 for everyone",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "40",
+        "currency": "EUR",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "train tickets £60 split evenly",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "60",
+        "currency": "GBP",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "groceries $85 all together",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "85",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Sam paid $200 for the airbnb",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "200",
+        "currency": "USD",
+        "payer": "Sam",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Alex covered the cab, $18",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "18",
+        "currency": "USD",
+        "payer": "Alex",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Jamie chipped in $25",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "25",
+        "currency": "USD",
+        "payer": "Jamie",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Chris treated us to dinner, $140",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "140",
+        "currency": "USD",
+        "payer": "Chris",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "Sam bought breakfast $30",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "30",
+        "currency": "USD",
+        "payer": "Sam",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "parking $12",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "12",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "description": "parking"
+      }
+    },
+    {
+      "text": "tolls $7.50",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "7.50",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "airport shuttle $35 for the four of us",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "35",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "beers $28 me and Alex",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "28",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Alex"
+        ]
+      }
+    },
+    {
+      "text": "snacks $9 for Sam and me",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "9",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ]
+      }
+    },
+    {
+      "text": "boat tour $75 each",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "75",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "sunscreen $14, Sam owes me",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "14",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ]
+      }
+    },
+    {
+      "text": "laundry $6 no split",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "6",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "known": "`no split` is a real English way to say this expense is not shared, and nothing in the split lexicon negates a split expression — the word `split` itself matches and reads as everyone. Negation over the split vocabulary is a grammar the parser does not have; the participants are visible and editable on the confirm card."
+    },
+    {
+      "text": "dinner $60, Sam is out",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "60",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ]
+      },
+      "known": "`X is out` (an exclusion) is not in the participant vocabulary, so Sam is read as a PARTICIPANT rather than excluded — the opposite of what the sentence says. `everyone but Sam` and `without Alex` are the supported forms; both are attested and both work. The card shows the participant pills, which is where this is caught."
+    },
+    {
+      "text": "hotel $450 for 3 nights",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "450",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "the night COUNT must not become a second amount"
+    },
+    {
+      "text": "2 pizzas $34",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "34",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "the item count is not the amount"
+    },
+    {
+      "text": "3 tickets $120 total",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "120",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "dinner $45 and drinks $30",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "45",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "mentions": 2
+      },
+      "note": "two MARKED mentions: the confirm card must not be built from the first alone"
+    },
+    {
+      "text": "$45.60 for lunch, $12 for coffee",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "45.60",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "mentions": 2
+      }
+    },
+    {
+      "text": "cab was like 20 bucks",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "20",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "the hedge `like` before a number must not break the read"
+    },
+    {
+      "text": "roughly $40 for gas",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "40",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "about $40 for gas",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "40",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "$20 even",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "20",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "40 bucks and change",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "40",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "`and change` adds an unknown remainder — the round number is what the parser reports, never an invented one"
+    },
+    {
+      "text": "a fiver for the tip",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "known": "Banknote nicknames (a fiver, a tenner, a Benjamin, a sawbuck) are attested but absent from the English money vocabulary; each names a currency AND a value, which the current lexicon shape (word -> ISO code) cannot express — `a fiver` would have to carry the value 5, not just GBP/USD. Null keeps the UI asking instead of inventing."
+    },
+    {
+      "text": "one hundred dollars for the tour",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "100",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      }
+    },
+    {
+      "text": "twelve fifty for parking",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "known": "The spoken price form `twelve fifty` (= 12.50) is not read: the number grammar composes tiers, so `twelve fifty` would have to mean 62 or 1250 before it could mean 12.50, and every one of those readings is a confidently wrong amount. Null asks instead."
+    },
+    {
+      "text": "I owe for the groceries, like 35",
+      "expect": {
+        "intent": "QUERY_MY_BALANCE",
+        "view": "amount",
+        "amount": null
+      },
+      "note": "2-digit bare number stays a count; the sentence still opens a card because it carries an expense signal",
+      "known": "A STATEMENT built out of the balance question's own words (\"I owe\") is read as the question. The query ladder is keyword AND-groups, not a mood analysis, and every attested D-1 row is exactly this shape minus the trailing number. The reply is a balance readout — unhelpful rather than harmful — and separating statements from questions is a classify-wide change with its own pinned corpus. Same class as \"I paid with cash\"."
+    },
+    {
+      "text": "put 60 on the hotel",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "`put` is not a pay verb and 60 is a 2-digit bare number — nothing here is confidently money"
+    },
+    {
+      "text": "front desk charged us 150 for the room",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "150",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "150 is not year-shaped and nothing claims it, so it reads on the default. `for` matters only in the 1000-2100 band, where it is one of the money-CONFIRMING followers that override the year rule."
+    },
+    {
+      "text": "settled the hotel bill, 300 total",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "300",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "The bare 300 now reads, since a bare number defaults to money (fix round 1). `settled` is still not a pay verb — it is this app's settlement vocabulary — so the payer is the actor by fallback, which is what the sentence means anyway."
+    },
+    {
+      "text": "zelle me for the groceries",
+      "expect": {
+        "intent": "QUERY_MY_BALANCE",
+        "view": "amount",
+        "amount": null
+      },
+      "note": "a reimbursement request with no amount is not an expense entry",
+      "known": "Same class as \"I owe for the groceries\": `zelle` is a whoFrame marker (the attested query is \"who do I zelle\"), so a reimbursement REQUEST comes back as the who-do-I-pay question. It answers with the people involved, which is adjacent to what was asked; no expense is booked."
+    },
+    {
+      "text": "this one's on me",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "note": "a payer claim with no amount and no item"
+    },
+    {
+      "text": "Sam owes for the drinks",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "note": "assigning a sub-expense with no amount — the ladder asks"
+    },
+    {
+      "text": "we're square",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "note": "A statement that two people are settled resolves to nothing, and the reason is the missing NAME, not the mood: `square` is a pairwise owe-frame, but the pairwise gate also needs a bound member, and \"we\" is not one. \"am I square with Sam\" (a row above) resolves correctly. UNKNOWN asks — the safe direction."
+    },
+    {
+      "text": "IOU $20",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "20",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "an IOU still carries a real amount; who owes whom is the card's job"
+    },
+    {
+      "text": "lunch, dinner 3000",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "3000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "description": "lunch, dinner"
+      },
+      "note": "MANDATED (T8): commas are RETAINED — the description is what the user wrote"
+    },
+    {
+      "text": "lunch splitwise 3000 with Sam",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "3000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ]
+      },
+      "note": "`split` inside `splitwise` must not trigger EVERYONE — the token is the maximal latin run"
+    },
+    {
+      "text": "taxi 8500 last night",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "8500",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 1 ruling: a bare number DEFAULTS to money. This is the commonest English expense shape — item, price, time — and the required-follower allowlist that shipped in d541f0d returned null for every one of them."
+    },
+    {
+      "text": "groceries 4500 yesterday",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "4500",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 1 ruling: a bare number DEFAULTS to money. This is the commonest English expense shape — item, price, time — and the required-follower allowlist that shipped in d541f0d returned null for every one of them."
+    },
+    {
+      "text": "hotel 450 tonight",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "450",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 1 ruling: a bare number DEFAULTS to money. This is the commonest English expense shape — item, price, time — and the required-follower allowlist that shipped in d541f0d returned null for every one of them."
+    },
+    {
+      "text": "dinner 12000 total",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "12000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 1 ruling: a bare number DEFAULTS to money. This is the commonest English expense shape — item, price, time — and the required-follower allowlist that shipped in d541f0d returned null for every one of them."
+    },
+    {
+      "text": "spent 40000 at the store",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "40000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 1 ruling: a bare number DEFAULTS to money. This is the commonest English expense shape — item, price, time — and the required-follower allowlist that shipped in d541f0d returned null for every one of them."
+    },
+    {
+      "text": "the check came out to 800 tonight",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "800",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 1 ruling: a bare number DEFAULTS to money. This is the commonest English expense shape — item, price, time — and the required-follower allowlist that shipped in d541f0d returned null for every one of them."
+    },
+    {
+      "text": "Complete the title of a 1979 number one",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "Bare-number disqualifier: year-shaped, followed by an English word. These are the reds that motivated the boundary work — they stay null under the accept-by-default design."
+    },
+    {
+      "text": "Which 1998 Disney film was the debut",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "Bare-number disqualifier: year-shaped, followed by an English word. These are the reds that motivated the boundary work — they stay null under the accept-by-default design."
+    },
+    {
+      "text": "dinner 40 minutes from here",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "Bare-number disqualifier: the follower CLAIMS the number as its own quantity. These are the reds that motivated the boundary work — they stay null under the accept-by-default design."
+    },
+    {
+      "text": "the hotel is 5 miles away",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "Bare-number disqualifier: the follower CLAIMS the number as its own quantity. These are the reds that motivated the boundary work — they stay null under the accept-by-default design."
+    },
+    {
+      "text": "hotel 1200 last night",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "known": "The documented cost of the year rule, stated exactly: a price in 1000-2100, followed by an English word that confirms nothing. It is refused, and because this is an ENTRY sentence rather than a reply to a card, the user gets NO CARD — they are asked, not shown. \"hotel $1200 last night\", \"hotel 1200 cash\" and \"1200 for the hotel\" all read; Korean is untouched (nothing Latin follows). Accepted deliberately: the alternative is booking every year in an English sentence as an amount."
+    },
+    {
+      "text": "lunch with 민수 30000",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "30000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone",
+        "description": "lunch with 민수"
+      },
+      "known": "MANDATED (T8) mixed-script with-binding, asserted literally. In THIS corpus 민수 is not a member (the English roster is Robin/Sam/Alex/Jamie/Chris), so no person hit exists, `with` binds to nothing and the whole phrase survives as the description — which is the correct reading of an unknown name. The Korean corpus asserts the bound case, where 민수 IS a member: there the name is consumed and only the dangling `with` is left, the cosmetic this row was mandated to pin."
+    },
+    {
+      "text": "change the amount to 50 bucks",
+      "card": "confirm",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "amount",
+        "slotAmount": "50"
+      },
+      "note": "The same field-named form with a currency word instead of a symbol."
+    },
+    {
+      "text": "change the amount to $50",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "50",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "With NO card open there is nothing to modify, so the same sentence is read as a new expense — the ladder's own P2-only rule, asserted here so the card-open row above cannot be mistaken for a global change."
+    },
+    {
+      "text": "yes",
+      "card": "confirm",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      },
+      "note": "Fix round 1 (sanctioned): the plain word was missing while every clipped form of it was present."
+    },
+    {
+      "text": "yes please",
+      "card": "confirm",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      },
+      "note": "Fix round 1 (sanctioned): the plain word was missing while every clipped form of it was present."
+    },
+    {
+      "text": "confirm",
+      "card": "confirm",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      },
+      "note": "Fix round 1 (sanctioned): the plain word was missing while every clipped form of it was present."
+    },
+    {
+      "text": "save it",
+      "card": "confirm",
+      "expect": {
+        "intent": "CONFIRM_YES"
+      },
+      "note": "Fix round 1 (sanctioned): the plain word was missing while every clipped form of it was present."
+    },
+    {
+      "text": "correct",
+      "card": "confirm",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "note": "ADVERSARIAL confirm row (not drawn from the lexicon). DELIBERATELY excluded from CONFIRM_TOKENS: \"correct\" is an agreement as an adjective (\"that's correct\") and its opposite as a verb (\"correct it\"). The token alone cannot tell them apart, so it asks — which is the right answer to a genuinely ambiguous word."
+    },
+    {
+      "text": "right",
+      "card": "confirm",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "note": "ADVERSARIAL confirm row (not drawn from the lexicon). Same exclusion, plus \"right\" is English's commonest discourse filler. Asking is safer than guessing which of the two readings a bare \"right\" carried."
+    },
+    {
+      "text": "looks good",
+      "card": "confirm",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "note": "ADVERSARIAL confirm row (not drawn from the lexicon). Not in the lexicon (\"sounds good\" is). Adjacent phrasings that fall outside a closed token list resolve to UNKNOWN and the card stays open — the failure mode a confirm vocabulary is allowed to have."
+    },
+    {
+      "text": "perfect",
+      "card": "confirm",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "note": "ADVERSARIAL confirm row (not drawn from the lexicon). Same class: an obvious approval that no attested source put in the token table."
+    },
+    {
+      "text": "thats right",
+      "card": "confirm",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "note": "ADVERSARIAL confirm row (not drawn from the lexicon). Same class, and it also contains no token from the list."
+    },
+    {
+      "text": "ship it",
+      "card": "confirm",
+      "expect": {
+        "intent": "UNKNOWN"
+      },
+      "note": "ADVERSARIAL confirm row (not drawn from the lexicon). Same class."
+    },
+    {
+      "text": "1500 for lunch",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1500",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 2 ruling: a real price in the year band (1000-2100) reads when the follower CONFIRMS money — here a price-binding preposition. Without the override these were null, and with no card at all, since an entry sentence that yields no amount opens nothing."
+    },
+    {
+      "text": "ticket 1899 each",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1899",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 2 ruling: a real price in the year band (1000-2100) reads when the follower CONFIRMS money — here a split expression. Without the override these were null, and with no card at all, since an entry sentence that yields no amount opens nothing."
+    },
+    {
+      "text": "1500 with Sam",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1500",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": [
+          "actor",
+          "Sam"
+        ]
+      },
+      "note": "Fix round 2 ruling: a real price in the year band (1000-2100) reads when the follower CONFIRMS money — here a price-binding preposition. Without the override these were null, and with no card at all, since an entry sentence that yields no amount opens nothing."
+    },
+    {
+      "text": "dinner 1500 split evenly",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1500",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 2 ruling: a real price in the year band (1000-2100) reads when the follower CONFIRMS money — here a split expression. Without the override these were null, and with no card at all, since an entry sentence that yields no amount opens nothing."
+    },
+    {
+      "text": "2000 cash",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "2000",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 2 ruling: a real price in the year band (1000-2100) reads when the follower CONFIRMS money — here the funding word. Without the override these were null, and with no card at all, since an entry sentence that yields no amount opens nothing."
+    },
+    {
+      "text": "hotel 1200 bucks",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1200",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 2 ruling: a real price in the year band (1000-2100) reads when the follower CONFIRMS money — here a currency word (which also marks the amount outright). Without the override these were null, and with no card at all, since an entry sentence that yields no amount opens nothing."
+    },
+    {
+      "text": "room 1204 last night",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "Year-band disqualifier holds: `last` confirms nothing, so the year rule stands. The money-confirming override (currency words, split expressions, price binders, the funding word) is what separates these from \"1500 for lunch\"."
+    },
+    {
+      "text": "the 1999 tour was great",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "Year-band disqualifier holds: a year modifying a noun. The money-confirming override (currency words, split expressions, price binders, the funding word) is what separates these from \"1500 for lunch\"."
+    },
+    {
+      "text": "we stayed in 2019 and 2021",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "2021",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Year-band disqualifier holds: two years, neither confirmed. The money-confirming override (currency words, split expressions, price binders, the funding word) is what separates these from \"1500 for lunch\".",
+      "known": "The FIRST year (2019) is correctly refused — `and` follows it and confirms nothing — but the second is terminal, and a terminal bare number has no follower to disqualify it. That is the same accepted class as \"we booked room 1204\" and \"my flight is at 1130\": refusing every number at the end of a message would kill the commonest way a price is written. 0.6 confidence, card-visible."
+    },
+    {
+      "text": "change the amount, it was 3 people",
+      "card": "confirm",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "amount",
+        "slotAmount": null
+      },
+      "note": "Fix round 2 ruling: a field-named amount modify reads the number ONLY when the amount parser agrees it is money. 3명 / 3 people is a headcount, so the slot stays null and the card asks — the loose fragment reader on its own would have set the amount to 3."
+    },
+    {
+      "text": "dinner 1500 total",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1500",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "note": "Fix round 2, controller ruling: `total` is money vocabulary in this domain, so it joins the money-CONFIRMING followers that override the year rule. It was refused while the identical shape outside the band (\"dinner 12000 total\", a row above) read correctly — an inconsistency, not a conservative choice. Held to `total` alone; altogether/sum stay out until the corpus asks."
+    },
+    {
+      "text": "1999 went by fast",
+      "expect": {
+        "intent": "UNKNOWN",
+        "amount": null
+      },
+      "note": "Fix round 3 ruling: `went`, `going` and `all` are only the first words of the split PHRASES \"went dutch\" / \"going dutch\" / \"all together\", and on their own they confirm nothing — so they are dropped from the money-confirming set and the year rule stands here."
+    },
+    {
+      "text": "1984 everyone knows",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": "1984",
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "known": "The stated cost of keeping `everyone` in the money-confirming set (fix round 3): it overrides the year rule, so a year followed by `everyone` reads as an amount. It stays because a number followed by `everyone` is an expense entry (\"dinner 1500 everyone\") far more often than it is a sentence about a year, and the three first-words that confirm NOTHING (all/went/going) were dropped instead. 0.6 confidence, card-visible."
+    },
+    {
+      "text": "2000 all together",
+      "expect": {
+        "intent": "EXPENSE_ENTRY",
+        "amount": null,
+        "currency": "USD",
+        "payer": "actor",
+        "participants": "everyone"
+      },
+      "known": "The other side of the same ruling: \"all together\" IS a split phrase, but its first word `all` was dropped from the money-confirming set, so a price in the year band followed by it is refused. Outside the band it is unaffected (\"lunch 3000 all together evenly\" reads 3000, a frozen test). Matching whole phrases here instead would fix it; the ruling chose the smaller change."
+    },
+    {
+      "text": "change the amount 2000 please",
+      "card": "confirm",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "amount",
+        "slotAmount": null
+      },
+      "known": "The year band reaches into the card-reply path, because the field-named licence asks `parse()` — which carries its own disqualifiers — whether the fragment is money. 2000 with `please` after it is not, so the slot comes back null and the card asks \"how much?\", and the next message (\"2000\") is a fragment that resolves outright. One extra round trip, accepted: the alternative is a second, looser definition of money living in the classifier and disagreeing with the parser. \"change the amount to $2000\" and \"change the amount to 2000 total\" both resolve directly."
+    },
+    {
+      "text": "change the amount to 2000 total",
+      "card": "confirm",
+      "expect": {
+        "intent": "CONFIRM_MODIFY",
+        "field": "amount",
+        "slotAmount": "2000"
+      },
+      "note": "The same year-band amount WITH a money-confirming follower resolves directly — the parser agrees, so the licence is taken."
+    }
+  ]
+}

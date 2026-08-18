@@ -1,0 +1,15 @@
+-- Phase 4D-A: a member with NO wallets can still record prepaid spending.
+--
+-- "Paid from" now asks two questions — prepaid, or paid on the spot? — and a
+-- member who answers "prepaid" but keeps no wallet has to be able to carry
+-- on. They are asked the one number the app genuinely cannot look up: the
+-- rate they actually got when they exchanged the money.
+--
+-- Deliberately NOT `marketRateSnapshot` (that would make the rate chip call
+-- a personal rate "market") and deliberately NOT `actualChargedAmount` (that
+-- column is the bank-statement correction, and a later correction would
+-- silently overwrite the exchange rate).
+--
+-- Nullable, no backfill: every existing expense keeps converting exactly as
+-- it did.
+ALTER TABLE "Expense" ADD COLUMN "ownRateSnapshot" DECIMAL(24,10);

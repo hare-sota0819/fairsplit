@@ -1,0 +1,11 @@
+{
+  "_members": [
+    { "id": "me", "name": "빅헤드" },
+    { "id": "m1", "name": "민수" }
+  ],
+  "_actorId": "me",
+  "_currency": "KRW",
+  "_locale": "ko",
+  "_note": "A reference with nothing to point at asks who — never a guess.",
+  "turns": [{ "user": "걔가 냈어", "expect": { "reference": "unknown" } }]
+}

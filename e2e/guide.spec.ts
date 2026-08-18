@@ -1,0 +1,89 @@
+import { expect, test, type Page } from '@playwright/test'
+
+/**
+ * The path a friend actually walks: a link arrives, they find out what this
+ * is, they sign up, they read the guide, and they land in the group that
+ * invited them. Every step of it used to be missing or a dead end.
+ */
+
+const uniqueEmail = (tag: string): string =>
+  `e2e-${tag}-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}@example.com`
+
+async function signUp(page: Page, name: string, email: string): Promise<void> {
+  await page.getByLabel('Name').fill(name)
+  await page.getByLabel('Email').fill(email)
+  await page.getByLabel('Password').fill('password123')
+  await page.getByRole('button', { name: 'Create account' }).click()
+}
+
+test('landing, invite preview, guide after sign-up, and the guide from Account', async ({
+  browser,
+}) => {
+  // The host creates a group so there is a real invite link to hand out.
+  const hostContext = await browser.newContext()
+  const host = await hostContext.newPage()
+  await host.goto('/signup')
+  await signUp(host, 'Host E2E', uniqueEmail('host'))
+  // Sign-up lands on the guide, not on the group list.
+  await expect(host).toHaveURL(/\/guide/)
+  await host.getByTestId('guide-continue').click()
+  // Zero groups yet, so root's redirect chain lands on the list.
+  await expect(host).toHaveURL(/\/groups$/)
+
+  await host.goto('/groups/new')
+  await host.getByLabel('Group name').fill('Guide Trip E2E')
+  await host.getByLabel('Settlement currency').selectOption('KRW')
+  await host.getByLabel('Your display name in this group').fill('Host')
+  await host.getByRole('button', { name: 'Create group' }).click()
+  // Home is chat-only (Task 5, app-shell restructure): the invite link
+  // lives on /invite now, not on home.
+  await expect(host.getByTestId('chat-input')).toBeVisible()
+  const groupUrl = host.url()
+  await host.goto(`${groupUrl}/invite`)
+  const invitePath = await host.getByTestId('invite-link').innerText()
+
+  // The guide is reachable from Account for anyone who wants it again.
+  await host.goto('/account')
+  await host.getByTestId('account-guide').click()
+  await expect(host).toHaveURL(/\/guide/)
+  await expect(
+    host.getByRole('heading', { name: 'How to use FairSplit' }),
+  ).toBeVisible()
+  // Pins the guide to the chat-first rewrite (Task 7, app-shell restructure)
+  // so a regression back to the old form-entry copy fails this test.
+  await expect(
+    host.getByRole('heading', { name: 'Type it in chat' }),
+  ).toBeVisible()
+
+  // A stranger, signed out. The bare URL now explains itself and offers a
+  // way in — it used to be a name and a tagline with no controls at all.
+  const guestContext = await browser.newContext()
+  const guest = await guestContext.newPage()
+  await guest.goto('/')
+  await expect(guest.getByTestId('landing-signup')).toBeVisible()
+  await guest.getByTestId('landing-guide').click()
+  await expect(guest).toHaveURL(/\/guide/)
+
+  // The invite link states who invited them and to what, BEFORE asking for
+  // an account. This used to redirect straight to the sign-in form.
+  await guest.goto(invitePath)
+  await expect(guest.getByTestId('invite-preview')).toBeVisible()
+  await expect(
+    guest.getByRole('heading', { name: /Host E2E invited you to/ }),
+  ).toContainText('Guide Trip E2E')
+
+  // Signing up from the preview: guide first, then the join form it came for.
+  await guest.getByTestId('invite-signup').click()
+  await signUp(guest, 'Guest E2E', uniqueEmail('guest'))
+  await expect(guest).toHaveURL(/\/guide\?next=/)
+  await guest.getByTestId('guide-continue').click()
+  await expect(guest).toHaveURL(new RegExp(invitePath.replace('/', '\\/')))
+  await guest.getByLabel('Your display name in this group').fill('Guest')
+  await guest.getByRole('button', { name: 'Join group' }).click()
+  await expect(
+    guest.getByRole('heading', { name: 'Guide Trip E2E' }),
+  ).toBeVisible()
+
+  await guestContext.close()
+  await hostContext.close()
+})

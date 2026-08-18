@@ -1,0 +1,125 @@
+FairSplit
+
+This product includes ideas and adapted code from:
+
+- Spliit (https://github.com/spliit-app/spliit)
+  Copyright (c) 2023 Sebastien Castiel — MIT License
+  The debt simplification algorithm in src/lib/settlement/simplifyDebts.ts is
+  adapted from Spliit's getSuggestedReimbursements (src/lib/balances.ts),
+  rewritten for bigint integer arithmetic.
+
+- kor-to-number.js (https://github.com/dragonteros/kor-to-number.js)
+  Copyright (c) dragonteros — MIT License
+  The sino/native Korean number parsing core in
+  src/lib/chat-parse/ko/numbers.ts is ported from kor-to-number.js's parsing
+  logic, reworked to walk this codebase's Token[] array (bigint arithmetic,
+  decoy-word rejection, and partial-token consumption are original additions
+  not present upstream).
+
+- open-korean-text (https://github.com/open-korean-text/open-korean-text)
+  Copyright (c) 2016 open-korean-text team — Apache License 2.0
+  scripts/lang/mine-korean-lexicons.mjs mines
+  src/lib/chat-parse/ko/lexicon-josa.ts (josa.txt) and
+  src/lib/chat-parse/ko/lexicon-typos.ts (typos/typos.txt) from this
+  project's data files. Filtered/curated for this codebase's needs; no code
+  copied.
+
+- mecab-ko-dic (via the jaepil/mecab-ko-dic GitHub mirror,
+  https://github.com/jaepil/mecab-ko-dic, of the CSV dictionary sources)
+  Apache License 2.0
+  scripts/lang/mine-korean-lexicons.mjs mines
+  src/lib/chat-parse/ko/lexicon-decoys.ts (NNG.csv, MAG.csv noun/adverb
+  entries) and contributes to lexicon-josa.ts (J.csv particle entries) from
+  this project's data files. Filtered/curated for this codebase's needs; no
+  code copied.
+
+- words-to-numbers (https://github.com/0x80/words-to-numbers,
+  npm package @codecompose/words-to-numbers)
+  MIT License
+  The English cardinal-number word grammar (ones/teens, tens+ones
+  composition, hundred/thousand/million/billion/trillion tiering, "and"
+  joiner, "point"/"dot" decimal marker) in src/lib/chat-parse/en/numbers.ts
+  is ported from words-to-numbers' constants.js/parser.js/compiler.js
+  region-matching logic, reworked to walk this codebase's Token[] array with
+  exact bigint/scale arithmetic (the upstream compiler.js divides by
+  Math.pow(10, n) for decimals, which this port does not — see money
+  precision policy in docs/DECISIONS.md) and this codebase's own tier-state
+  bigint arithmetic (ported from the same pattern already used by
+  ko/numbers.ts's applyAtom/TierState). Bare "a" is deliberately NOT
+  ported as a standalone value-1 word (upstream's UNIT.a = 1 would parse
+  "a" in ordinary sentences like "a book" as the number 1) — "a" only
+  contributes here as an explicit article immediately before a magnitude
+  word ("a hundred", "a grand"), a narrower, original addition.
+
+- Duckling (https://github.com/facebook/duckling)
+  Copyright (c) 2016-present, Facebook, Inc. — BSD-3-Clause License
+  scripts/lang/convert-en-fixtures.mjs converts
+  Duckling/AmountOfMoney/EN/Corpus.hs's example/negative-example phrases and
+  their resolved values into test-fixtures/goat/duckling-en-amounts.json,
+  used by src/lib/chat-parse/en/numbers.test.ts. Ported rule LOGIC (the "a
+  grand"/"a buck" article-before-magnitude-noun pattern, k/K/m magnitude
+  suffixes) informed src/lib/chat-parse/en/numbers.ts's design; no Duckling
+  code was copied — only the corpus data and the described rule behavior.
+
+- Microsoft Recognizers-Text (https://github.com/microsoft/Recognizers-Text)
+  Copyright (c) Microsoft Corporation — MIT License
+  scripts/lang/convert-en-fixtures.mjs converts
+  Specs/NumberWithUnit/English/CurrencyModel.json's real-sentence currency
+  spec rows into test-fixtures/goat/ms-currency-model.json, used by
+  src/lib/chat-parse/en/numbers.test.ts as fixture data (real-world English
+  number/magnitude phrasing regression coverage). No code copied — data
+  only.
+
+- NSMC, the Naver sentiment movie corpus (https://github.com/e9t/nsmc)
+  CC0 1.0 Universal (public domain dedication)
+  scripts/lang/fetch-fuzz-samples.mjs samples 500 review lines from
+  ratings_test.txt into test-fixtures/goat/fuzz-ko.json, used by
+  src/lib/chat-parse/goat-corpus.test.ts as NEGATIVE controls (movie reviews
+  are not expense entries, so any amount the parser finds in one is a false
+  positive by construction). Data only; no code.
+
+- Chatbot_data (https://github.com/songys/Chatbot_data)
+  Copyright (c) songys — MIT License
+  Same script samples 500 Korean chitchat turns from ChatbotData.csv into
+  test-fixtures/goat/fuzz-ko.json, for the same purpose. Data only; no code.
+
+- chatterbot-corpus (https://github.com/gunthercox/chatterbot-corpus)
+  Copyright (c) 2016 Gunther Cox — BSD-3-Clause License
+  Same script samples 1,000 English conversation lines from
+  chatterbot_corpus/data/english/*.yml into test-fixtures/goat/fuzz-en.json,
+  the English half of the same negative-control gate. Data only; no code.
+
+Studied for design patterns (no code copied):
+
+- SplitPro (https://github.com/oss-apps/split-pro)
+  Copyright (c) 2024 OSS Apps — MIT License
+
+Third-party UI code and artwork bundled in this product:
+
+- shadcn/ui (https://ui.shadcn.com)
+  Copyright (c) 2023 shadcn — MIT License
+  The components under src/components/ui/ were generated by the shadcn CLI
+  and are maintained in-tree. Local modifications: `touch` and `hero` sizes
+  added to button.tsx for phone-sized tap targets; the selected state in
+  toggle.tsx changed from `bg-muted` (this theme's page colour, invisible on
+  a card) to the accent.
+
+- Radix UI primitives (https://www.radix-ui.com)
+  Copyright (c) 2022 WorkOS — MIT License
+  Used by the shadcn components above (collapsible, toggle-group, select).
+
+- Lucide (https://lucide.dev)
+  Copyright (c) 2022 Lucide Contributors; portions (c) 2013-2022 Cole Bemis —
+  ISC License
+  Icon artwork throughout the UI.
+
+The six decorative loading animations (airliner, banknotes, coins, baggage
+carousel, passport stamp, receipt) were removed in Phase 4B along with the
+/dev/loaders gallery. Nothing third-party remains from them.
+
+The 麻の葉 (asanoha) motif used for the loading indicator and the background
+texture is a traditional Japanese geometric pattern in the public domain.
+The drawing in src/components/loaders/index.tsx and src/app/globals.css is
+constructed from its geometry and is ours.
+
+No third-party character art, brand marks or trademarked imagery is included.
