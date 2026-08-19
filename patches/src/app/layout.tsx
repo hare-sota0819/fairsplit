@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
 import { Newsreader } from 'next/font/google'
+import { Backdrop } from '@/components/Backdrop'
 import { Header } from '@/components/Header'
 import { NavigationWatchdog } from '@/components/NavigationWatchdog'
 import { SidebarProvider } from '@/components/sidebar/SidebarProvider'
@@ -59,6 +60,7 @@ export default function RootLayout({
         <NavigationWatchdog />
         <NextIntlClientProvider>
           <SidebarProvider>
+            <Backdrop />
             <Header />
             {children}
           </SidebarProvider>

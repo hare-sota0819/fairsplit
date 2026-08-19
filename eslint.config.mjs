@@ -18,6 +18,13 @@ const eslintConfig = defineConfig([
     // Design handoff bundle: reference prototypes + their runtime, not
     // product code (handoff/design_handoff_fairsplit_statement/README.md).
     'handoff/**',
+    // Verbatim design patch drops (patches/PATCHES.md): applied by copying
+    // over src/, never compiled in place.
+    'patches/**',
+    // Owner's design-review drops (design-tool canvas exports + their
+    // runtime, e.g. `step 1 피드백/support.js`): reference material, not
+    // product code.
+    'step * 피드백/**',
   ]),
 ])
 
