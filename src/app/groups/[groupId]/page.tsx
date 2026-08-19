@@ -18,6 +18,7 @@ import { requireGroupMember } from '@/lib/membership'
 import { prisma } from '@/lib/prisma'
 import { destinationFor, flagEmoji } from '@/lib/destinations'
 import { defaultExpenseCurrency } from '@/lib/expense-currency'
+import { SemStateProvider } from '@/components/sem/SemStateProvider'
 
 /**
  * Home. Chat-only (Task 5, app-shell restructure): "정산은 그 자리에서 딱
@@ -160,7 +161,10 @@ export default async function GroupHomePage({
   const mostRecentExpense = data.expenses.find((e) => e.cancelledAt === null)
   const defaultCurrency = defaultExpenseCurrency({
     recent: mostRecentExpense
-      ? { currency: mostRecentExpense.currency, at: mostRecentExpense.timestamp }
+      ? {
+          currency: mostRecentExpense.currency,
+          at: mostRecentExpense.timestamp,
+        }
       : null,
     now: new Date(),
     tripCurrency: group.tripCurrency,
@@ -206,46 +210,49 @@ export default async function GroupHomePage({
         </h1>
       </header>
 
-      <ChatTranscriptProvider
-        // Keyed by the REQUESTED ?s= param — not the resolved id — so the
-        // key only changes when the USER navigates between conversations
-        // (a deliberate remount/reset). Data drift never remounts: the
-        // adoption-time router.refresh() re-resolves activeSessionId
-        // (null → the new row) on an unchanged URL, and a resolved-id key
-        // would have torn down the very card the first message opened
-        // (e2e-reproduced: the save button detached mid-click).
-        key={s ?? 'default'}
-        groupId={groupId}
-        chatSessionId={activeSessionId}
-        initialMessages={initialMessages}
-        initialCursor={chatHistory.nextCursor}
-        atCap={chatHistory.atCap}
-      >
-        <ChatTranscript
-          recalcBanner={recalcBanner}
-          memberCount={chatMembers.length}
-        />
+      {/* Sem's state provider wraps transcript + composer: the composer
+          publishes typing / busy / settled, the transcript its answer beat,
+          and the one SemBody on the page reads the resolved state
+          (docs/BRAND.md v2 §4d). */}
+      <SemStateProvider>
+        <ChatTranscriptProvider
+          // Keyed by the REQUESTED ?s= param — not the resolved id — so the
+          // key only changes when the USER navigates between conversations
+          // (a deliberate remount/reset). Data drift never remounts: the
+          // adoption-time router.refresh() re-resolves activeSessionId
+          // (null → the new row) on an unchanged URL, and a resolved-id key
+          // would have torn down the very card the first message opened
+          // (e2e-reproduced: the save button detached mid-click).
+          key={s ?? 'default'}
+          groupId={groupId}
+          chatSessionId={activeSessionId}
+          initialMessages={initialMessages}
+          initialCursor={chatHistory.nextCursor}
+          atCap={chatHistory.atCap}
+        >
+          <ChatTranscript recalcBanner={recalcBanner} />
 
-        {/* Chat-first entry (primary path): a persistent dock, always
+          {/* Chat-first entry (primary path): a persistent dock, always
             mounted — never behind a conditional or a keyed list — so an open
             confirm card survives the router.refresh() a save triggers (see
             ChatComposer's own doc comment). Task 6 (app-shell restructure):
             sits at the real bottom now that the tab bar is gone, safe-area
             aware via the calc'd bottom padding rather than an offset. */}
-        <DockFrame>
-          <div className="mx-auto w-full max-w-md lg:max-w-2xl">
-            <ChatComposer
-              groupId={groupId}
-              actorId={me.id}
-              defaultCurrency={defaultCurrency}
-              members={chatMembers}
-              assistantData={assistantData}
-              recentExpenses={recentExpenses}
-              initialMemory={sessionMemory}
-            />
-          </div>
-        </DockFrame>
-      </ChatTranscriptProvider>
+          <DockFrame>
+            <div className="mx-auto w-full max-w-md lg:max-w-2xl">
+              <ChatComposer
+                groupId={groupId}
+                actorId={me.id}
+                defaultCurrency={defaultCurrency}
+                members={chatMembers}
+                assistantData={assistantData}
+                recentExpenses={recentExpenses}
+                initialMemory={sessionMemory}
+              />
+            </div>
+          </DockFrame>
+        </ChatTranscriptProvider>
+      </SemStateProvider>
     </main>
   )
 }

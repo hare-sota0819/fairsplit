@@ -56,7 +56,7 @@ export function Dialog({
         <DialogPrimitive.Content
           data-testid={testId}
           className={cn(
-            'fixed z-50 flex flex-col gap-4 bg-card p-5 shadow-lg',
+            'fixed z-50 flex flex-col gap-4 bg-card p-5 ring-1 ring-border-strong',
             // On the mobile bottom-sheet layout this sits flush against the
             // real bottom edge — with `viewportFit: 'cover'` (root layout)
             // that is the home-indicator area, so the sheet's own bottom

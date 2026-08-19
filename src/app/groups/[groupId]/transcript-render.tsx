@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { AlertCircle, Clock } from 'lucide-react'
 import { NavLink } from '@/components/NavLoader'
+import { useSemSpeakOnMount } from '@/components/sem/SemStateProvider'
 import { SubmitButton } from '@/components/SubmitButton'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -21,7 +22,6 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { MONEY_KEYS } from '@/lib/assistant/compose'
 import { formatLocalDateTime } from '@/lib/datetime'
 import { formatMinor } from '@/lib/format'
-import { SemMark } from '@/components/sem/SemMark'
 import { RecalcBanner } from './RecalcBanner'
 import { ChatAssignCard } from './ChatAssignCard'
 import type { PersistStatus } from './persist-status'
@@ -143,13 +143,11 @@ export function TranscriptBubble({
  * looks exactly as it did before this task. Icon size (`size-3.5`, 14px)
  * matches the app's own "meta" text scale (docs/PITCH_TEARDOWN.md ## Type
  * scale), the same scale timestamps/quiet links already use elsewhere in
- * this transcript. Colour rides `text-primary-foreground` (not the
- * `negative` token) on purpose: this sits ON the user bubble's own
- * `bg-primary` fill, and shape (Clock vs. AlertCircle) plus the icon's own
- * aria-label already distinguish pending from failed — using a semantic
- * negative red here would risk a contrast mismatch against `--primary`
- * (a saturated brand colour, not this app's neutral background) in either
- * theme, for no accessibility gain over the shape + label it already has.
+ * this transcript. Colour is the muted ink of the user message it sits in
+ * (docs/BRAND.md v2 §5: hairline-bordered, tint fill, plain foreground);
+ * shape (Clock vs. AlertCircle) plus the icon's own aria-label distinguish
+ * pending from failed — a status hue would be a large-ish coloured mark
+ * inside every message for no accessibility gain over the shape + label.
  */
 function PersistIndicator({
   status,
@@ -169,7 +167,7 @@ function PersistIndicator({
           aria-label={t('pending')}
           role="img"
           data-testid="chat-persist-pending"
-          className="size-3.5 shrink-0 text-primary-foreground/70"
+          className="size-3.5 shrink-0 text-muted-foreground/70"
         />
       </div>
     )
@@ -180,7 +178,7 @@ function PersistIndicator({
         aria-label={t('failed')}
         role="img"
         data-testid="chat-persist-failed"
-        className="size-3.5 shrink-0 text-primary-foreground"
+        className="size-3.5 shrink-0 text-muted-foreground"
       />
       <Button
         type="button"
@@ -189,7 +187,7 @@ function PersistIndicator({
         onClick={onRetry}
         aria-label={t('retry')}
         data-testid="chat-retry-persist"
-        className="h-auto p-0 text-primary-foreground underline underline-offset-2 hover:bg-transparent hover:text-primary-foreground active:bg-transparent active:text-primary-foreground"
+        className="h-auto p-0 text-muted-foreground transition-colors duration-fast after:ml-1 after:content-['→'] hover:bg-transparent hover:text-foreground active:bg-transparent active:text-foreground"
       >
         {t('retry')}
       </Button>
@@ -337,12 +335,11 @@ function ScanningBubble() {
     <div
       aria-live="polite"
       data-testid="chat-scan-reading"
-      className="flex items-center gap-2 rounded-lg rounded-bl-[4px] bg-primary-soft px-4 py-3 text-base leading-[1.6] tracking-[-0.02em] text-foreground dark:bg-card"
+      className="flex items-center gap-2 text-base leading-[1.6] text-foreground"
     >
-      {/* Sem thinking, in the flesh — the mark's network churn IS the
-          progress indicator (docs/BRAND.md §4), so the text no longer
-          pulses on its own. */}
-      <SemMark state="thinking" size={26} />
+      {/* Sem's body (the transcript tail) is the one that visibly thinks
+          while this reads — one instance per page (docs/BRAND.md v2 §4);
+          this line is its voice only. */}
       <p>{t('reading')}</p>
     </div>
   )
@@ -360,7 +357,7 @@ function PersistExplainerBubble() {
   const t = useTranslations('chat.persist')
   return (
     <div
-      className="flex flex-col gap-2 rounded-lg rounded-bl-[4px] bg-primary-soft px-4 py-3 text-base leading-[1.6] tracking-[-0.02em] text-foreground dark:bg-card"
+      className="flex flex-col gap-2 text-base leading-[1.6] text-foreground"
       data-testid="chat-persist-explainer"
     >
       <p>{t('explainer')}</p>
@@ -440,6 +437,8 @@ function AnswerBubble({
   )
   const total = costs.reduce((sum, cost) => sum + cost, 0)
   const [shown, animated] = useTypewriter(total, messageId)
+  // A new Sem message rendering = one 300ms pulse of the body (v2 §4d).
+  useSemSpeakOnMount(animated && total > 0)
 
   // The bubble GROWS while it types, past where `ChatTranscript`'s own
   // auto-scroll (which fired when the bubble was still empty) left the
@@ -467,7 +466,7 @@ function AnswerBubble({
       return
     }
     rendered.push(
-      <div key={`chips-${key}`} className="flex flex-wrap gap-2">
+      <div key={`chips-${key}`} className="flex flex-col items-start gap-1 pt-1">
         {chipBuffer}
       </div>,
     )
@@ -495,7 +494,7 @@ function AnswerBubble({
           href={line.href}
           caption={text}
           testId={`chat-guided-escape-${messageId}`}
-          className="w-fit text-sm font-medium text-primary underline"
+          className="w-fit text-sm font-medium text-muted-foreground transition-colors duration-fast after:ml-1 after:content-['→'] hover:text-foreground"
         >
           {text}
         </NavLink>,
@@ -508,42 +507,32 @@ function AnswerBubble({
       return
     }
     const suffix = line.key.split('.').pop()
-    // Suggestion chip: PITCH_TEARDOWN.md ## Chat-surface mapping — 8px
-    // radius (`rounded-sm` = `--radius-sm`, the derived chip step), 600
-    // weight (the one place the measured reference uses it), 44px tap
-    // target (`size="touch"`, this app's own floor — the reference's own
-    // chip is far shorter, but it's decorative marketing chrome, not a
-    // touch target). Press/hover recipe reused verbatim from the `outline`
-    // variant Task 4 already swept, for the same token vocabulary as every
-    // other control in the app rather than a one-off.
+    // A suggested next step is a line of text, not a chip (docs/BRAND.md
+    // v2 §5 bans suggestion chips): muted, darkening to ink on hover, with
+    // a trailing arrow as its only affordance; the 44px tap floor survives
+    // as vertical padding. Testids unchanged.
     chipBuffer.push(
-      <Button
+      <button
         key={index}
         type="button"
-        variant="outline"
-        size="touch"
-        className="h-11 w-fit rounded-sm px-4 font-semibold"
+        className="-mx-1 min-h-11 w-fit px-1 text-left text-base leading-[1.6] text-muted-foreground transition-colors duration-fast after:ml-1 after:content-['→'] hover:text-foreground focus-visible:text-foreground focus-visible:outline-none active:text-foreground"
         onClick={line.onSelect}
         data-testid={`chat-suggestion-${suffix}-${messageId}`}
       >
         {text}
-      </Button>,
+      </button>,
     )
   })
   flushChips('end')
   return (
     <div
       ref={bubbleRef}
-      // Assistant "surface card" fill per the mapping's "Assistant bubble"
-      // row: `surface-tint` (light) / a lighter-than-background fill
-      // (dark, this app's own --card — already derived as "canvas-deep
-      // lightened one step", the same relationship the teardown's
-      // `glass-tint`-over-canvas-deep recipe describes). 16px radius, tail
-      // corner (bottom-left — assistant is left-aligned) pulled to 4px.
-      // scroll-mb mirrors the transcript wrapper's own dock clearance —
-      // the reveal-done scrollIntoView above targets THIS div, and scroll
+      // Sem's messages are plain text set directly on the paper — no fill,
+      // no bubble (docs/BRAND.md v2 §5, the letter voice). scroll-mb
+      // mirrors the transcript wrapper's own dock clearance — the
+      // reveal-done scrollIntoView above targets THIS div, and scroll
       // margins are only read off the element being scrolled to.
-      className="flex flex-col gap-2 rounded-lg rounded-bl-[4px] bg-primary-soft px-4 py-3 text-base leading-[1.6] tracking-[-0.02em] text-foreground scroll-mb-[calc(6rem+env(safe-area-inset-bottom))] dark:bg-card"
+      className="flex flex-col gap-2 text-base leading-[1.6] text-foreground scroll-mb-[calc(6rem+env(safe-area-inset-bottom))]"
       data-testid={testId ?? 'chat-answer'}
     >
       {rendered}
@@ -567,7 +556,7 @@ function SavedBubble({
     <div
       // Same assistant "surface card" fill/radius as AnswerBubble — see the
       // comment there.
-      className="flex flex-col gap-2 rounded-lg rounded-bl-[4px] bg-primary-soft px-4 py-3 text-base leading-[1.6] tracking-[-0.02em] text-foreground dark:bg-card"
+      className="flex flex-col gap-2 text-base leading-[1.6] text-foreground"
       data-testid="chat-saved-summary"
     >
       {title !== null && receiptTotal !== null ? (
@@ -595,7 +584,7 @@ function SavedBubble({
         href={`/groups/${groupId}/history`}
         caption={tLoading('general')}
         testId="chat-saved-history-link"
-        className="w-fit text-sm font-medium text-primary underline"
+        className="w-fit text-sm font-medium text-muted-foreground transition-colors duration-fast after:ml-1 after:content-['→'] hover:text-foreground"
       >
         {tHistory('title')}
       </NavLink>
@@ -784,7 +773,7 @@ function OutcomeCard({ card }: { card: CardPayload }) {
     return (
       <Card data-testid="chat-wallet-card" className="chat-card-enter">
         <CardContent className="flex flex-col gap-4 text-sm">
-          <h2 className="text-2xl leading-[1.2] font-bold tracking-[-0.02em]">
+          <h2 className="text-2xl leading-[1.2] font-bold">
             {t('wallet.title')}
           </h2>
 
@@ -958,7 +947,7 @@ function OutcomeCard({ card }: { card: CardPayload }) {
               href={card.historyHref}
               caption={tLoading('general')}
               testId="chat-edit-history"
-              className="w-fit text-sm font-medium text-primary underline"
+              className="w-fit text-sm font-medium text-muted-foreground transition-colors duration-fast after:ml-1 after:content-['→'] hover:text-foreground"
             >
               {tHistory('title')}
             </NavLink>
@@ -1056,7 +1045,7 @@ function OutcomeCard({ card }: { card: CardPayload }) {
             {/* Task 3, spec item 5 ("내용" → "제목"): same title-style
                 heading treatment as the ordinary confirm card, just above a
                 `ChatAssignCard` instead of a single amount. */}
-            <h2 className="text-2xl leading-[1.2] font-bold tracking-[-0.02em]">
+            <h2 className="text-2xl leading-[1.2] font-bold">
               {t('confirmTitle')}
             </h2>
 
@@ -1252,7 +1241,7 @@ function OutcomeCard({ card }: { card: CardPayload }) {
     <Card data-testid="chat-confirm-card" className="chat-card-enter">
       <CardContent className="flex flex-col gap-4 text-sm">
         {/* card-title scale (## Type scale): 24px/700, tracking -0.02em. */}
-        <h2 className="text-2xl leading-[1.2] font-bold tracking-[-0.02em]">
+        <h2 className="text-2xl leading-[1.2] font-bold">
           {t('confirmTitle')}
         </h2>
 

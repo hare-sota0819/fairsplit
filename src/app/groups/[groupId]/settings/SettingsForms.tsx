@@ -75,7 +75,7 @@ export function GroupSettingsForm({
           name="currency"
           defaultValue={initial.currency}
           disabled={currencyLocked}
-          className="h-11 w-full rounded-lg border border-input bg-transparent px-3 text-base shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
+          className="h-11 w-full rounded-lg border border-input bg-transparent px-3 text-base outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
         >
           {CURATED_CURRENCIES.map((code) => (
             <option key={code} value={code}>

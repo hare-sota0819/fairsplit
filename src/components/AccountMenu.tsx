@@ -49,7 +49,7 @@ export function AccountMenu({
       <DropdownMenuTrigger
         aria-label={labels.menu}
         data-testid="account-menu"
-        className="flex size-10 items-center justify-center rounded-full bg-primary-soft text-sm font-bold text-primary outline-none transition-colors hover:brightness-95 focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="flex size-8 items-center justify-center border border-border-strong text-[13px] text-primary uppercase outline-none transition-colors duration-fast hover:bg-primary hover:text-primary-foreground focus-visible:bg-primary focus-visible:text-primary-foreground"
       >
         <span aria-hidden="true">{initial}</span>
       </DropdownMenuTrigger>

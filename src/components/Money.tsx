@@ -23,7 +23,7 @@ export function Money({
     <span
       className={cn(
         'tabular-nums',
-        size === 'hero' && 'text-4xl font-bold tracking-tight',
+        size === 'hero' && 'text-4xl font-bold',
         size === 'lg' && 'text-xl font-semibold',
         size === 'md' && 'font-medium',
         className,

@@ -32,7 +32,7 @@ export function KeepAsWalletOffer({
 
   return (
     <div
-      className="rounded-xl bg-card p-4 text-sm shadow-sm"
+      className="rounded-xl bg-card p-4 text-sm ring-1 ring-border-strong"
       data-testid="keep-as-wallet"
     >
       <p>{t('question', { currency })}</p>

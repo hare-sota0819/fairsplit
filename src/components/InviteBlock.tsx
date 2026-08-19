@@ -21,7 +21,7 @@ export function InviteBlock({
 }) {
   return (
     <section
-      className="flex flex-col gap-3 rounded-xl bg-card p-4 shadow-sm ring-1 ring-border-strong"
+      className="flex flex-col gap-3 rounded-xl bg-card p-4 ring-1 ring-border-strong"
       data-testid="invite-cta"
     >
       <h2 className="font-semibold">{title}</h2>

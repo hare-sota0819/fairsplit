@@ -285,39 +285,16 @@ Entry format:
   the remove-phrased ask (`누구를 뺄까요?`) because §4.7 has no
   `askWhoToAdd` key — copy candidate for the design/wording pass.
 
-## [2026-08-11] Design overhaul T8 — ₩ system-font fallback (GA-fork ruling)
+## [2026-08-19] Design & branding reset — only the name "Sem" survives
 
-- **Decision**: `--font-sans` in `src/app/globals.css` (`:root`, the
-  `@theme`-mapped design-token block) now reads `var(--font-geist-sans),
-  'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif`
-  instead of the bare `var(--font-geist-sans)`. All three added names are
-  SYSTEM fonts already installed on their platforms — iOS/macOS (Apple SD
-  Gothic Neo), Android (the name Android's bundled Noto CJK resolves under),
-  Windows Vista+ (Malgun Gothic) — so this adds **zero new font loads**, per
-  the plan's explicit constraint. Geist stays first in the stack, so every
-  Latin glyph it already covers is unaffected; the fallback names only
-  engage for a codepoint Geist's `subsets: ['latin']` build has no glyph
-  for, which includes U+20A9 (₩) and all of Hangul.
-  This is the **GA-fork boundary, ruled deliberately, not an oversight**:
-  the full guarantee — every ₩ figure rendering cleanly for every user, on
-  every OS, with no dependency on what fonts happen to be locally installed
-  — needs one of (a) a webfont that actually covers U+20A9 (a new font
-  load, which the plan forbids for this pass) or (b) rendering the ISO 4217
-  code (`KRW 12,000`) instead of the symbol (a copy change out of scope for
-  a token-file pass). Neither is done here. What this pass buys is real but
-  bounded: it closes the gap on every desktop OS and every mobile OS the
-  app targets, because all three ship a Korean-capable system font. It does
-  **not** close a bare-Linux case with no CJK/symbol font installed at
-  all — Task 7 (`docs/SOLVED.md` 2026-08-11) isolated exactly that
-  environment as the one where the artifact was found and reproduced, and
-  this sandbox is one, so the T8 verification screenshots taken inside it
-  are still expected to show the artifact even after this fix. That is the
-  correct, predicted outcome of this ruling, not a regression.
-- **Reasoning**: Owner was silent when Task 7 raised this as a carry item;
-  the ruling defaults to option ① from that carry note (system-font
-  fallback now, webfont/ISO-code fork deferred to GA) rather than either
-  blocking T8 on an owner reply or silently picking the heavier fix. KRW is
-  the app's primary/default settlement currency (`groups/new`'s currency
-  picker defaults to it), so the desktop/PWA share of the gap this closes is
-  the majority of real usage; the deferred bare-Linux case is a minority
-  platform for this app's actual audience.
+- **Decision**: every design/branding decision recorded so far is retired
+  (brand book v1/v2, the pitch.com teardown, the Phase 4B extraction spec,
+  the 2026-08-11 T8 `--font-sans` ₩-fallback ruling that used to sit here).
+  The only surviving brand decision is the assistant's name: **셈 / Sem**
+  (see `docs/BRAND.md`). The app name stays FairSplit.
+- **Reasoning**: owner (2026-08-19) is starting a full design overhaul and
+  asked for a clean slate so the new direction is not shaped by the old one.
+- **Scope note**: this retires the *decisions*, not the running code. The
+  current UI, tokens, fonts and Sem 3D component stay in place until the new
+  design replaces them; code comments still citing the deleted docs are
+  expected to go away with that overhaul.

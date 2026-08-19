@@ -28,29 +28,15 @@ async function createGroup(page: Page, name: string): Promise<string> {
   return page.url().replace(/\?.*$/, '')
 }
 
-async function openSidebarWithRetry(page: Page): Promise<void> {
-  // Desktop viewport: the sidebar is a persistent rail, nothing to open
-  // (see e2e/nav.ts openSidebar).
-  if (await page.getByTestId('sidebar-rail').isVisible()) {
-    return
-  }
-  for (let attempt = 0; attempt < 3; attempt++) {
-    await page.getByTestId('sidebar-toggle').click()
-    try {
-      await expect(page.getByTestId('sidebar-panel')).toBeVisible({
-        timeout: 2000,
-      })
-      return
-    } catch {
-      await page.waitForTimeout(500)
-    }
-  }
-  await expect(page.getByTestId('sidebar-panel')).toBeVisible()
+/** The session list lives on the /chats page (the drawer that used to
+ *  mirror it is gone — navigation is the in-place text index). */
+async function openChatsPage(page: Page, groupUrl: string): Promise<void> {
+  await page.goto(`${groupUrl}/chats`)
+  await expect(page.getByTestId('sidebar-sessions')).toBeVisible()
 }
 
-/** The drawer's row menu can detach mid-click while an RSC refresh is in
- *  flight — retry like a real second tap, same rationale as
- *  openSidebarWithRetry. */
+/** A row menu can detach mid-click while an RSC refresh is in flight —
+ *  retry like a real second tap. */
 async function openRowMenuWithRetry(page: Page): Promise<void> {
   const menuButtons = page.locator('[data-testid^="sidebar-session-menu-"]')
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -87,12 +73,11 @@ test('sessions: lazy creation, auto-title, switch, cross-session ledger, rename,
   await expect(page.getByText(/Noted\./)).toBeVisible()
 
   // --- New chat starts empty (?s=new; no session row yet). ----------------
-  await openSidebarWithRetry(page)
-  await expect(page.getByTestId('sidebar-sessions')).toBeVisible()
+  await openChatsPage(page, groupUrl)
   await expect(
     page.getByTestId('sidebar-sessions').getByText('점심 김치찌개 13000원'),
   ).toBeVisible()
-  await page.getByTestId('sidebar-new-chat').click()
+  await page.getByTestId('chats-new-chat').click()
   await page.waitForURL(/\?s=new/)
   // The fresh conversation greets empty — no card, no prior bubbles.
   await expect(page.getByText('What did you spend today?')).toBeVisible()
@@ -104,10 +89,7 @@ test('sessions: lazy creation, auto-title, switch, cross-session ledger, rename,
   await expect(page.getByText('김치찌개').last()).toBeVisible()
 
   // The follow-up created conversation 2 lazily; both are now listed.
-  // The lazy adoption fires a router.refresh(); a toggle click that lands
-  // mid-remount is lost on the detached node, so open with a retry — the
-  // same second tap a real user would make.
-  await openSidebarWithRetry(page)
+  await openChatsPage(page, groupUrl)
   await expect(
     page.getByTestId('sidebar-sessions').getByText('show me the history'),
   ).toBeVisible()
@@ -123,7 +105,7 @@ test('sessions: lazy creation, auto-title, switch, cross-session ledger, rename,
   ).toBeVisible()
 
   // --- Rename pins a hand-given title; delete removes the thread. ---------
-  await openSidebarWithRetry(page)
+  await openChatsPage(page, groupUrl)
   await openRowMenuWithRetry(page)
   await page.getByTestId('sidebar-session-rename-input').fill('여행 첫날')
   await page.getByTestId('sidebar-session-rename-save').click()
@@ -136,5 +118,4 @@ test('sessions: lazy creation, auto-title, switch, cross-session ledger, rename,
   await expect(
     page.getByTestId('sidebar-sessions').getByText('여행 첫날'),
   ).toHaveCount(0)
-  void groupUrl
 })

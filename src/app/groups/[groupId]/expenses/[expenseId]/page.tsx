@@ -138,7 +138,7 @@ export default async function ExpenseDetailPage({
 
       {showPrompt ? (
         <div
-          className="rounded-xl bg-card p-4 text-sm shadow-sm ring-1 ring-border-strong"
+          className="rounded-xl bg-card p-4 text-sm ring-1 ring-border-strong"
           data-testid="exchange-prompt"
         >
           <p>{tExchange('prompt.question')}</p>

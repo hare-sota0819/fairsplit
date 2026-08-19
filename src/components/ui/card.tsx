@@ -13,16 +13,11 @@ function Card({
       data-size={size}
       className={cn(
         // PITCH_TEARDOWN.md ## Radii & borders: the measured card radius
-        // (16px) IS --radius itself (`rounded-lg`), not the old `rounded-xl`
-        // (20px). ## Shadows & elevation: the one measured box-shadow,
-        // "raised" tier — zero horizontal offset, 20px down, 60px blur,
-        // -20px spread, brand-tinted (never black). Light substitutes
-        // `brand` for `brand-companion` at ~0.18 alpha (the DERIVED
-        // light-surface rule); --primary already resolves to whichever of
-        // the two is correct per theme. Dark keeps its pre-existing
-        // "elevate by a lighter --card fill, not a shadow" rule (the light
-        // comment above this block, unchanged) — `dark:shadow-none`.
-        'group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-lg bg-card py-(--card-spacing) text-sm text-card-foreground shadow-[0_20px_60px_-20px_rgb(from_var(--primary)_r_g_b_/_0.18)] ring-1 ring-border-strong dark:shadow-none [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg',
+        // (16px) IS --radius itself (`rounded-lg`). BRAND.md v2 §2c: no
+        // elevation anywhere — a card is the paper itself, told apart by
+        // its hairline ring only (the former brand-tinted box-shadow is
+        // gone in both themes).
+        'group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-lg bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-border-strong [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg',
         className,
       )}
       {...props}

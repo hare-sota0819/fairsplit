@@ -32,7 +32,7 @@ function DropdownMenuContent({
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(
-          'z-50 min-w-56 overflow-hidden rounded-xl bg-popover p-1 text-popover-foreground shadow-lg ring-1 ring-border-strong',
+          'z-50 min-w-56 overflow-hidden rounded-lg bg-popover p-1 text-popover-foreground ring-1 ring-border-strong',
           // `--dur-fast`: the same quick-popover token as select.tsx's
           // SelectContent, not an unexplained default.
           'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 duration-fast',

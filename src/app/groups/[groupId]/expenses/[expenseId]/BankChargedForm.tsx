@@ -68,7 +68,7 @@ export function BankChargedForm({
 
   return (
     <section
-      className="flex flex-col gap-2 rounded-xl bg-card p-4 text-sm shadow-sm"
+      className="flex flex-col gap-2 rounded-xl bg-card p-4 text-sm ring-1 ring-border-strong"
       data-testid="bank-charged"
     >
       <h2 className="font-medium">{t('title')}</h2>

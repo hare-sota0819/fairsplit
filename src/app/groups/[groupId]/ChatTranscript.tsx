@@ -39,7 +39,8 @@ import {
   shouldShowPersistExplainer,
 } from './persist-explainer'
 import { TranscriptBubble } from './transcript-render'
-import { SemMark } from '@/components/sem/SemMark'
+import { SemBodyLazy } from '@/components/sem/SemBodyLazy'
+import { useSemBusy, useSemState } from '@/components/sem/SemStateProvider'
 import { useSidebar } from '@/components/sidebar/SidebarProvider'
 
 /**
@@ -855,12 +856,8 @@ function shouldHoldForThinking(message: TranscriptMessage): boolean {
  */
 export function ChatTranscript({
   recalcBanner,
-  memberCount = 3,
 }: {
   recalcBanner: RecalcBubbleProps | null
-  /** Active member count — Sem's avatar renders one dot per member plus
-   *  its own accent dot (docs/BRAND.md §3, literal-count rule). */
-  memberCount?: number
 }) {
   const t = useTranslations('chat')
   const {
@@ -959,8 +956,8 @@ export function ChatTranscript({
   // had scrolled up to re-read something — but the card's own `kind` IS
   // folded in, so an askAmount → confirm transition (same message id, taller
   // content) still re-scrolls.
-  // Poking Sem (owner's 2026-08-14 request): tapping the greeting mark
-  // startles the dots (SemMark's own engine reaction) AND swaps the hint
+  // Poking Sem (owner's 2026-08-14 request): tapping the greeting body
+  // morphs it into a solid (SemBody's own reaction) AND swaps the hint
   // line for one of a few playful replies, cycling per tap and reverting
   // to the ordinary hint a few seconds after the last poke.
   const POKE_LINE_COUNT = 4
@@ -1028,6 +1025,11 @@ export function ChatTranscript({
   const visibleMessages = messages.filter((m) => !isHeld(m))
   const heldCount = messages.length - visibleMessages.length
   const thinking = heldCount > 0
+  // The transcript's answer beat is one of the "thinking" sources; the
+  // composer publishes the others (scan / save / edit). Sem's body reads
+  // the resolved state.
+  useSemBusy('answer-beat', thinking)
+  const semState = useSemState()
 
   const lastKey = `${scrollKeyOf(messages[messages.length - 1])}:${heldCount}`
   const lastBubbleRef = useRef<HTMLDivElement>(null)
@@ -1102,21 +1104,15 @@ export function ChatTranscript({
         data-testid="chat-empty"
       >
         {/* Sem is present before the first word — the signature greeting
-            moment (docs/BRAND.md §5): the live mark breathing in idle.
-            Interactive here (and only here): hover leans the dots toward
-            the cursor, a tap startles them and earns a playful line. */}
-        <SemMark
-          state="idle"
-          size={160}
-          members={memberCount}
-          interactive
-          onPoke={handlePoke}
-        />
-        <p className="text-[32px] leading-[1.2] font-bold tracking-[-0.04em]">
+            moment (docs/BRAND.md v2 §4e): the living body, breathing in
+            idle, IS the empty state. A tap morphs it and earns a playful
+            line. */}
+        <SemBodyLazy state={semState} size={160} onPoke={handlePoke} />
+        <p className="text-[22px] leading-[1.3] text-primary uppercase">
           {t('greeting')}
         </p>
         <p
-          className="max-w-xs text-base leading-[1.6] tracking-[-0.02em] text-muted-foreground"
+          className="max-w-xs text-[13px] leading-[1.6] text-muted-foreground uppercase"
           data-testid="chat-greeting-hint"
         >
           {pokeIndex === null ? t('greetingHint') : t(`poke.p${pokeIndex}`)}
@@ -1210,8 +1206,12 @@ export function ChatTranscript({
             // element), so it rides the shared class string rather than a
             // conditional.
             'scroll-mb-[calc(6rem+env(safe-area-inset-bottom))]',
+            // User messages: right-aligned, a gray block behind the words —
+            // departuremono.com's highlighted line, square, no border (v2
+            // §5/§2d). Sem's rows carry no fill at all — their text sits on
+            // the desk.
             message.role === 'user'
-              ? 'ml-auto max-w-[85%] rounded-lg rounded-br-[4px] bg-primary px-4 py-3 text-base leading-[1.6] tracking-[-0.02em] text-primary-foreground'
+              ? 'ml-auto max-w-[85%] bg-primary-soft px-3 py-2 text-[15px] leading-[1.6] text-primary'
               : 'mr-auto w-full max-w-[92%]',
           )}
         >
@@ -1243,12 +1243,7 @@ export function ChatTranscript({
         className="mr-auto scroll-mb-[calc(6rem+env(safe-area-inset-bottom))]"
         data-testid="chat-sem-tail"
       >
-        <SemMark
-          state={thinking ? 'thinking' : 'idle'}
-          size={44}
-          members={memberCount}
-          interactive
-        />
+        <SemBodyLazy state={semState} size={48} />
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { openSidebar } from './nav'
+import { openNav } from './nav'
 import { createWallet, recordTopUp } from './wallet-flow'
 
 const uniqueEmail = (tag: string): string =>
@@ -71,11 +71,11 @@ test('the last member to leave takes the group with them', async ({ page }) => {
   // The group is gone for good, not merely hidden.
   await page.goto(groupUrl)
   await expect(page.getByTestId('not-found')).toBeVisible()
-  // This 404 is caught above the group layout (requireGroupMember never
-  // resolves a member, so `SidebarData`/`Sidebar` never mount) — the
-  // hamburger is reserved-but-inert here (T1 note), not absent, so this
-  // must assert hidden, not a zero count.
-  await expect(page.getByTestId('sidebar-toggle')).toBeHidden()
+  // This 404 is caught above the group layout. The header's text index is
+  // still there (it is path-driven), but its group rows point at a group
+  // that no longer exists — the account rows are what remain useful.
+  await openNav(page)
+  await expect(page.getByTestId('nav-all-groups')).toBeVisible()
 })
 
 test('a member leaves, the creator deletes, and dead ends offer a way back', async ({
@@ -283,10 +283,10 @@ test('an unknown expense id keeps the group sidebar and offers a way back', asyn
 
   await page.goto(`${groupUrl}/expenses/does-not-exist`)
   await expect(page.getByTestId('not-found')).toBeVisible()
-  // Inside the group layout (only the expense page itself 404s), so
-  // `SidebarData` still mounted — the hamburger is live, not just present.
-  await openSidebar(page)
-  await expect(page.getByTestId('sidebar-status')).toBeVisible()
+  // Inside the group layout (only the expense page itself 404s) — the
+  // index still lists this group's screens.
+  await openNav(page)
+  await expect(page.getByTestId('nav-status')).toBeVisible()
 })
 
 /**

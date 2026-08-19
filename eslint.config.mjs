@@ -15,6 +15,9 @@ const eslintConfig = defineConfig([
     'build/**',
     'next-env.d.ts',
     'coverage/**',
+    // Design handoff bundle: reference prototypes + their runtime, not
+    // product code (handoff/design_handoff_fairsplit_statement/README.md).
+    'handoff/**',
   ]),
 ])
 

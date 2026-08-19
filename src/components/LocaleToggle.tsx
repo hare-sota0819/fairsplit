@@ -24,10 +24,10 @@ export function LocaleToggle({
   const [pending, startTransition] = useTransition()
 
   return (
-    <p className="flex items-center gap-2 text-sm text-muted-foreground">
+    <p className="flex items-center gap-2 text-[13px] text-muted-foreground uppercase">
       {LOCALES.map((locale, index) => (
         <span key={locale} className="flex items-center gap-2">
-          {index > 0 ? <span aria-hidden="true">·</span> : null}
+          {index > 0 ? <span aria-hidden="true">/</span> : null}
           <button
             type="button"
             disabled={pending || locale === current}
@@ -40,8 +40,8 @@ export function LocaleToggle({
             }
             className={
               locale === current
-                ? 'font-medium text-foreground'
-                : 'underline transition-colors hover:text-foreground disabled:opacity-60'
+                ? 'text-primary uppercase'
+                : 'uppercase transition-colors duration-fast hover:text-primary disabled:opacity-60'
             }
           >
             {labels[locale]}

@@ -14,7 +14,59 @@
       "rate": "The rate is fetched for you, and money from a travel card is counted at what you actually paid for it.",
       "receipt": "Photograph the receipt and the line items fill themselves in.",
       "items": "Tick who had what, quantity included. Nobody pays for a dish they never touched."
-    }
+    },
+    "caption": "FairSplit is the treasurer of your group trip — text an expense in, Sem settles it.",
+    "links": {
+      "start": "Get started",
+      "signIn": "Sign in",
+      "guide": "How it works",
+      "language": "Language"
+    },
+    "letter": {
+      "from": "Sem, treasurer",
+      "org": "FairSplit",
+      "greeting": "Dear traveler,",
+      "p1": "Text me what you spent the way you would text a friend — \"lunch 12000, Minsu and me\" — and I settle it. No forms, no spreadsheet.",
+      "p1Highlight": "text me what you spent the way you would text a friend",
+      "p2": "The exchange rate is fetched for you, and money from a travel card is counted at what you actually paid for it. Photograph the receipt and the line items fill themselves in.",
+      "p3": "Tick who had what, quantity included. Nobody pays for a dish they never touched. When the trip ends, I hand everyone the shortest list of who pays whom.",
+      "signoff": "Yours in arithmetic,",
+      "signature": "Sem"
+    },
+    "receipt": {
+      "title": "Izakaya, night 2",
+      "meta": "3 people · paid by Minsu",
+      "items": {
+        "a": "Sashimi platter",
+        "b": "Highball x4",
+        "c": "Yakitori"
+      },
+      "total": "Total",
+      "each": "Each",
+      "settled": "Settled by Sem"
+    },
+    "table": {
+      "caption": "What it does",
+      "rows": {
+        "rate": {
+          "k": "Rate",
+          "v": "Fetched for you. Travel-card money counts at what you paid for it."
+        },
+        "receipt": {
+          "k": "Receipt",
+          "v": "Photograph it — the line items fill themselves in."
+        },
+        "items": {
+          "k": "Items",
+          "v": "Tick who had what, quantity included."
+        },
+        "settle": {
+          "k": "Settle",
+          "v": "The shortest list of who pays whom, in your currency."
+        }
+      }
+    },
+    "footer": "© 2026 FairSplit"
   },
   "guide": {
     "title": "How to use FairSplit",
@@ -587,7 +639,7 @@
     }
   },
   "chat": {
-    "placeholder": "Just say what you spent",
+    "placeholder": "What did you spend?",
     "send": "Send",
     "confirmTitle": "Save this expense?",
     "descriptionLabel": "Title",
@@ -942,7 +994,7 @@
   },
   "dev": {
     "sem": {
-      "title": "Sem mark lab",
+      "title": "Sem body lab",
       "stateLabel": "State",
       "states": {
         "idle": "Idle",
@@ -951,10 +1003,8 @@
         "speaking": "Speaking",
         "settled": "Settled"
       },
-      "membersLabel": "Members",
-      "accentLabel": "Accent dot",
-      "frozenLabel": "Frozen glyph (past messages / reduced motion)",
-      "sizesLabel": "Sizes"
+      "sizesLabel": "Size",
+      "pokes": "Pokes: {count}"
     }
   }
 }

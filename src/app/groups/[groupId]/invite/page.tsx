@@ -29,7 +29,7 @@ export default async function GroupInvitePage({
   return (
     <main className="flex flex-1 flex-col gap-6 px-5 py-6">
       <header>
-        <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+        <h1 className="text-2xl font-bold">{t('title')}</h1>
       </header>
       <InviteBlock
         inviteCode={group.inviteCode}

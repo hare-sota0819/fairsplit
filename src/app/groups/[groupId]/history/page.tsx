@@ -35,7 +35,7 @@ export default async function GroupHistoryPage({
   return (
     <main className="flex flex-1 flex-col gap-6 px-5 py-6">
       <header>
-        <h1 className="text-2xl font-bold tracking-tight">
+        <h1 className="text-2xl font-bold">
           {tHistory('title')}
         </h1>
       </header>

@@ -1,5 +1,4 @@
-import { SemMark } from '@/components/sem/SemMark'
-import type { LoaderId } from './registry'
+import { LOADERS, LOADER_IDS, type LoaderId } from './registry'
 
 export { ACTIVE_LOADERS, nextLoader } from './config'
 export { LOADERS, LOADER_IDS } from './registry'
@@ -29,6 +28,7 @@ export type { LoaderId, LoaderDef } from './registry'
 export function RouteLoader({
   caption,
   label,
+  id,
   onScrim = false,
 }: {
   caption: string
@@ -42,6 +42,7 @@ export function RouteLoader({
    */
   onScrim?: boolean
 }) {
+  const { Art } = LOADERS[id ?? LOADER_IDS[0]] ?? LOADERS[LOADER_IDS[0]]
   return (
     <div
       role="status"
@@ -55,14 +56,10 @@ export function RouteLoader({
         onScrim ? 'text-scrim-foreground' : 'text-primary'
       }`}
     >
-      {/* Loading IS Sem thinking (docs/BRAND.md §4) — the mark churns
-          through its network state while the app works. The scrim never
-          follows the theme, so the mark is forced light-on-dark there. */}
-      <SemMark
-        state="thinking"
-        size={88}
-        inverted={onScrim ? true : undefined}
-      />
+      {/* The ring + dots family (registry.tsx). Sem's body lives only in
+          chat (docs/BRAND.md v2 §4e), so a route loader is monochrome ink
+          — its voice is the caption. */}
+      <Art onScrim={onScrim} />
       <span
         className={`max-w-xs text-center text-balance ${
           onScrim

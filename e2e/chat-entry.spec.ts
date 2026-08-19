@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { goVia, openSidebar } from './nav'
+import { goVia, openNav } from './nav'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -518,29 +518,28 @@ test('a cross-currency handoff prefill wins over a parked draft, which survives 
 })
 
 /**
- * Task 6 review debt (T1 note): nothing exercised the sidebar drawer's own
- * content at runtime — the group name as an accessible `<h2>` (Radix
- * `Dialog.Title`) while the panel is open, and the `sidebar-invite` item
- * actually reaching `/invite`. `openSidebar`/`goVia` (e2e/nav.ts) deliberately
- * never look up the panel's links by heading/role name, exactly to avoid
- * colliding with this `<h2>` — this test is where that ambiguity risk is
- * actually named and checked, once, rather than left implicit.
+ * The text index at runtime: it opens in place (no panel — the page under
+ * it never moves), marks the current route in ink, and its invite item
+ * actually reaches `/invite`.
  */
-test('the sidebar drawer names the current group, and its invite item reaches /invite', async ({
+test('the text index opens in place, marks the current route, and its invite item reaches /invite', async ({
   page,
 }) => {
   await signUp(page, 'Sidebar E2E', uniqueEmail('sidebar'))
   const groupName = 'Sidebar Nav E2E'
   await createGroup(page, groupName, 'Sam')
 
-  await openSidebar(page)
-  await expect(
-    page.getByRole('heading', { level: 2, name: groupName }),
-  ).toBeVisible()
+  const before = await page.getByTestId('chat-composer').boundingBox()
+  await openNav(page)
+  // Nothing beneath moved.
+  expect(await page.getByTestId('chat-composer').boundingBox()).toEqual(before)
+  await expect(page.getByTestId('nav-index')).toBeVisible()
 
-  await page.getByTestId('sidebar-invite').click()
+  await page.getByTestId('nav-invite').click()
   await page.waitForURL(/\/invite$/)
   await expect(page.getByTestId('invite-link')).toBeVisible()
+  await openNav(page)
+  await expect(page.getByTestId('nav-invite')).toHaveAttribute('aria-current', 'page')
 })
 
 /**

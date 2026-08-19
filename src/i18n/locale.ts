@@ -11,14 +11,15 @@
  *   1. the `fairsplit:locale` cookie — the account's locale, written at
  *      sign-in, or an explicit choice made in account settings;
  *   2. `Accept-Language`, on a genuinely first visit;
- *   3. Korean.
+ *   3. English (owner, 2026-08-18: English is the first language; the
+ *      landing carries the selector).
  */
 
-export const LOCALES = ['ko', 'en'] as const
+export const LOCALES = ['en', 'ko'] as const
 
 export type Locale = (typeof LOCALES)[number]
 
-export const DEFAULT_LOCALE: Locale = 'ko'
+export const DEFAULT_LOCALE: Locale = 'en'
 
 export const LOCALE_COOKIE = 'fairsplit:locale'
 

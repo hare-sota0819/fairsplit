@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { getTranslations } from 'next-intl/server'
-import { Camera, TrendingUp, UsersRound } from 'lucide-react'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { auth } from '@/auth'
-import { buttonVariants } from '@/components/ui/button'
+import { LocaleToggle } from '@/components/LocaleToggle'
+import type { Locale } from '@/i18n/locale'
 import { prisma } from '@/lib/prisma'
 
 /**
@@ -15,102 +15,150 @@ import { prisma } from '@/lib/prisma'
  * moved to `/groups`.
  */
 export default async function Home() {
-  const [session, tLanding] = await Promise.all([
+  const [session, t, tAccount, locale] = await Promise.all([
     auth(),
     getTranslations('landing'),
+    getTranslations('account'),
+    getLocale(),
   ])
 
   if (!session?.user?.id) {
     /*
-     * Signed out, this is the only page a stranger can reach on their own,
-     * so it has to answer "what is this" and "how do I start" without a
-     * session. It used to be just the app name and the tagline; then the
-     * feature points were added; this round rebuilds it on the new visual
-     * language — PITCH_TEARDOWN.md's phone-column layout (oversized
-     * headline -> supporting line -> feature points -> hero CTA +
-     * secondary), the ## Choreography entrance (staggered rise+fade,
-     * `.landing-enter`/`.landing-step-*` in globals.css), and
-     * <Backdrop /> at full `--art-strength` behind it (this route is in
-     * Backdrop.tsx's ART_ROUTES).
-     *
-     * Copy is fresh, not the app.name/app.tagline pair used for metadata
-     * elsewhere — the pitch here is specifically the chat-first entry
-     * (owner's product framing), not the generic tagline.
+     * The signed-out landing, in the Departure Mono grammar (docs/BRAND.md
+     * v2 §2d, departuremono.com): a pixel wordmark in a gray block, a short
+     * index of glyph-prefixed links, an olive caption, and then the product
+     * shown as the artefacts it produces — a letter from Sem (its voice),
+     * a receipt, a table. English first; the language line on this screen
+     * is the app's language selector for a stranger (owner, 2026-08-18).
      */
-    const points = [
-      { key: 'rate', Icon: TrendingUp },
-      { key: 'receipt', Icon: Camera },
-      { key: 'items', Icon: UsersRound },
-    ] as const
+    const rows = ['rate', 'receipt', 'items', 'settle'] as const
     return (
-      <main className="relative mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-10 px-6 py-12 md:max-w-3xl md:gap-14">
-        <div className="flex flex-col gap-4">
-          {/* `display-lg` (## Type scale): 40px mobile / 64px desktop,
-              line-height ratio 0.90, tracking -0.04em (>=32px rule). */}
-          <h1 className="landing-enter text-[40px] leading-[0.9] font-bold tracking-[-0.04em] md:text-[64px]">
-            {tLanding('headline')}
-          </h1>
-          {/* `lead` role: 20px/400, tracking -0.02em, 1.6 line-height. */}
-          <p className="landing-enter landing-step-1 text-lg leading-[1.6] tracking-[-0.02em] text-muted-foreground md:text-xl">
-            {tLanding('subhead')}
-          </p>
-        </div>
-
-        <ul className="flex flex-col gap-4">
-          {points.map(({ key, Icon }, index) => (
-            <li
-              key={key}
-              className={`landing-enter landing-step-${index + 2} flex items-start gap-3`}
-            >
-              <span
-                aria-hidden="true"
-                className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"
-              >
-                <Icon className="size-4" />
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-14 px-5 pt-10 pb-16 md:max-w-5xl md:gap-20 md:px-10 md:pt-16">
+        {/* ---- Masthead ---------------------------------------------- */}
+        <section className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+          <div className="flex flex-col gap-6">
+            <h1 className="flex flex-wrap items-start gap-x-2">
+              <span className="bg-primary-soft px-2 text-[44px] leading-[1.05] tracking-[0.02em] text-primary uppercase md:text-[66px]">
+                FairSplit
               </span>
-              <p className="text-sm">{tLanding(`points.${key}`)}</p>
-            </li>
-          ))}
-        </ul>
+              <span className="pt-1 text-[11px] text-muted-foreground uppercase">
+                beta
+              </span>
+            </h1>
+            <p className="max-w-xs text-[11px] leading-[1.5] text-muted-foreground uppercase">
+              <span aria-hidden="true">░ </span>
+              {t('caption')}
+            </p>
+          </div>
 
-        <div className="landing-enter landing-step-5 flex flex-col items-stretch gap-3 md:items-start">
-          {/* Row 9 (teardown "what we do differently"): pill is the primary
-              app-action shape. `hero` size is `rounded-xl` + `w-full` for
-              every other call site (a phone-width control); the landing
-              hero CTA is the one place the pill itself is the point AND
-              the one screen wide enough to show it as an intrinsically
-              sized control rather than a stretched bar, so both are
-              overridden here — full-width phone button below `md`,
-              self-sized pill from `md` up — rather than in the shared
-              component. */}
-          <Link
-            href="/signup"
-            className={buttonVariants({
-              size: 'hero',
-              className: 'rounded-full md:w-auto md:px-10',
-            })}
-            data-testid="landing-signup"
+          <nav
+            aria-label={t('links.start')}
+            className="flex flex-col gap-2 text-[13px] leading-[1.6] uppercase"
           >
-            {tLanding('cta')}
-          </Link>
-          <Link
-            href="/guide"
-            className={buttonVariants({
-              variant: 'outline',
-              size: 'hero',
-              className: 'md:w-auto md:px-10',
-            })}
-            data-testid="landing-guide"
-          >
-            {tLanding('guideLink')}
-          </Link>
-          <p className="text-center text-sm text-muted-foreground md:text-left">
-            {tLanding('haveAccount')}{' '}
-            <Link className="underline" href="/signin">
-              {tLanding('signIn')}
+            <Link
+              href="/signup"
+              data-testid="landing-signup"
+              className="text-foreground transition-colors duration-fast hover:text-primary"
+            >
+              <span aria-hidden="true">{'> '}</span>
+              {t('links.start')}
             </Link>
+            <Link
+              href="/signin"
+              className="text-muted-foreground transition-colors duration-fast hover:text-primary"
+            >
+              <span aria-hidden="true">{'> '}</span>
+              {t('links.signIn')}
+            </Link>
+            <Link
+              href="/guide"
+              data-testid="landing-guide"
+              className="text-muted-foreground transition-colors duration-fast hover:text-primary"
+            >
+              <span aria-hidden="true">{'> '}</span>
+              {t('links.guide')}
+            </Link>
+            <div className="flex items-center gap-2 pt-2 text-muted-foreground">
+              <span aria-hidden="true">{'░ '}</span>
+              <span>{t('links.language')}</span>
+              <LocaleToggle
+                current={locale as Locale}
+                labels={{ ko: tAccount('localeKo'), en: tAccount('localeEn') }}
+              />
+            </div>
+          </nav>
+        </section>
+
+        {/* ---- The artefacts: a letter from Sem, and a receipt ---------- */}
+        <section className="grid gap-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:items-start">
+          <article
+            className="flex flex-col gap-6 border border-border-strong bg-card px-6 py-8 text-[15px] leading-[1.7] text-card-foreground md:px-10 md:py-12"
+            data-testid="landing-letter"
+          >
+            <header className="text-[11px] leading-[1.6] uppercase">
+              <p>{t('letter.from')}</p>
+              <p>{t('letter.org')}</p>
+            </header>
+            <p>{t('letter.greeting')}</p>
+            <p>
+              <Highlight text={t('letter.p1')} phrase={t('letter.p1Highlight')} />
+            </p>
+            <p>{t('letter.p2')}</p>
+            <p>{t('letter.p3')}</p>
+            <footer className="flex flex-col gap-1 pt-2">
+              <p>{t('letter.signoff')}</p>
+              <p className="text-[22px] leading-none text-primary">
+                {t('letter.signature')}
+              </p>
+            </footer>
+          </article>
+
+          <aside
+            className="mx-auto w-full max-w-[300px] border border-border-strong bg-card px-5 py-6 text-[13px] leading-[1.6] text-card-foreground md:mx-0 md:mt-10"
+            aria-hidden="true"
+          >
+            <p className="text-center uppercase">{t('receipt.title')}</p>
+            <p className="text-center text-[11px] text-muted-foreground uppercase">
+              {t('receipt.meta')}
+            </p>
+            <div className="my-4 border-t border-dashed border-border-strong" />
+            <ReceiptLine label={t('receipt.items.a')} value="4,800" />
+            <ReceiptLine label={t('receipt.items.b')} value="2,400" />
+            <ReceiptLine label={t('receipt.items.c')} value="1,650" />
+            <div className="my-4 border-t border-dashed border-border-strong" />
+            <ReceiptLine label={t('receipt.total')} value="¥8,850" strong />
+            <ReceiptLine label={t('receipt.each')} value="¥2,950" />
+            <div className="my-4 border-t border-dashed border-border-strong" />
+            <p className="text-center text-[11px] text-muted-foreground uppercase">
+              <span className="text-sem">■ </span>
+              {t('receipt.settled')}
+            </p>
+          </aside>
+        </section>
+
+        {/* ---- What it does, as a table ---------------------------------- */}
+        <section className="flex flex-col gap-4">
+          <p className="text-[11px] leading-[1.5] text-muted-foreground uppercase">
+            <span aria-hidden="true">░ </span>
+            {t('table.caption')}
           </p>
-        </div>
+          <dl className="border-t border-border-strong text-[15px] leading-[1.6]">
+            {rows.map((row) => (
+              <div
+                key={row}
+                className="grid grid-cols-[6.5rem_1fr] gap-4 border-b border-border-strong py-3 md:grid-cols-[10rem_1fr]"
+              >
+                <dt className="text-primary uppercase">{t(`table.rows.${row}.k`)}</dt>
+                <dd className="text-foreground">{t(`table.rows.${row}.v`)}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <p className="text-[11px] leading-[1.5] text-muted-foreground uppercase">
+          <span aria-hidden="true">░ </span>
+          {t('footer')}
+        </p>
       </main>
     )
   }
@@ -148,4 +196,42 @@ export default async function Home() {
   }
 
   redirect('/groups')
+}
+
+/** One receipt row: label left, amount right, dotted leader between. */
+function ReceiptLine({
+  label,
+  value,
+  strong = false,
+}: {
+  label: string
+  value: string
+  strong?: boolean
+}) {
+  return (
+    <p className={`flex items-baseline gap-2 ${strong ? 'text-primary' : ''}`}>
+      <span className="shrink-0">{label}</span>
+      <span
+        aria-hidden="true"
+        className="min-w-4 flex-1 border-b border-dotted border-border-strong"
+      />
+      <span className="shrink-0 tabular-nums">{value}</span>
+    </p>
+  )
+}
+
+/** The letter's one highlighted phrase (a gray block behind the words, the
+ *  way departuremono.com marks a line — no hue). */
+function Highlight({ text, phrase }: { text: string; phrase: string }) {
+  const index = text.toLowerCase().indexOf(phrase.toLowerCase())
+  if (index < 0) return <>{text}</>
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark className="bg-primary-soft text-inherit">
+        {text.slice(index, index + phrase.length)}
+      </mark>
+      {text.slice(index + phrase.length)}
+    </>
+  )
 }

@@ -10,9 +10,8 @@ import {
 } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
-import { Paperclip, Send } from 'lucide-react'
+import { Paperclip } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import type { Locale } from '@/i18n/locale'
 import { classify } from '@/lib/assistant/classify'
 import { mergeReceiptIntoChat } from '@/lib/chat-receipt/merge'
@@ -103,6 +102,11 @@ import {
 } from './ChatTranscript'
 import { draftFormHref } from './transcript-render'
 import { useSidebar } from '@/components/sidebar/SidebarProvider'
+import {
+  useSemBusy,
+  useSemSignals,
+  useSemTyping,
+} from '@/components/sem/SemStateProvider'
 
 /**
  * Task 2 (chat-image-c): the JSON shape `/api/receipts/parse` (route.ts)
@@ -412,6 +416,9 @@ export function ChatComposer({
   const [, startTransition] = useTransition()
 
   const [text, setText] = useState('')
+  // Sem listens while the composer holds unsent text (v2 §4d).
+  useSemTyping(text.trim().length > 0)
+  const { markSettled } = useSemSignals()
   const [outcome, setOutcome] = useState<Outcome | null>(null)
   const [askAmountText, setAskAmountText] = useState('')
   // The items card's live "who had what" state (Task 3) — outside `outcome`
@@ -442,10 +449,13 @@ export function ChatComposer({
   // onto the same fixed message id) the same way `isSaving` already gates
   // it below.
   const [scanning, setScanning] = useState(false)
+  // Sem thinks while a receipt scan is in flight (v2 §4d).
+  useSemBusy('scan', scanning)
   // Task 10: true for the duration of one edit action's round trip — gates the
   // confirm button so a double tap cannot dispatch the same edit twice (the
   // same guard `isSaving` gives the save button).
   const [editPending, setEditPending] = useState(false)
+  useSemBusy('edit', editPending)
   // Task 10: rows an edit has already changed, keyed by id. An applied edit
   // returns the FRESH row, and this is where it lands, so the very next
   // sentence resolves against what is actually stored — a cancelled expense
@@ -2276,6 +2286,8 @@ export function ChatComposer({
     ChatFormState,
     FormData
   >(clientAction, {})
+  // Sem thinks while a save is in flight (v2 §4d).
+  useSemBusy('save', isSaving)
   // Post-save follow-up, AFTER the action's own state has committed:
   //
   //  1. Push the returned feed row as a `saved` transcript message —
@@ -2296,14 +2308,17 @@ export function ChatComposer({
         receiptTotal: feedRow ? feedRow.receiptTotal : null,
         groupId,
       })
+      // The payoff moment: Sem stamps the record (docs/BRAND.md v2 §4d).
+      markSettled()
       router.refresh()
     }
-    // `groupId` is a stable prop, listed for completeness. `pushMessage` is
-    // stable (useCallback in the provider). Deliberately NOT keyed on
-    // anything from `t`/translations: their identity changes every render
-    // (next-intl) but the strings they return do not, and this bubble reads
-    // its copy inside `transcript-render.tsx`, not here.
-  }, [result, router, pushMessage, groupId])
+    // `groupId` is a stable prop, listed for completeness. `pushMessage` and
+    // `markSettled` are stable (useCallback/useMemo in their providers).
+    // Deliberately NOT keyed on anything from `t`/translations: their
+    // identity changes every render (next-intl) but the strings they return
+    // do not, and this bubble reads its copy inside `transcript-render.tsx`,
+    // not here.
+  }, [result, router, pushMessage, groupId, markSettled])
   // Guards `result.duplicate` / `result.error`: true only while the
   // currently-open confirm/confirmItems card is the same one that produced
   // `result`.
@@ -2604,15 +2619,12 @@ export function ChatComposer({
   ])
 
   return (
-    // The composer is the screen's anchor (owner's law): a 24px "panel"
-    // frame with the measured `raised` elevation, standing in for the
-    // teardown's 3-layer glass stack without the glow/blur layers (those
-    // are Task 6's Backdrop scope, not this file's). PITCH_TEARDOWN.md
-    // ## Chat-surface mapping › "Composer field": focus treatment is the
-    // frame's own border swapping to `--ring` at `--dur-fast`, the
-    // measured pairing for "press feedback, colour swaps, focus rings".
+    // The composer is a command line on the desk (docs/BRAND.md v2 §5/§2d):
+    // a square, dark-ruled field with a `>` prompt, an attach glyph and a
+    // SEND word — no pill, no elevation, no circular button. The rule
+    // swaps to `--ring` on focus.
     <form
-      className="flex items-center gap-2 rounded-2xl border border-border bg-card p-2 shadow-[0_20px_60px_-20px_rgb(from_var(--primary)_r_g_b_/_0.18)] transition-colors duration-fast focus-within:border-ring dark:shadow-none"
+      className="flex items-center gap-1 border border-border-strong bg-background py-1 pr-1 pl-3 transition-colors duration-fast focus-within:border-ring"
       data-testid="chat-composer"
       onSubmit={(event) => {
         event.preventDefault()
@@ -2639,42 +2651,35 @@ export function ChatComposer({
           if (file) void handleAttach(file)
         }}
       />
-      <Button
+      <span aria-hidden="true" className="text-[15px] text-primary select-none">
+        {'>'}
+      </span>
+      <Input
+        value={text}
+        onChange={(event) => setText(event.target.value)}
+        placeholder={t('placeholder')}
+        className="h-11 flex-1 rounded-none border-transparent bg-transparent px-2 text-[15px] shadow-none focus-visible:border-transparent focus-visible:ring-0 dark:bg-transparent"
+        data-testid="chat-input"
+      />
+      <button
         type="button"
-        variant="outline"
-        size="icon"
-        className="size-11 shrink-0 rounded-full"
+        className="flex size-11 shrink-0 items-center justify-center text-muted-foreground transition-colors duration-fast hover:text-primary focus-visible:text-primary focus-visible:outline-none disabled:opacity-40 disabled:hover:text-muted-foreground"
         data-testid="chat-attach"
         aria-label={t('attach')}
         disabled={scanning || isSaving}
         onClick={() => fileInputRef.current?.click()}
       >
-        <Paperclip className="size-5" aria-hidden="true" />
-      </Button>
-      <Input
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-        placeholder={t('placeholder')}
-        className="h-11 flex-1 rounded-sm border-transparent bg-transparent px-3 shadow-none"
-        data-testid="chat-input"
-      />
-      {/* The owner explicitly hated "추가"/"Add" here — it read as "tap to
-          add nothing". A send affordance (paper-plane icon, matching the
-          reference-app design) replaces it; `chat.send` still supplies the
-          accessible name via i18n, now "Send"/"보내기" instead of "Add"/
-          "추가". The former "4px rectilinear exception" (## Radii & borders
-          row 9) is retired per the owner's phone review: this button is now
-          fully round, matching the curvature of the composer frame it sits
-          inside — not a separate visual language. */}
-      <Button
+        <Paperclip className="size-[18px]" aria-hidden="true" />
+      </button>
+      {/* Send is a word, not a round button (v2 §5): `chat.send` is both the
+          visible label and the accessible name. */}
+      <button
         type="submit"
-        size="icon"
-        className="size-11 shrink-0 rounded-full"
+        className="flex h-11 shrink-0 items-center px-3 text-[13px] text-primary uppercase transition-colors duration-fast hover:bg-primary hover:text-primary-foreground focus-visible:bg-primary focus-visible:text-primary-foreground focus-visible:outline-none active:bg-primary active:text-primary-foreground"
         data-testid="chat-send"
-        aria-label={t('send')}
       >
-        <Send className="size-5" aria-hidden="true" />
-      </Button>
+        {t('send')}
+      </button>
     </form>
   )
 }

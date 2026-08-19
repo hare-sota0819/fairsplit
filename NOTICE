@@ -123,3 +123,7 @@ The drawing in src/components/loaders/index.tsx and src/app/globals.css is
 constructed from its geometry and is ours.
 
 No third-party character art, brand marks or trademarked imagery is included.
+
+- Departure Mono (https://departuremono.com/)
+  Copyright (c) 2022–2024 Helena Zhang — SIL Open Font License 1.1
+  The app's typeface, self-hosted at src/app/fonts/ (license text alongside).

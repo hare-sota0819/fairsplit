@@ -1,22 +1,30 @@
 import type { Metadata, Viewport } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
-import { Geist, Geist_Mono } from 'next/font/google'
-import { Backdrop } from '@/components/Backdrop'
+import { Newsreader } from 'next/font/google'
 import { Header } from '@/components/Header'
 import { NavigationWatchdog } from '@/components/NavigationWatchdog'
 import { SidebarProvider } from '@/components/sidebar/SidebarProvider'
 import { ThemeScript } from '@/components/ThemeChoice'
+// Pretendard Variable — the UI/body face (SPEC §3). The dynamic-subset
+// stylesheet declares one @font-face per unicode range, so a page fetches
+// only the glyph ranges it renders (a few KB for Latin, the Hangul ranges
+// only when Korean copy is on screen). Referenced by name in globals.css's
+// `--font-sans` stack.
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css'
 import './globals.css'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+// Newsreader — display type and every money figure (SPEC §3). Variable
+// font from Google Fonts with the optical-size axis, roman + italic; weight
+// defaults to the full variable range (400/500 are the ones the statement
+// uses). Latin-only by design: globals.css puts it first in the display
+// stack with Pretendard second, so Hangul always falls through to sans.
+const newsreader = Newsreader({
   subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  axes: ['opsz'],
+  variable: '--font-newsreader',
+  display: 'swap',
 })
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -58,7 +66,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${newsreader.variable} h-full`}
     >
       <head>
         <ThemeScript />
@@ -90,7 +98,6 @@ export default function RootLayout({
         <NavigationWatchdog />
         <NextIntlClientProvider>
           <SidebarProvider>
-            <Backdrop />
             <Header />
             {children}
           </SidebarProvider>

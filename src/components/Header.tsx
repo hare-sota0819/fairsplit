@@ -1,11 +1,10 @@
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { auth } from '@/auth'
-import { SidebarToggle } from './sidebar/SidebarToggle'
-import { BrandSlot, RailOffset } from './sidebar/ShellFrame'
+import { NavIndex } from './nav/NavIndex'
+import { HeaderFrame, PanelOffset } from './sidebar/ShellFrame'
 import { AccountMenu } from './AccountMenu'
 import { NavLink } from './NavLoader'
-import { Button } from './ui/button'
 
 export async function Header() {
   const [session, t, tApp, tLoading] = await Promise.all([
@@ -14,54 +13,66 @@ export async function Header() {
     getTranslations('app'),
     getTranslations('loading'),
   ])
+  const wordmark = (
+    <NavLink
+      href="/"
+      caption={tLoading('general')}
+      className="bg-primary-soft px-1.5 text-[13px] leading-[1.6] tracking-[0.04em] text-primary uppercase transition-colors duration-fast hover:bg-primary hover:text-primary-foreground"
+    >
+      {tApp('name')}
+    </NavLink>
+  )
   return (
-    // Sticky (owner, 2026-08-14: the menu scrolled away with long chat
-    // transcripts): pinned to the viewport top, above page content and the
-    // composer dock (z-10) but under the sidebar drawer/scrim (z-50). The
-    // top safe-area inset lives HERE now, not on <body> — a stuck header
-    // sits at viewport y=0, so ITS padding is what keeps the notch/status
-    // bar off the controls (see layout.tsx's body comment).
-    <header className="sticky top-0 z-20 border-b border-border bg-background">
-      <RailOffset className="flex items-center justify-between px-5 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3">
-        <div className="flex items-center gap-1">
-          <SidebarToggle label={t('sidebar.open')} />
-          <BrandSlot>
-            <NavLink
-              href="/"
-              caption={tLoading('general')}
-              className="rounded-md px-1 font-bold tracking-tight transition-colors hover:text-primary"
-            >
-              {tApp('name')}
-            </NavLink>
-          </BrandSlot>
-        </div>
-        <nav className="flex items-center gap-1 text-sm">
-          {session?.user ? (
-            /*
-             * ONE control, not three. "New group", "Account" and "Sign out"
-             * used to sit side by side at equal weight, and none of them told
-             * you whose account you were in. Everything moved behind the
-             * avatar — see AccountMenu.
-             */
-            <AccountMenu
-              name={session.user.name?.trim() ?? ''}
-              email={session.user.email ?? ''}
-              labels={{
-                menu: t('accountMenu'),
-                settings: t('accountSettings'),
-                newGroup: t('newGroup'),
-                switchGroup: t('sidebar.switchGroup'),
-                switchAccount: t('switchAccount'),
-                signOut: t('signOut'),
-              }}
-            />
-          ) : (
-            <Button asChild variant="ghost" size="touch">
-              <Link href="/signin">{t('signIn')}</Link>
-            </Button>
-          )}
-        </nav>
-      </RailOffset>
-    </header>
+    <HeaderFrame signedIn={Boolean(session?.user)}>
+      {/* Sticky (owner, 2026-08-14: the menu scrolled away with long chat
+          transcripts): pinned to the viewport top, above page content and
+          the composer dock (z-10). The top safe-area inset lives HERE, not
+          on <body> — a stuck header sits at viewport y=0, so ITS padding is
+          what keeps the notch/status bar off the controls (see layout.tsx's
+          body comment). Chrome is typography on the desk (docs/BRAND.md v2
+          §2c/§2d): one dark rule below, no fill difference, no shadow. */}
+      <header className="sticky top-0 z-20 border-b border-border-strong bg-background">
+        <PanelOffset className="flex items-center justify-between px-5 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3">
+          <div className="flex items-center gap-1">
+            {/* The in-place text index (v2 §3) — signed-in only; a stranger
+              on the landing/auth screens has nowhere to go yet. The wordmark
+              rides inside it so both fade as the links materialise. */}
+            {session?.user ? <NavIndex>{wordmark}</NavIndex> : wordmark}
+          </div>
+          <nav className="flex items-center gap-1 text-sm">
+            {session?.user ? (
+              /*
+               * ONE control, not three. "New group", "Account" and "Sign out"
+               * used to sit side by side at equal weight, and none of them told
+               * you whose account you were in. Everything moved behind the
+               * avatar — see AccountMenu.
+               */
+              <AccountMenu
+                name={session.user.name?.trim() ?? ''}
+                email={session.user.email ?? ''}
+                labels={{
+                  menu: t('accountMenu'),
+                  settings: t('accountSettings'),
+                  newGroup: t('newGroup'),
+                  switchGroup: t('sidebar.switchGroup'),
+                  switchAccount: t('switchAccount'),
+                  signOut: t('signOut'),
+                }}
+              />
+            ) : (
+              <Link
+                href="/signin"
+                className="flex h-11 items-center px-2 text-[13px] text-muted-foreground uppercase transition-colors duration-fast hover:text-primary"
+              >
+                <span aria-hidden="true" className="mr-1">
+                {'>'}
+              </span>
+                {t('signIn')}
+              </Link>
+            )}
+          </nav>
+        </PanelOffset>
+      </header>
+    </HeaderFrame>
   )
 }

@@ -67,7 +67,7 @@ export function TotalCard({
   const [open, setOpen] = useState(false)
   return (
     <div
-      className="flex flex-col rounded-xl bg-card shadow-sm ring-1 ring-border-strong"
+      className="flex flex-col rounded-xl bg-card ring-1 ring-border-strong"
       data-testid={testId}
     >
       <button

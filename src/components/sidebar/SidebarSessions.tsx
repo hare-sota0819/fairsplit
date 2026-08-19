@@ -12,9 +12,11 @@ import {
 } from '@/app/groups/[groupId]/chat-session-actions'
 import { useSidebar } from './SidebarProvider'
 
+// Rows are typography on paper (docs/BRAND.md v2 §2c): hover darkens the
+// hairline, the current row is told by weight, never by a fill.
 const rowClassName =
-  'rounded-lg px-2 py-2 text-sm text-foreground transition-colors duration-fast hover:bg-muted active:bg-muted'
-const activeRowClassName = 'bg-primary-soft font-semibold text-primary'
+  'rounded-lg px-2 py-2 text-sm text-foreground transition-colors duration-fast'
+const activeRowClassName = 'font-semibold'
 
 /**
  * The reference-app-style conversation list (R2b, docs/PROMPT.md 2026-08-15 — the
@@ -157,17 +159,13 @@ export function SidebarSessions({
                 rowClassName,
                 'flex min-w-0 flex-1 items-center gap-2 pr-8',
                 isPage &&
-                  'gap-3 rounded-xl border border-border bg-card px-3 py-3 pr-10 hover:bg-muted/60',
+                  'gap-3 rounded-lg border border-border bg-card px-3 py-3 pr-10 hover:border-border-strong active:border-border-strong',
                 activeId === session.id && activeRowClassName,
               )}
             >
               <MessageSquare
                 aria-hidden="true"
-                className={cn(
-                  'size-4 shrink-0 text-muted-foreground',
-                  isPage &&
-                    'size-9 rounded-full bg-primary-soft p-2 text-foreground/80',
-                )}
+                className="size-4 shrink-0 text-muted-foreground"
               />
               {isPage ? (
                 <span className="flex min-w-0 flex-col">
@@ -188,7 +186,7 @@ export function SidebarSessions({
               }}
               aria-label={t('rowMenu')}
               className={cn(
-                'absolute right-1 rounded-md p-1.5 text-muted-foreground opacity-60 transition-opacity hover:bg-muted hover:opacity-100',
+                'absolute right-1 rounded-md p-1.5 text-muted-foreground transition-colors duration-fast hover:text-foreground',
                 isPage && 'right-2',
               )}
               data-testid={`sidebar-session-menu-${session.id}`}
