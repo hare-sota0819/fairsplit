@@ -4,7 +4,6 @@ import { getTranslations } from 'next-intl/server'
 import { Newsreader } from 'next/font/google'
 import { Header } from '@/components/Header'
 import { NavigationWatchdog } from '@/components/NavigationWatchdog'
-import { SidebarProvider } from '@/components/sidebar/SidebarProvider'
 import { ThemeScript } from '@/components/ThemeChoice'
 import './globals.css'
 
@@ -48,7 +47,11 @@ export default function RootLayout({
     <html lang="en" className={`${newsreader.variable} h-full antialiased`}>
       <head>
         <ThemeScript />
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://cdn.jsdelivr.net"
+          crossOrigin="anonymous"
+        />
         {/* eslint-disable-next-line @next/next/no-css-tags -- third-party CDN stylesheet, not a local asset */}
         <link
           rel="stylesheet"
@@ -58,10 +61,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col pb-[env(safe-area-inset-bottom)]">
         <NavigationWatchdog />
         <NextIntlClientProvider>
-          <SidebarProvider>
-            <Header />
-            {children}
-          </SidebarProvider>
+          <Header />
+          {children}
         </NextIntlClientProvider>
       </body>
     </html>

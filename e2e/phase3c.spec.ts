@@ -50,13 +50,18 @@ test('rates: as-of date, wallet detour keeps the draft, unit-anchored override, 
   await signUp(pageA, 'Alice E2E', uniqueEmail('alice'))
 
   await pageA.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await pageA.waitForTimeout(1500)
   await pageA.getByLabel('Group name').fill('Rates E2E')
   await pageA.getByLabel('Settlement currency').selectOption('KRW')
   await pageA.getByLabel('Your display name in this group').fill('Alice')
   await pageA.getByRole('button', { name: 'Create group' }).click()
-  // Home is chat-only (Task 5, app-shell restructure): the invite link
+  // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
-  await expect(pageA.getByTestId('chat-input')).toBeVisible()
+  await expect(pageA.getByTestId('home')).toBeVisible()
   const groupUrl = pageA.url()
   await pageA.goto(`${groupUrl}/invite`)
   const invitePath = await pageA.getByTestId('invite-link').innerText()
@@ -67,9 +72,9 @@ test('rates: as-of date, wallet detour keeps the draft, unit-anchored override, 
   await pageB.goto(invitePath)
   await pageB.getByLabel('Your display name in this group').fill('Bob')
   await pageB.getByRole('button', { name: 'Join group' }).click()
-  // Home is chat-only (Task 5, app-shell restructure): the composer being
+  // Home is the expense feed (chat removal, 2026-08-21): it being
   // there is proof the join landed and home rendered.
-  await expect(pageB.getByTestId('chat-input')).toBeVisible()
+  await expect(pageB.getByTestId('home')).toBeVisible()
 
   await pageA.goto(`${groupUrl}/expenses/new`)
   await pageA.getByTestId('amount').fill('5000')

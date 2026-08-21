@@ -1,5 +1,7 @@
 import 'dotenv/config'
 import { defineConfig } from '@playwright/test'
+import { E2E_DEV_EMAILS } from './e2e/dev-constants'
+import { E2E_BASE_URL, E2E_PORT, scratchDatabaseUrl } from './e2e/scratch-db'
 
 // Smoke tests run against a production build on a dedicated port, using a
 // dedicated scratch database — never the developer's dev DB. See
@@ -13,17 +15,17 @@ import { defineConfig } from '@playwright/test'
 // The URL is derived from DATABASE_URL (loaded from .env by `dotenv/config`
 // above) rather than hand-typed, so it always tracks whatever host/user/port
 // the developer's local Postgres actually uses.
-function scratchDatabaseUrl(devUrl: string): string {
-  const u = new URL(devUrl)
-  const name = u.pathname.replace(/^\//, '')
-  u.pathname = `/${name}_e2e`
-  return u.toString()
-}
-
-const devDatabaseUrl =
-  process.env.DATABASE_URL ??
-  'postgresql://fairsplit:localdev@localhost:5432/fairsplit?schema=public'
-const e2eDatabaseUrl = scratchDatabaseUrl(devDatabaseUrl)
+// The port and the scratch database name are env-overridable (E2E_PORT /
+// E2E_DB_NAME) so two checkouts of this repo — parallel worker branches, a
+// worktree next to the main clone — can run the suite at the same time
+// without stealing each other's port or DROPping each other's database
+// mid-run. Unset means today's values exactly, so nothing changes for a
+// single-checkout developer.
+//
+// Both live in e2e/scratch-db.ts rather than here, because three specs open
+// their own Prisma client against the same database and must agree with this
+// file about which one it is.
+const e2eDatabaseUrl = scratchDatabaseUrl()
 
 export default defineConfig({
   testDir: 'e2e',
@@ -62,7 +64,7 @@ export default defineConfig({
   // lexicon rows need it). Most specs still default to English, and most
   // Korean-locale copy is still only exercised by those two files rather
   // than every spec — that narrower gap remains real.
-  use: { baseURL: 'http://localhost:3100', locale: 'en-US' },
+  use: { baseURL: E2E_BASE_URL, locale: 'en-US' },
   webServer: {
     // Reset the scratch DB, THEN start the app server — chained in one shell
     // command so it runs no matter how Playwright is invoked (verify.sh or a
@@ -70,8 +72,8 @@ export default defineConfig({
     // Playwright starts the webServer plugin before running globalSetup, so
     // a globalSetup-based reset would race the app server's first DB
     // connection instead of preceding it.
-    command: 'scripts/e2e-db-reset.sh && npx next start -p 3100',
-    url: 'http://localhost:3100',
+    command: `scripts/e2e-db-reset.sh && npx next start -p ${E2E_PORT}`,
+    url: E2E_BASE_URL,
     // NEVER reuse a running server. `next start` loads the build at boot and
     // a later `npm run build` does not hot-swap it, so a leftover server from
     // an earlier run silently serves stale code. That cost three separate
@@ -100,6 +102,18 @@ export default defineConfig({
       FRANKFURTER_BASE_URL: 'http://127.0.0.1:9',
       DATABASE_URL: e2eDatabaseUrl,
       DIRECT_URL: e2eDatabaseUrl,
+      // Dev-mode allowlist (PLAN.md Stage 2). Pinned HERE rather than in
+      // `.env` so the permissions spec is reproducible on a fresh clone:
+      // `.env` is gitignored, and `verify.sh` only seeds it from
+      // `.env.example` when it is missing entirely. The address is the one
+      // `e2e/dev-account.ts` exports, so config and specs cannot drift.
+      DEV_EMAILS: E2E_DEV_EMAILS.join(', '),
+      // D2-3: the chat fallback is rules-only in dev, test AND e2e. The
+      // default is keyed off NODE_ENV, and this suite runs a PRODUCTION
+      // build (`next start` below) — so without the explicit flag the
+      // fallback would be live here, quietly producing cards for exactly
+      // the sentences the corpus exists to catch the parser failing on.
+      CHAT_FALLBACK_ENABLED: 'false',
     },
   },
 })

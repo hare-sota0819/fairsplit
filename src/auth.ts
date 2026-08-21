@@ -5,6 +5,7 @@ import Credentials from 'next-auth/providers/credentials'
 import Google from 'next-auth/providers/google'
 import { DEFAULT_LOCALE, isLocale } from '@/i18n/locale'
 import { reportAuthEnv } from '@/lib/auth-env'
+import { stampEmailVerified } from '@/lib/auth-verified'
 import { prisma } from '@/lib/prisma'
 
 reportAuthEnv()
@@ -65,6 +66,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  // The producer for `User.emailVerified` (DECISIONS D2-17). Nothing in this
+  // app wrote the column before, which is why the dev role gate had to carry
+  // an "… or a linked OAuth account" clause; it now tests the column alone
+  // (src/app/dev/role-policy.ts) because this event keeps the column true.
+  // The rule itself lives in `stampEmailVerified` so it is unit-tested with
+  // no database; see there for why `signIn` and not `linkAccount`.
+  events: {
+    signIn: async ({ user, account }) => {
+      await stampEmailVerified(prisma, { user, account })
+    },
+  },
   callbacks: {
     /**
      * The account's language rides in the token.

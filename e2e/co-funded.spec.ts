@@ -36,13 +36,18 @@ test('a receipt two people fronted credits both of them', async ({
   const alice = await contextA.newPage()
   await signUp(alice, 'Alice E2E', uniqueEmail('cofund-a'))
   await alice.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await alice.waitForTimeout(1500)
   await alice.getByLabel('Group name').fill('Co-funded E2E')
   await alice.getByLabel('Settlement currency').selectOption('KRW')
   await alice.getByLabel('Your display name in this group').fill('Alice')
   await alice.getByRole('button', { name: 'Create group' }).click()
-  // Home is chat-only (Task 5, app-shell restructure): the invite link
+  // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
-  await expect(alice.getByTestId('chat-input')).toBeVisible()
+  await expect(alice.getByTestId('home')).toBeVisible()
   const groupUrl = alice.url()
   await alice.goto(`${groupUrl}/invite`)
   const invitePath = await alice.getByTestId('invite-link').innerText()
@@ -53,9 +58,9 @@ test('a receipt two people fronted credits both of them', async ({
   await bob.goto(invitePath)
   await bob.getByLabel('Your display name in this group').fill('Bob')
   await bob.getByRole('button', { name: 'Join group' }).click()
-  // Home is chat-only (Task 5, app-shell restructure): the composer being
+  // Home is the expense feed (chat removal, 2026-08-21): it being
   // there is proof the join landed and home rendered.
-  await expect(bob.getByTestId('chat-input')).toBeVisible()
+  await expect(bob.getByTestId('home')).toBeVisible()
 
   // Alice's cash wallet holds exactly ¥30,000, bought at 100 JPY = 1000 KRW.
   // A flat rate both portions share keeps the rates out of the way: this

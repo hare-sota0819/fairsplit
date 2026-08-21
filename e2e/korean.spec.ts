@@ -36,14 +36,19 @@ test('the app can be used end to end in Korean', async ({ page }) => {
   await expect(page.getByTestId('account-menu')).toBeVisible()
 
   await page.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await page.waitForTimeout(1500)
   await page.getByLabel('모임 이름').fill('오사카 여행')
   await page.getByLabel('정산 통화').selectOption('KRW')
   await page.getByLabel('이 모임에서 쓸 내 이름').fill('소타')
   await page.getByRole('button', { name: '모임 만들기' }).click()
-  // Home is chat-only (Task 5, app-shell restructure): the empty-chat
-  // greeting is what a brand-new group shows now — also proof the redirect
-  // landed, so no separate wait is needed first.
-  await expect(page.getByText('오늘 어떤 지출이 있었나요?')).toBeVisible()
+  // Home is the expense feed (chat removal, 2026-08-21): a brand-new group
+  // shows its empty state — also proof the redirect landed, so no separate
+  // wait is needed first.
+  await expect(page.getByTestId('home-empty')).toBeVisible()
   const groupUrl = page.url()
 
   // A foreign-currency expense: the manual override keeps this off the network,

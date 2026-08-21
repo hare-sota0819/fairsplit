@@ -48,6 +48,11 @@ async function setUp(page: Page): Promise<string> {
   await stubRates(page)
   await signUp(page, 'Alice E2E', uniqueEmail('alice'))
   await page.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await page.waitForTimeout(1500)
   await page.getByLabel('Group name').fill('Till E2E')
   await page.getByLabel('Settlement currency').selectOption('KRW')
   await page.getByLabel('Your display name in this group').fill('Alice')

@@ -1,4 +1,6 @@
 import { auth } from '@/auth'
+import { resolveAccountRoleFor } from '@/app/dev/role'
+import { decideScanAllowance } from '@/app/dev/scan-limit'
 import { prisma } from '@/lib/prisma'
 import {
   RECEIPT_DAILY_SCAN_LIMIT,
@@ -6,7 +8,7 @@ import {
 } from '@/lib/receipts/config'
 import { GeminiReceiptParser } from '@/lib/receipts/gemini'
 import { checkTotal } from '@/lib/receipts/invariant'
-import { evaluateAllowance, startOfUtcDay } from '@/lib/receipts/limit'
+import { startOfUtcDay } from '@/lib/receipts/limit'
 import { receiptImageStoreFromEnv } from '@/lib/receipts/storage'
 
 /**
@@ -73,10 +75,21 @@ export async function POST(request: Request): Promise<Response> {
   // Daily cap (brief §181). Counted BEFORE the call, over both successful and
   // failed attempts — a parse that returned nothing still cost tokens, and a
   // limit that only counted successes would not stop a stuck client.
-  const usedToday = await prisma.receiptScan.count({
-    where: { userId, createdAt: { gte: startOfUtcDay(new Date()) } },
-  })
-  const allowance = evaluateAllowance(usedToday, RECEIPT_DAILY_SCAN_LIMIT)
+  //
+  // LIFTED for dev accounts (PLAN.md Stage 2, "Dev effects: receipt-scan
+  // daily limit lifted"): the mining round has the owner scanning well past
+  // an ordinary day's use, and a tester who hits a wall stops testing. The
+  // `ReceiptScan` row below is still written either way, so the spend stays
+  // observable — only the refusal goes. Who counts as dev is decided
+  // server-side from the verified-email allowlist (src/app/dev/role.ts).
+  const allowance = await decideScanAllowance(
+    await resolveAccountRoleFor(userId),
+    () =>
+      prisma.receiptScan.count({
+        where: { userId, createdAt: { gte: startOfUtcDay(new Date()) } },
+      }),
+    RECEIPT_DAILY_SCAN_LIMIT,
+  )
   if (!allowance.allowed) {
     return fail('DAILY_LIMIT_REACHED', 429, { limit: allowance.limit })
   }
@@ -142,6 +155,8 @@ export async function POST(request: Request): Promise<Response> {
     receipt: outcome.receipt,
     check: checkTotal(outcome.receipt),
     imagePath,
-    remaining: allowance.remaining - 1,
+    // null = uncapped (a dev account). No client reads this field today; it
+    // is the honest value rather than an invented large number.
+    remaining: allowance.remainingAfter,
   })
 }

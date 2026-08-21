@@ -10,6 +10,12 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    // Scripts under scripts/**/*.mts run on Node's native type stripping
+    // ("node scripts/corpus/recover-chat-logs.mts"), which does NOT rewrite
+    // import specifiers — a relative import has to name the .mts file that
+    // actually exists on disk. This flag lets tsc accept that specifier; it
+    // is safe here because the project never emits (noEmit above).
+    "rewriteRelativeImportExtensions": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,

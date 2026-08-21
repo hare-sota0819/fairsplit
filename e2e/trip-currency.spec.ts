@@ -1,6 +1,4 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
 import { createWallet, showWallets } from './wallet-flow'
 
 test.use({ viewport: { width: 390, height: 844 } })
@@ -27,6 +25,11 @@ async function createGroup(
   options: { tripCountry?: string; displayName?: string } = {},
 ): Promise<string> {
   await page.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await page.waitForTimeout(1500)
   await page.getByLabel('Group name').fill(name)
   await page.getByLabel('Settlement currency').selectOption('KRW')
   if (options.tripCountry) {
@@ -91,54 +94,6 @@ async function stubRates(page: Page): Promise<void> {
 }
 
 /**
- * The scratch DB URL, derived the same way playwright.config.ts derives
- * `webServer`'s DATABASE_URL — duplicated rather than imported because the
- * config module's own copy is not exported.
- */
-function scratchDatabaseUrl(devUrl: string): string {
-  const u = new URL(devUrl)
-  const name = u.pathname.replace(/^\//, '')
-  u.pathname = `/${name}_e2e`
-  return u.toString()
-}
-
-/**
- * Chat (unlike the wizard) has no manual-rate field: a confirm-card save in
- * a currency other than settlement always resolves its rate through
- * `getSnapshotRate`, and this suite's `webServer` deliberately points both
- * FX providers at a closed port (playwright.config.ts) so nothing here ever
- * reaches a live one. Seeding today's rate straight into `RateCache` makes
- * that lookup a cache hit (`cachePlan`'s `reuse` branch — cache-policy.ts)
- * instead of a network call: the same substitute every other spec makes via
- * the wizard's manual-rate-toggle, for the one save path that has no such
- * control to enter one through.
- */
-async function seedTodaysRate(
-  base: string,
-  quote: string,
-  rate: string,
-): Promise<void> {
-  const devUrl =
-    process.env.DATABASE_URL ??
-    'postgresql://fairsplit:localdev@localhost:5432/fairsplit?schema=public'
-  const db = new PrismaClient({
-    adapter: new PrismaPg({
-      connectionString: scratchDatabaseUrl(devUrl),
-    }),
-  })
-  const today = new Date().toISOString().slice(0, 10)
-  try {
-    await db.rateCache.upsert({
-      where: { date_base_quote: { date: today, base, quote } },
-      create: { date: today, base, quote, rate, asOf: today },
-      update: { rate, asOf: today, fetchedAt: new Date() },
-    })
-  } finally {
-    await db.$disconnect()
-  }
-}
-
-/**
  * The owner's definition of done, verbatim: create a group with trip
  * currency JPY -> expense defaults to JPY -> item prices in JPY -> travel
  * card offered under "Paid from" -> assign by quantity and close the
@@ -164,7 +119,7 @@ test('the phone walkthrough: JPY trip currency end to end', async ({
     tripCountry: 'JP',
     displayName: 'Alice',
   })
-  // Home is chat-only (Task 5, app-shell restructure): the invite link
+  // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await pageA.goto(`${groupUrl}/invite`)
   const invitePath = await pageA.getByTestId('invite-link').innerText()
@@ -175,9 +130,9 @@ test('the phone walkthrough: JPY trip currency end to end', async ({
   await pageB.goto(invitePath)
   await pageB.getByLabel('Your display name in this group').fill('Bob')
   await pageB.getByRole('button', { name: 'Join group' }).click()
-  // Home is chat-only (Task 5, app-shell restructure): the composer being
+  // Home is the expense feed (chat removal, 2026-08-21): it being
   // there is proof the join landed and home rendered.
-  await expect(pageB.getByTestId('chat-input')).toBeVisible()
+  await expect(pageB.getByTestId('home')).toBeVisible()
 
   // A travel card in the trip currency, so "Paid from" has something to
   // offer besides the bank.
@@ -270,9 +225,9 @@ test('the phone walkthrough: JPY trip currency end to end', async ({
     receiptRows.nth(0).getByTestId('receipt-assignees'),
   ).not.toBeVisible()
   await receiptRows.nth(0).locator('summary').click()
-  await expect(receiptRows.nth(0).getByTestId('receipt-assignees')).toContainText(
-    'Bob',
-  )
+  await expect(
+    receiptRows.nth(0).getByTestId('receipt-assignees'),
+  ).toContainText('Bob')
 
   // The member's TWO TOTALS, wallet balances and per-person list used to
   // all lead home, in that DOM order. Task 5 (app-shell restructure,
@@ -308,9 +263,7 @@ test('the phone walkthrough: JPY trip currency end to end', async ({
   // The per-person list moved to /status too — the viewer's own row (only
   // that one, home never showed anyone else's counterparties) opens onto
   // the shared two-person history, same as home's old per-person row did.
-  const aliceRow = pageA
-    .getByTestId('status-row')
-    .filter({ hasText: 'Alice' })
+  const aliceRow = pageA.getByTestId('status-row').filter({ hasText: 'Alice' })
   await aliceRow.getByTestId('status-row-toggle').click()
   await aliceRow.getByTestId('pairwise-link').first().click()
   await expect(pageA).toHaveURL(/\/with\//)
@@ -384,7 +337,7 @@ test('assignment step: the >10 filter keeps ticks intact, and Done wraps around'
   const ownerPage = await ownerContext.newPage()
   await signUp(ownerPage, 'Roster Owner', uniqueEmail('roster-owner'))
   const groupUrl = await createGroup(ownerPage, 'Roster Trip E2E')
-  // Home is chat-only (Task 5, app-shell restructure): the invite link
+  // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await ownerPage.goto(`${groupUrl}/invite`)
   const invitePath = await ownerPage.getByTestId('invite-link').innerText()
@@ -394,11 +347,9 @@ test('assignment step: the >10 filter keeps ticks intact, and Done wraps around'
     const page = await context.newPage()
     await signUp(page, `Member ${i}`, uniqueEmail(`roster-${i}`))
     await page.goto(invitePath)
-    await page
-      .getByLabel('Your display name in this group')
-      .fill(`Member ${i}`)
+    await page.getByLabel('Your display name in this group').fill(`Member ${i}`)
     await page.getByRole('button', { name: 'Join group' }).click()
-    await expect(page.getByTestId('chat-input')).toBeVisible()
+    await expect(page.getByTestId('home')).toBeVisible()
     await context.close()
   }
 
@@ -481,94 +432,4 @@ test('assignment step: the >10 filter keeps ticks intact, and Done wraps around'
   expect(expandedCount).toBe(0)
 
   await ownerContext.close()
-})
-
-/**
- * A1 hotfix: the chat composer's `defaultCurrency` now matches the wizard's
- * (`defaultExpenseCurrency` — group.tripCurrency, not group.settlementCurrency).
- * Before the fix, chat always defaulted to settlement, so a trip-currency
- * mention on a foreign-trip group was misclassified as `crossCurrency` (its
- * parsed currency != the chat default) and bounced to the wizard for no
- * reason — even though the wizard itself would have opened on that exact
- * currency. This is the regression test for that: same JPY-trip/KRW-settlement
- * group as "the phone walkthrough" above, entered through chat instead of the
- * wizard.
- */
-test('chat entry in the trip currency saves directly instead of bouncing to the wizard', async ({
-  page,
-}) => {
-  await signUp(page, 'Erin E2E', uniqueEmail('erin'))
-  await createGroup(page, 'JPY Trip Chat E2E', {
-    tripCountry: 'JP',
-    displayName: 'Erin',
-  })
-
-  // See seedTodaysRate's doc comment: chat has no manual-rate field, so this
-  // stands in for a live provider answering (which it would, in production;
-  // this suite's webServer never lets one be reached for real).
-  await seedTodaysRate('JPY', 'KRW', '9')
-
-  await page.getByTestId('chat-input').fill('택시 8500엔')
-  await page.getByTestId('chat-send').click()
-
-  // The bug: this used to render `chat-cross-currency-card` instead.
-  await expect(page.getByTestId('chat-confirm-card')).toBeVisible()
-  await expect(page.getByTestId('chat-cross-currency-card')).toHaveCount(0)
-  await expect(page.getByTestId('chat-amount')).toContainText('¥8,500')
-
-  await page.getByTestId('chat-confirm-save').click()
-  await expect(
-    page.getByTestId('chat-saved-summary').filter({ hasText: '택시' }),
-  ).toBeVisible()
-})
-
-/**
- * A2 (docs/PROMPT.md "2026-08-11 배포 후 폰 리뷰 2차") superseded this test's
- * old premise: a currency matching neither the trip nor the settlement
- * currency used to bail to the wizard with no way back — the A1 hotfix this
- * file otherwise documents only changed what counted as "the same currency
- * as the default", not that crossCurrency mechanism itself. A2 removed the
- * mechanism entirely: ANY currency now opens an ordinary confirm card, with
- * an inline funding-source section whenever it differs from the group's
- * settlement currency (here: USD, JPY trip currency, KRW settlement — all
- * three distinct, so this is the strictest version of that case). The
- * escape to the wizard survives as a secondary link, never the only path.
- */
-test('a currency mention that matches neither the trip nor settlement currency is recorded in-chat, with a funding section', async ({
-  page,
-}) => {
-  await signUp(page, 'Frank E2E', uniqueEmail('frank'))
-  await createGroup(page, 'JPY Trip USD Mention E2E', {
-    tripCountry: 'JP',
-    displayName: 'Frank',
-  })
-  // See seedTodaysRate's own doc comment above: chat's confirm card has no
-  // manual-rate field, so this stands in for a live provider answering.
-  await seedTodaysRate('USD', 'KRW', '1300')
-
-  await page.getByTestId('chat-input').fill('저녁 50달러')
-  await page.getByTestId('chat-send').click()
-
-  // The bug this used to pin: this rendered `chat-cross-currency-card`
-  // instead, with no way to finish the entry without leaving the chat.
-  await expect(page.getByTestId('chat-confirm-card')).toBeVisible()
-  await expect(page.getByTestId('chat-cross-currency-card')).toHaveCount(0)
-  await expect(page.getByTestId('chat-amount')).toContainText('$50')
-
-  // USD differs from the group's KRW settlement currency, so the
-  // funding-source section is offered — defaulting to the safe "paid on
-  // the spot" choice, since Frank has no USD wallet.
-  await expect(page.getByTestId('chat-funding-section')).toBeVisible()
-  await expect(page.getByTestId('chat-funding-onspot')).toHaveAttribute(
-    'data-state',
-    'on',
-  )
-
-  // The wizard escape still exists (never a dead end, never the ONLY path).
-  await expect(page.getByTestId('chat-open-form')).toBeVisible()
-
-  await page.getByTestId('chat-confirm-save').click()
-  await expect(
-    page.getByTestId('chat-saved-summary').filter({ hasText: '저녁' }),
-  ).toBeVisible()
 })

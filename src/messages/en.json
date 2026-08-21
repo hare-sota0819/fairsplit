@@ -70,7 +70,7 @@
   },
   "guide": {
     "title": "How to use FairSplit",
-    "intro": "You type expenses like a text message. A few more things worth knowing before you start.",
+    "intro": "You record an expense in a few taps. A few more things worth knowing before you start.",
     "why": {
       "rateTitle": "It settles at what your money cost you",
       "rateBody": "Record what you paid to exchange money — ₩450,000 for ¥50,000 — and everything spent from that wallet settles at that rate. Today's market rate is fetched automatically when you need one instead.",
@@ -79,19 +79,18 @@
       "itemsTitle": "Per item, not per head",
       "itemsBody": "An expense can be split by who actually had each line, down to the quantity. Anything nobody claims is shared out."
     },
-    "persistIcon": "A small clock next to a message means it's still saving to your history — wait for it to disappear before closing the app or refreshing.",
     "stepsTitle": "Five steps",
     "steps": {
       "groupTitle": "Join a group, or start one",
       "groupBody": "An invite link puts you straight into your friend's group. Starting your own takes a name, the currency you will settle in, and where you are going.",
       "walletTitle": "Add a wallet, then top it up",
       "walletBody": "Exchanged cash, a travel card, a prepaid card — each one is a wallet. Add one from Wallets & top-ups in the menu, and recording a top-up is what teaches the app your own exchange rate.",
-      "chatTitle": "Type it in chat",
-      "chatBody": "Type it the way you'd say it, and it sorts itself out — try “lunch 12000, Minsu and me”. For a complicated receipt, use Add manually from the menu instead — you can photograph the receipt there too.",
+      "chatTitle": "Add an expense",
+      "chatBody": "Add manually from the menu walks you through it — amount, who paid, who is in. You can photograph the receipt there too and the items come back as lines.",
       "assignTitle": "Say who had what",
       "assignBody": "Tick the people on each line, quantity included. Anything nobody ticks is shared between everyone on that expense.",
       "settleTitle": "See where everyone stands",
-      "settleBody": "Status, from the menu, shows what you fronted, what your own share came to, and what you are owed or owe with each person. Tap a name for the full history between the two of you. Or just ask chat — try “who do I owe?”"
+      "settleBody": "Status, from the menu, shows what you fronted, what your own share came to, and what you are owed or owe with each person. Tap a name for the full history between the two of you."
     },
     "again": "You can open this guide again any time from Account.",
     "cta": "Start using it"
@@ -119,28 +118,13 @@
       "manualEntry": "Add manually",
       "invite": "Invite",
       "allGroups": "All groups",
-      "chats": "Chats",
       "switchGroup": "Switch group",
       "currentGroup": "Current group"
     },
     "account": "Account",
     "accountMenu": "Your account",
     "accountSettings": "Account settings",
-    "switchAccount": "Switch account",
-    "sessions": {
-      "heading": "Chats",
-      "newChat": "New chat",
-      "renameLabel": "Chat name",
-      "renameSave": "Save",
-      "renameCancel": "Cancel",
-      "delete": "Delete",
-      "rowMenu": "Chat options",
-      "recent": "Recents",
-      "pageTitle": "Chats",
-      "search": "Search chats",
-      "empty": "No chats yet — start one below.",
-      "noMatch": "No chats match."
-    }
+    "switchAccount": "Switch account"
   },
   "auth": {
     "signIn": {
@@ -763,113 +747,59 @@
       "total": "Total",
       "evenAmong": "Split evenly, {count} people",
       "itemised": "Itemised"
-    }
-  },
-  "assistant": {
-    "balance": {
-      "owesTotal": "Send {amount} and you're all settled.",
-      "owesLine": "{name}: {amount}",
-      "receivesTotal": "You get {amount} back once everyone settles.",
-      "receivesLine": "{name}: {amount}",
-      "even": "You're all square right now.",
-      "who": "Send it to {names}.",
-      "empty": "Add one expense and I'll tell you what you owe."
     },
-    "pairwise": {
-      "youOwe": "Send {name} {amount}.",
-      "theyOwe": "{name} owes you {amount}.",
-      "even": "You and {name} are square."
-    },
-    "groupTotal": {
-      "sum": "Together you've spent {amount} so far.",
-      "sumWithCount": "Together you've spent {amount} so far, across {count} expenses.",
-      "perPerson": "That's about {amount} each.",
-      "transfersTitle": "Here's how it clears.",
-      "transferLine": "{from} → {to} {amount}",
-      "empty": "Add an expense and I'll total it up for you."
-    },
-    "mySpending": {
-      "paid": "You've paid {amount} so far.",
-      "consumed": "Your own share of that is {amount}.",
-      "ahead": "You're {amount} ahead.",
-      "behind": "You're {amount} behind.",
-      "empty": "Add an expense and I'll add up what you've paid."
-    },
-    "wallet": {
-      "one": "{label} has {amount} left.",
-      "line": "{label}: {amount}",
-      "overdrawn": "{label} is {amount} past zero. Record a top-up and it'll line up.",
-      "empty": "Add a wallet and I'll track your cash for you.",
-      "created": "Created the {label} wallet. Tell me whenever you exchange or spend and I'll keep the balance straight."
-    },
-    "help": {
-      "intro": "Here's what you can leave to Sem.",
-      "entry": "Type something like \"taxi $20, Sam paid\" and I'll log it.",
-      "balance": "Ask \"how much do I owe\" and I'll tell you.",
-      "pairwise": "Ask \"does Sam owe me\" for one person's balance.",
-      "groupTotal": "Ask \"how much have we spent\" for the group total.",
-      "wallet": "Ask \"how much cash do I have left\" for your wallet.",
-      "manual": "For anything complicated, the full form is one tap away."
-    },
-    "confirm": {
-      "saved": "Logged {amount}.",
-      "cancelled": "Dropped it. Tell me again and I'll write it down.",
-      "updatedAmount": "Changed it to {amount}. Save it like this?",
-      "updatedPayer": "{name} paid it now. Save it like this?",
-      "updatedParticipants": "Splitting between {names} now. Save it like this?",
-      "updatedHalf": "Splitting it with {name} 50/50. Save it like this?",
-      "updatedEveryone": "Splitting it with everyone now. Save it like this?",
-      "askWhatToChange": "What should I change — the amount, who paid, or who's splitting?",
-      "askWhichAmount": "What should the amount be?",
-      "askWhoToRemove": "Who should I take out?",
-      "askWhoToAdd": "Who should I add?",
-      "itemPriced": "Logged {name} at {amount}.",
-      "itemPriceNext": "What about {name}?",
-      "askItemPrice": "I couldn't read a price for {name}. Give me a number in this card's currency.",
-      "itemAssigned": "Marked {name} for {names}.",
-      "itemShared": "Marked {name} as shared by everyone."
-    },
-    "guided": {
-      "ack": "Sem got a little lost. Is it one of these?",
-      "cardOpenAck": "You've still got a card open — finish that one first, or cancel it.",
-      "hold": "No rush — tell me when you're ready.",
-      "option": {
-        "myBalance": "Want to know what you owe?",
-        "pairwise": "Want your balance with {name}?",
-        "groupTotal": "Want the group total so far?",
-        "mySpending": "Want to see what you've paid?",
-        "wallet": "Want your cash balance?",
-        "expense": "Should I log \"{input}\" as an expense?",
-        "help": "Want to see everything I can do?"
+    "batch": {
+      "title": "Review before saving",
+      "summary": "{rows, plural, one {# line read} other {# lines read}}. Nothing is saved until you confirm.",
+      "checksumMismatch": "Total line says {declared}, but the rows add up to {sum}.",
+      "checksumOk": "Total line {declared} matches the rows.",
+      "checksumExcluded": "{count, plural, one {# row in another currency is not counted} other {# rows in another currency are not counted}}.",
+      "status": {
+        "completed": "Ready",
+        "ask": "Needs an answer",
+        "unread": "Not read",
+        "total": "Total",
+        "scope": "Applies to all"
       },
-      "escape": "Or write it in the full form.",
-      "itemsPriceAsk": "Still missing prices for {names}. Tell me like \"{example} 3000\" and I'll fill it in.",
-      "settleAck": "Settling up! What would you like me to do?",
-      "whoAmbiguous": "Who do you mean — {names}? Give me the name.",
-      "whoUnknown": "I lost track of who you mean. Give me a name and I'll pick it right up."
-    },
-    "smallTalk": {
-      "greeting": "Hey! Tell me what you spent or what needs settling — I'm on it.",
-      "thanks": "Anytime. Call me whenever.",
-      "farewell": "See you next time!"
-    },
-    "history": {
-      "empty": "Nothing recorded yet — tell me the first expense and I'll log it.",
-      "headerMine": "Your latest {count, plural, one {expense} other {# expenses}} (paid by you):",
-      "headerGroup": "The group's latest {count, plural, one {expense} other {# expenses}}:",
-      "row": "{title} · {amount} ({name})",
-      "more": "…and {count} more. Ask me about any of them.",
-      "filteredHeader": "Found {count, plural, one {# expense} other {# expenses}} matching that.",
-      "filteredEmpty": "Nothing matches that. Try different terms.",
-      "totalLine": "Total {amount}",
-      "loadMore": "Show more ({count} left)"
-    },
-    "explain": {
-      "empty": "Nothing to explain yet - no shared expenses with you in them.",
-      "header": "Here is how it adds up - your share, newest first:",
-      "rowEven": "{title} · your share {amount} (split {count} ways)",
-      "rowItems": "{title} · your share {amount} ({items})",
-      "footer": "Ask \"how much do I owe?\" for the transfer amount."
+      "amountLabel": "Amount",
+      "payerLabel": "Paid by",
+      "descriptionLabel": "Description",
+      "payerUnset": "Ask who paid",
+      "merge": "Merge with next",
+      "split": "Split apart",
+      "confirm": "{count, plural, =0 {Nothing ready to save} one {Save 1 row} other {Save # rows}}",
+      "skipped": "{count, plural, one {# row is left open} other {# rows are left open}} — nothing is discarded.",
+      "checksumUnreadable": "The total line's amount could not be read, so nothing is compared against it.",
+      "checksumUnparsable": "{count, plural, one {# row's amount could not be read} other {# rows' amounts could not be read}}.",
+      "checksumNotAllReady": "{count, plural, one {# of the rows it adds up is still open} other {# of the rows it adds up are still open}}.",
+      "payerUnknown": "Not in this group ({id})",
+      "asks": {
+        "amount": "Needs an amount",
+        "payer": "Needs a payer",
+        "participants": "Needs someone to split with",
+        "counterparty": "Needs the other side",
+        "interpretation": "Needs a reading chosen"
+      },
+      "participantsLabel": "Split with",
+      "asksUnanswerable": "(cannot be answered here)",
+      "memberUnknown": "Not in this group ({id})",
+      "mergeBlocked": "Cannot merge: there is no boundary between this row and the next.",
+      "scopeApplied": "Applied across rows ({scope}).",
+      "scopeRevoke": "Revoke",
+      "scopeRestore": "Apply again",
+      "scopeRevoked": "Revoked — this line no longer applies across rows.",
+      "scopeKind": {
+        "payer": "payer",
+        "split": "split"
+      },
+      "unreadReason": {
+        "no-amount": "No amount on this line.",
+        "unparsed": "An amount was found but no expense could be read around it.",
+        "cross-row-reference": "Refers to another line, so it cannot be read alone.",
+        "residual-arithmetic": "States a remainder, not an amount of its own.",
+        "spans-rows": "Continues across lines."
+      },
+      "itemUnpriced": "no price"
     }
   },
   "balance": {
@@ -1005,6 +935,34 @@
       },
       "sizesLabel": "Size",
       "pokes": "Pokes: {count}"
+    },
+    "panel": {
+      "title": "Parser trace",
+      "show": "Show",
+      "hide": "Hide",
+      "empty": "Send a sentence to see how it parsed.",
+      "loading": "Tracing…",
+      "slots": "Slots",
+      "hits": "Hits",
+      "corrections": "Corrections",
+      "none": "none",
+      "leftover": "Description residue",
+      "openCard": "Open card",
+      "commit": "Parser",
+      "confidence": "confidence",
+      "refused": "No trace — this account is not in dev mode.",
+      "rejected": "The server would not accept that sentence (too long?).",
+      "error": "Tracing threw. That is a parser bug worth reporting."
+    },
+    "recall": {
+      "title": "Report this sentence",
+      "wrongAmount": "Wrong amount",
+      "wrongPerson": "Wrong person",
+      "shouldNotRecord": "Should not have been recorded",
+      "shouldRecord": "Should have been recorded",
+      "saved": "Reported.",
+      "failed": "Could not report that.",
+      "limited": "Too many reports just now — try again shortly."
     }
   }
 }

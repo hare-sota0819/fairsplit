@@ -31,13 +31,18 @@ test('landing, invite preview, guide after sign-up, and the guide from Account',
   await expect(host).toHaveURL(/\/groups$/)
 
   await host.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await host.waitForTimeout(1500)
   await host.getByLabel('Group name').fill('Guide Trip E2E')
   await host.getByLabel('Settlement currency').selectOption('KRW')
   await host.getByLabel('Your display name in this group').fill('Host')
   await host.getByRole('button', { name: 'Create group' }).click()
-  // Home is chat-only (Task 5, app-shell restructure): the invite link
+  // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
-  await expect(host.getByTestId('chat-input')).toBeVisible()
+  await expect(host.getByTestId('home')).toBeVisible()
   const groupUrl = host.url()
   await host.goto(`${groupUrl}/invite`)
   const invitePath = await host.getByTestId('invite-link').innerText()
@@ -49,10 +54,10 @@ test('landing, invite preview, guide after sign-up, and the guide from Account',
   await expect(
     host.getByRole('heading', { name: 'How to use FairSplit' }),
   ).toBeVisible()
-  // Pins the guide to the chat-first rewrite (Task 7, app-shell restructure)
-  // so a regression back to the old form-entry copy fails this test.
+  // Pins the guide to the entry step it actually documents, so a
+  // regression back to the removed chat copy fails this test.
   await expect(
-    host.getByRole('heading', { name: 'Type it in chat' }),
+    host.getByRole('heading', { name: 'Add an expense' }),
   ).toBeVisible()
 
   // A stranger, signed out. The bare URL now explains itself and offers a

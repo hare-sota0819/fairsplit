@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { auth } from '@/auth'
 import { NavIndex } from './nav/NavIndex'
-import { HeaderFrame, PanelOffset } from './sidebar/ShellFrame'
+import { HeaderFrame } from './sidebar/ShellFrame'
 import { AccountMenu } from './AccountMenu'
 import { NavLink } from './NavLoader'
 
@@ -32,7 +32,7 @@ export async function Header() {
           body comment). Chrome is typography on the desk (docs/BRAND.md v2
           §2c/§2d): one dark rule below, no fill difference, no shadow. */}
       <header className="sticky top-0 z-20 border-b border-border-strong bg-background">
-        <PanelOffset className="flex items-center justify-between px-5 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3">
+        <div className="flex items-center justify-between px-5 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3">
           <div className="flex items-center gap-1">
             {/* The in-place text index (v2 §3) — signed-in only; a stranger
               on the landing/auth screens has nowhere to go yet. The wordmark
@@ -65,13 +65,13 @@ export async function Header() {
                 className="flex h-11 items-center px-2 text-[13px] text-muted-foreground uppercase transition-colors duration-fast hover:text-primary"
               >
                 <span aria-hidden="true" className="mr-1">
-                {'>'}
-              </span>
+                  {'>'}
+                </span>
                 {t('signIn')}
               </Link>
             )}
           </nav>
-        </PanelOffset>
+        </div>
       </header>
     </HeaderFrame>
   )

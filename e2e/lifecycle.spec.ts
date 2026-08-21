@@ -16,6 +16,11 @@ async function signUp(page: Page, name: string, email: string): Promise<void> {
 
 async function createGroup(page: Page, name: string): Promise<string> {
   await page.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await page.waitForTimeout(1500)
   await page.getByLabel('Group name').fill(name)
   await page.getByLabel('Settlement currency').selectOption('KRW')
   await page.getByLabel('Your display name in this group').fill('Owner')
@@ -30,11 +35,11 @@ test('a one-member group explains itself and hides the empty sections', async ({
   await signUp(page, 'Solo E2E', uniqueEmail('solo'))
   const groupUrl = await createGroup(page, 'Solo Trip E2E')
 
-  // Home is chat-only (Task 5, app-shell restructure): the same empty-chat
+  // Home is the expense feed (chat removal, 2026-08-21): the same empty-chat
   // greeting shows for any group size, solo included — home no longer has
   // solo-specific gating to prove (totals/per-person rows/the feed moved
   // off home entirely, for every group size, not just solo ones).
-  await expect(page.getByTestId('chat-empty')).toBeVisible()
+  await expect(page.getByTestId('home-empty')).toBeVisible()
 
   // The invite prompt is no longer gated on being alone either (T3 made
   // `/invite` always show it) — reachable regardless of group size.
@@ -85,7 +90,7 @@ test('a member leaves, the creator deletes, and dead ends offer a way back', asy
   const pageA = await contextA.newPage()
   await signUp(pageA, 'Alice L', uniqueEmail('alice-l'))
   const groupUrl = await createGroup(pageA, 'Shared Trip E2E')
-  // Home is chat-only (Task 5, app-shell restructure): the invite link
+  // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await pageA.goto(`${groupUrl}/invite`)
   const invitePath = await pageA.getByTestId('invite-link').innerText()
@@ -98,8 +103,8 @@ test('a member leaves, the creator deletes, and dead ends offer a way back', asy
   await pageB.getByRole('button', { name: 'Join group' }).click()
   // Wait for the join's own redirect to land before navigating elsewhere —
   // otherwise the /status goto below can race the still-in-flight join.
-  await expect(pageB.getByTestId('chat-input')).toBeVisible()
-  // Home is chat-only (Task 5, app-shell restructure); per-member balances
+  await expect(pageB.getByTestId('home')).toBeVisible()
+  // Home is the expense feed (chat removal, 2026-08-21); per-member balances
   // (and the invite prompt's alone-gating) moved to /status and /invite.
   await pageB.goto(`${groupUrl}/status`)
   await expect(pageB.getByTestId('status-row')).toHaveCount(2)
@@ -205,35 +210,6 @@ test('a group with wallet-funded expenses in it still deletes', async ({
   await expect(page.getByTestId('group-list-empty')).toBeVisible()
 })
 
-/**
- * The other RESTRICT chain: `ChatSession` and `ChatMessage` point at both
- * the group and its members with the default RESTRICT (schema comment above
- * `ChatMessage`), so a group with any persisted conversation in it can only
- * be dropped if those rows go first. A group nobody chatted in never catches
- * a regression here — this one deliberately talks before deleting.
- */
-test('a group with a chat conversation in it still deletes', async ({
-  page,
-}) => {
-  await signUp(page, 'Chatty Purge E2E', uniqueEmail('chatty-purge'))
-  const groupUrl = await createGroup(page, 'Chatty Purge Trip E2E')
-
-  // Home is chat-only; a saved expense through chat persists a ChatSession
-  // row plus its ChatMessage rows.
-  await page.getByTestId('chat-input').fill('lunch 13000')
-  await page.getByTestId('chat-send').click()
-  await expect(page.getByTestId('chat-confirm-card')).toBeVisible()
-  await page.getByTestId('chat-confirm-save').click()
-  await expect(page.getByTestId('chat-saved-summary')).toBeVisible()
-
-  await page.goto(`${groupUrl}/settings`)
-  await page.getByTestId('delete-group').click()
-  await page.getByTestId('delete-confirm-name').fill('Chatty Purge Trip E2E')
-  await page.getByTestId('delete-confirm').click()
-  await expect(page).toHaveURL(/\/groups$/)
-  await expect(page.getByTestId('group-list-empty')).toBeVisible()
-})
-
 /** Rejoining reclaims the same member row, not a second one. */
 test('a member who left can rejoin through the invite link', async ({
   browser,
@@ -242,7 +218,7 @@ test('a member who left can rejoin through the invite link', async ({
   const pageA = await contextA.newPage()
   await signUp(pageA, 'Host R', uniqueEmail('host-r'))
   const groupUrl = await createGroup(pageA, 'Revolving Trip E2E')
-  // Home is chat-only (Task 5, app-shell restructure): the invite link
+  // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await pageA.goto(`${groupUrl}/invite`)
   const invitePath = await pageA.getByTestId('invite-link').innerText()
@@ -253,9 +229,9 @@ test('a member who left can rejoin through the invite link', async ({
   await pageB.goto(invitePath)
   await pageB.getByLabel('Your display name in this group').fill('Rey')
   await pageB.getByRole('button', { name: 'Join group' }).click()
-  // Home is chat-only (Task 5, app-shell restructure): the composer being
+  // Home is the expense feed (chat removal, 2026-08-21): it being
   // there is proof the join landed and home rendered.
-  await expect(pageB.getByTestId('chat-input')).toBeVisible()
+  await expect(pageB.getByTestId('home')).toBeVisible()
 
   await pageB.goto(`${groupUrl}/settings`)
   await pageB.getByTestId('leave-group').click()
@@ -265,7 +241,7 @@ test('a member who left can rejoin through the invite link', async ({
   await pageB.goto(invitePath)
   await pageB.getByLabel('Your display name in this group').fill('Rey')
   await pageB.getByRole('button', { name: 'Join group' }).click()
-  await expect(pageB.getByTestId('chat-input')).toBeVisible()
+  await expect(pageB.getByTestId('home')).toBeVisible()
 
   // One Rey, not two: the old row was reclaimed.
   await pageA.goto('/groups')
@@ -306,6 +282,11 @@ test('trip currency can be set, changed, and cleared in settings', async ({
   await signUp(page, 'Trip Currency E2E', uniqueEmail('tripcur'))
 
   await page.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await page.waitForTimeout(1500)
   await page.getByLabel('Group name').fill('Trip Currency E2E Group')
   await page.getByLabel('Settlement currency').selectOption('KRW')
   await page.getByTestId('trip-country').selectOption('JP')
@@ -374,6 +355,11 @@ test('a trip currency matching settlement is never preselected on the wallet for
   await signUp(page, 'Same Currency E2E', uniqueEmail('samecur'))
 
   await page.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await page.waitForTimeout(1500)
   await page.getByLabel('Group name').fill('Same Currency E2E Group')
   await page.getByLabel('Settlement currency').selectOption('KRW')
   await page.getByTestId('trip-country').selectOption('KR')

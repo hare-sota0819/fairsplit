@@ -149,12 +149,10 @@ model Group {
   createdById        String?
   createdAt          DateTime @default(now())
 
-  members      Member[]
-  expenses     Expense[]
-  checkpoints  Checkpoint[]
-  receiptScans ReceiptScan[]
-  chatMessages ChatMessage[]
-  chatSessions ChatSession[]
+  members       Member[]
+  expenses      Expense[]
+  checkpoints   Checkpoint[]
+  receiptScans  ReceiptScan[]
 }
 
 model Member {
@@ -190,8 +188,6 @@ model Member {
   expenseShares     ExpenseParticipant[]
   expenseFunding    ExpenseFunding[]     @relation("ExpenseFundingMember")
   itemAssignments   ItemAssignment[]
-  chatMessages      ChatMessage[]
-  chatSessions      ChatSession[]
 
   @@unique([groupId, userId])
   @@index([groupId])
@@ -471,71 +467,4 @@ model ReceiptScan {
   createdAt      DateTime @default(now())
 
   @@index([userId, createdAt])
-}
-
-/**
- * One persisted chat bubble — PRIVATE per member per group (assistant
- * semantics, not a shared group room: two members in the same group never
- * see each other's rows). Capped at the newest CHAT_HISTORY_CAP per member
- * (src/lib/chat-history.ts); older rows are trimmed on write.
- * No onDelete cascade beyond the default Restrict on `group`/`member`:
- * `deleteGroupRows` (settings/actions.ts) must delete these rows AND the
- * ChatSession rows before the members/group they point at, same lesson as
- * `Expense.enteredById` — a RESTRICT fires inside the same cascade that
- * deletes members (docs/SOLVED.md 2026-08-17: forgetting ChatSession broke
- * group deletion for any group that had been chatted in).
- */
-// One conversation thread in the chat — the reference-app-style session
-// (docs/PROMPT.md 2026-08-15). Private per member per group, like the
-// history rows it groups. `memory` carries the dialogue layer's
-// serialized salience state so 걔-references survive reopening a session
-// days later. Sessions are created LAZILY: the first persisted message
-// creates the row, so an opened-and-abandoned "new chat" never clutters
-// the list.
-model ChatSession {
-  id            String        @id @default(cuid())
-  groupId       String
-  group         Group         @relation(fields: [groupId], references: [id])
-  memberId      String
-  member        Member        @relation(fields: [memberId], references: [id])
-  title         String
-  // True once the user renamed it — auto-titling never overwrites a
-  // hand-given name.
-  titleEdited   Boolean       @default(false)
-  memory        Json?
-  createdAt     DateTime      @default(now())
-  lastMessageAt DateTime      @default(now())
-  messages      ChatMessage[]
-
-  @@index([memberId, groupId, lastMessageAt])
-}
-
-model ChatMessage {
-  id              String       @id @default(cuid())
-  groupId         String
-  group           Group        @relation(fields: [groupId], references: [id])
-  memberId        String
-  member          Member       @relation(fields: [memberId], references: [id])
-  // Nullable for pre-session rows only; the migration backfills every
-  // existing row into a per-member "이전 대화" session, and every new
-  // write supplies a session.
-  sessionId       String?
-  session         ChatSession? @relation(fields: [sessionId], references: [id])
-  role            String // 'user' | 'assistant'
-  kind            String // 'text' | 'image' | 'answer' | 'saved'
-  payload         Json
-  // Dedup key for a retried persist batch (docs/SOLVED.md 2026-08-14
-  // "Chat-indicator-currency T1 review round 1" double-persist fix):
-  // `appendChatMessages` pairs this with `createMany`'s `skipDuplicates` so
-  // a retry that resends a batch whose rows already landed (server
-  // committed, then the response was lost) inserts nothing a second time.
-  // Nullable + Postgres allows multiple NULLs in a unique index, so every
-  // row inserted before this migration (no client id) is unaffected; every
-  // new insert always supplies one.
-  clientMessageId String?
-  createdAt       DateTime @default(now())
-
-  @@unique([memberId, clientMessageId])
-  @@index([memberId, createdAt])
-  @@index([sessionId, createdAt])
 }

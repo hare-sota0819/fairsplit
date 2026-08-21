@@ -162,14 +162,10 @@ async function deleteGroupRows(groupId: string): Promise<void> {
     select: { receiptImagePath: true },
   })
 
-  // Order matters: ChatMessage -> ChatSession -> Group. Messages point at
-  // sessions and both point at group/member with the default RESTRICT (see
-  // the schema comment above ChatMessage), so each has to go before what it
-  // references, or the group delete trips the FK inside the same cascade.
+  // Order matters: expenses point at members with the default RESTRICT, so
+  // they have to go before the group delete cascades the members away.
   await prisma.$transaction([
     prisma.expense.deleteMany({ where: { groupId } }),
-    prisma.chatMessage.deleteMany({ where: { groupId } }),
-    prisma.chatSession.deleteMany({ where: { groupId } }),
     prisma.group.delete({ where: { id: groupId } }),
   ])
 

@@ -3,9 +3,8 @@ import { getTranslations } from 'next-intl/server'
 import {
   Camera,
   ClipboardCheck,
-  Clock,
   Handshake,
-  MessageCircle,
+  PenLine,
   TrendingUp,
   UsersRound,
   Wallet,
@@ -53,7 +52,7 @@ export default async function GuidePage({
   const steps = [
     { key: 'group', Icon: UsersRound },
     { key: 'wallet', Icon: Wallet },
-    { key: 'chat', Icon: MessageCircle },
+    { key: 'chat', Icon: PenLine },
     { key: 'assign', Icon: ClipboardCheck },
     { key: 'settle', Icon: Handshake },
   ] as const
@@ -85,18 +84,6 @@ export default async function GuidePage({
             </p>
           </div>
         ))}
-        {/* One line, not a full why-card (Task 2, chat-indicator-currency):
-            documents the pending-persist clock the chat surface can show on
-            a message, same icon it uses there. */}
-        <div className="flex items-center gap-3 rounded-2xl bg-card p-4 ring-1 ring-border">
-          <span
-            aria-hidden="true"
-            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"
-          >
-            <Clock className="size-4" />
-          </span>
-          <p className="text-sm text-muted-foreground">{t('persistIcon')}</p>
-        </div>
       </section>
 
       <section className="flex flex-col gap-5">

@@ -28,6 +28,11 @@ test('signup, group create, and join via invite link', async ({ browser }) => {
   await signUp(pageA, 'Alice E2E', aliceEmail)
 
   await pageA.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await pageA.waitForTimeout(1500)
   await pageA.getByLabel('Group name').fill('Japan Trip E2E')
   await pageA.getByLabel('Settlement currency').selectOption('KRW')
   await pageA.getByLabel('Your display name in this group').fill('Alice')
@@ -35,7 +40,7 @@ test('signup, group create, and join via invite link', async ({ browser }) => {
   await expect(
     pageA.getByRole('heading', { name: 'Japan Trip E2E' }),
   ).toBeVisible()
-  // Home is chat-only (Task 5, app-shell restructure): the invite link
+  // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   const groupUrl = pageA.url()
   await pageA.goto(`${groupUrl}/invite`)
@@ -61,10 +66,10 @@ test('signup, group create, and join via invite link', async ({ browser }) => {
   await pageB.getByRole('button', { name: 'Join group' }).click()
   // The join page has its own "Japan Trip E2E" heading (the invite
   // preview), so waiting on that heading alone can resolve BEFORE the join
-  // actually redirects — `chat-input` only exists once home itself has
+  // actually redirects — the `home` marker only exists once home itself has
   // rendered, so it is the reliable "the join landed" signal.
-  await expect(pageB.getByTestId('chat-input')).toBeVisible()
-  // Home is chat-only (Task 5, app-shell restructure); per-member balances
+  await expect(pageB.getByTestId('home')).toBeVisible()
+  // Home is the expense feed (chat removal, 2026-08-21); per-member balances
   // moved to /status — one row per member, Bob's own row included. Bob sees
   // Alice as a real co-member, and the two are settled (nothing spent yet).
   await pageB.goto(`${pageB.url()}/status`)

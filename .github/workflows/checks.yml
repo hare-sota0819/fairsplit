@@ -1,0 +1,53 @@
+# The checks that need nothing but Node.
+#
+# SCOPE, deliberately narrow: the static gates plus the unit suite. It does
+# NOT run `./scripts/verify.sh`. Three of that script's checks are missing
+# here:
+#   - the production build and the Playwright suite, which need a Postgres
+#     instance, a migrated scratch database and a set of application secrets;
+#   - the coverage threshold, because this runs `npm test` rather than
+#     `npm run test:coverage`, and the 90% floor on src/lib/settlement/**
+#     (vitest.config.ts) only applies to the latter.
+# Adding those is a separate decision with its own maintenance cost;
+# `verify.sh` remains the local gate and the definition of done.
+#
+# The recognizers differential-oracle steps were removed on 2026-08-21 with
+# the parser they measured (docs/PROMPT.md [2026-08-21]).
+
+name: checks
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  node-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Design token contrast gate
+        run: node scripts/design/contrast-check.mjs
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: TypeScript
+        run: npx tsc --noEmit
+
+      - name: Prisma schema
+        run: npx prisma validate
+        env:
+          # `prisma validate` only needs the URL to parse; it never connects.
+          DATABASE_URL: postgresql://fairsplit:ci@localhost:5432/fairsplit?schema=public
+
+      - name: Tests
+        run: npm test

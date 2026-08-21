@@ -126,16 +126,6 @@ export function NavIndex({ children }: { children?: React.ReactNode }) {
   const groupItems: IndexItem[] = groupId
     ? [
         {
-          key: 'chats',
-          href: `/groups/${groupId}/chats`,
-          label: t('sidebar.chats'),
-          caption: tLoading('general'),
-          testid: 'nav-chats',
-          // The group home IS a chat, so the Chats row is the current one
-          // there too, not only on the /chats list.
-          alsoActiveAt: `/groups/${groupId}`,
-        },
-        {
           key: 'history',
           href: `/groups/${groupId}/history`,
           label: t('sidebar.history'),

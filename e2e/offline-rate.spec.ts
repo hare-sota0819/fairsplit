@@ -30,13 +30,18 @@ test('a wallet-funded expense saves with no market rate, and says the rate is st
   await signUp(page, 'Offline E2E')
 
   await page.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await page.waitForTimeout(1500)
   await page.getByLabel('Group name').fill('Offline Trip E2E')
   await page.getByLabel('Settlement currency').selectOption('KRW')
   await page.getByLabel('Your display name in this group').fill('Owner')
   await page.getByRole('button', { name: 'Create group' }).click()
-  // Home is chat-only (Task 5, app-shell restructure): the composer
-  // being there is proof the redirect landed.
-  await expect(page.getByTestId('chat-input')).toBeVisible()
+  // Home is the expense feed (chat removal, 2026-08-21): it being
+  // there is proof the redirect landed.
+  await expect(page.getByTestId('home')).toBeVisible()
   const groupUrl = page.url()
 
   // A wallet with a known cost: ₩93,100 bought ¥10,000, i.e. 100 JPY = 931 KRW.
@@ -76,13 +81,18 @@ test('a pay-as-you-go expense with no rate is still refused, because nothing can
   await signUp(page, 'Offline Card E2E')
 
   await page.goto('/groups/new')
+  // docs/BUGS.md [2026-08-09]: filling this form before hydration
+  // settles can lose the typed values — DestinationPicker's country-name
+  // mismatch regenerates a subtree that takes sibling form state with it.
+  // The documented workaround (docs/BUGS.md [2026-08-09]).
+  await page.waitForTimeout(1500)
   await page.getByLabel('Group name').fill('Offline Card E2E')
   await page.getByLabel('Settlement currency').selectOption('KRW')
   await page.getByLabel('Your display name in this group').fill('Owner')
   await page.getByRole('button', { name: 'Create group' }).click()
-  // Home is chat-only (Task 5, app-shell restructure): the composer
-  // being there is proof the redirect landed.
-  await expect(page.getByTestId('chat-input')).toBeVisible()
+  // Home is the expense feed (chat removal, 2026-08-21): it being
+  // there is proof the redirect landed.
+  await expect(page.getByTestId('home')).toBeVisible()
   const groupUrl = page.url()
 
   await page.goto(`${groupUrl}/expenses/new`)

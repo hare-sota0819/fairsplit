@@ -8,6 +8,15 @@ This product includes ideas and adapted code from:
   adapted from Spliit's getSuggestedReimbursements (src/lib/balances.ts),
   rewritten for bigint integer arithmetic.
 
+
+Sealed, no longer part of the product:
+
+The natural-language expense parser and its corpus tooling were removed on
+2026-08-21 when the product moved from free-text chat entry to a guided
+flow. Neither the ported code nor the staged corpora are present in this
+repository any more. The attributions below are kept as the record of what
+that work was built from.
+
 - kor-to-number.js (https://github.com/dragonteros/kor-to-number.js)
   Copyright (c) dragonteros — MIT License
   The sino/native Korean number parsing core in
@@ -89,6 +98,56 @@ This product includes ideas and adapted code from:
   chatterbot_corpus/data/english/*.yml into test-fixtures/goat/fuzz-en.json,
   the English half of the same negative-control gate. Data only; no code.
 
+- MultiWOZ 2.2 (https://github.com/budzianowski/multiwoz)
+  Copyright (c) 2019 Pawel Budzianowski — MIT License
+  scripts/corpus/fetch-public-sources.mts extracts the dialogue turns that
+  state a money amount from data/MultiWOZ_2.2/test/dialogues_001.json and
+  dialogues_002.json into test-fixtures/staging/multiwoz-en-money.json, as
+  human-written English price talk for the corpus pipeline. Data only; no
+  code.
+
+- Taskmaster-2 (https://github.com/google-research-datasets/Taskmaster)
+  Bill Byrne, Karthik Krishnamoorthi, Saravanan Ganesh, Amit Dubey,
+  Kyu-Young Kim and Andy Cedilnik, Google LLC —
+  Creative Commons Attribution 4.0 International (CC BY 4.0)
+  The same script extracts money-bearing utterances from
+  TM-2-2020/data/food-ordering.json and restaurant-search.json into
+  test-fixtures/staging/taskmaster-en-money.json. Data only; no code.
+
+- banking77 (https://github.com/PolyAI-LDN/task-specific-datasets)
+  Copyright (c) PolyAI Limited —
+  Creative Commons Attribution 4.0 International (CC BY 4.0)
+  From "Efficient Intent Detection with Dual Sentence Encoders"
+  (Casanueva, Temcinas, Gerz, Henderson, Vulic, 2020).
+  The same script stages banking_data/test.csv, and
+  scripts/corpus/port-banking77-fuzz.mts selects 1,000 of its utterances into
+  test-fixtures/goat/fuzz-en-banking77.json as NEGATIVE controls — banking
+  requests are about money and are never expenses to record. Data only; no
+  code.
+
+- Wikipedia: Lists of common misspellings / For machines
+  (https://en.wikipedia.org/wiki/Wikipedia:Lists_of_common_misspellings/For_machines)
+  Wikipedia contributors, revision 1199637275 —
+  Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+  The same script stages the machine-readable misspelling list into
+  test-fixtures/staging/sa/wikipedia-misspellings.json, and
+  scripts/corpus/generate-typos.mts draws the empirical edit distribution
+  behind test-fixtures/staging/sa/typos-en.json from it. BOTH FILES ARE
+  SHARE-ALIKE and are isolated in test-fixtures/staging/sa/ for that reason;
+  anything derived from them inherits CC BY-SA terms. Data only; no code.
+
+Sealed too — development-time only, and removed with the parser:
+
+- Microsoft Recognizers-Text, npm @microsoft/recognizers-text-suite
+  (https://github.com/microsoft/Recognizers-Text)
+  Copyright (c) Microsoft Corporation — MIT License
+  Was pinned as a devDependency and run by scripts/oracle/ over this project's
+  own corpus, to produce the ours-vs-Recognizers comparison report in
+  docs/oracle/. It was never imported by src/. The same project's
+  Specs/Number/English and Specs/NumberWithUnit/English JSON files are staged
+  as that report's ground truth (test-fixtures/staging/recognizers-specs-en.json),
+  alongside the earlier CurrencyModel conversion listed above.
+
 Studied for design patterns (no code copied):
 
 - SplitPro (https://github.com/oss-apps/split-pro)
@@ -124,6 +183,10 @@ constructed from its geometry and is ours.
 
 No third-party character art, brand marks or trademarked imagery is included.
 
-- Departure Mono (https://departuremono.com/)
-  Copyright (c) 2022–2024 Helena Zhang — SIL Open Font License 1.1
-  The app's typeface, self-hosted at src/app/fonts/ (license text alongside).
+- Newsreader (https://fonts.google.com/specimen/Newsreader)
+  Copyright (c) 2019 Production Type — SIL Open Font License 1.1
+  Display and money figures, served through `next/font/google`.
+
+- Pretendard (https://github.com/orioncactus/pretendard)
+  Copyright (c) 2021 Kil Hyung-jin — SIL Open Font License 1.1
+  The Hangul/UI text face, loaded from the project's own jsDelivr CDN build.
