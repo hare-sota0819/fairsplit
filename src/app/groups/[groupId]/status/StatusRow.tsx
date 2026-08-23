@@ -67,14 +67,14 @@ export function StatusRow({
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleTrigger
           aria-label={expandLabel}
-          className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted"
+          className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted"
           data-testid="status-row-toggle"
         >
           <span className="flex min-w-0 items-center">
             <span className="font-semibold">
               {name}
               {leftLabel ? (
-                <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
+                <span className="ml-2 border border-[#e4e4e4] px-2 py-0.5 text-xs font-normal text-[#8a8a8a]">
                   {leftLabel}
                 </span>
               ) : null}

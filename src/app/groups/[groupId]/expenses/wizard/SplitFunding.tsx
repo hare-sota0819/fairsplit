@@ -37,7 +37,7 @@ const DIALOG_SELECT_CLASS =
   'h-11 w-full rounded-lg border border-input bg-transparent px-3 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50'
 
 const ANSWER_CLASS =
-  'flex flex-col gap-0.5 rounded-xl border border-border px-4 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted/60 active:scale-[0.97] active:bg-muted/60'
+  'flex flex-col gap-0.5 rounded-xl border border-border px-4 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted/60 active:translate-y-px active:bg-muted/60'
 
 /**
  * "How much of this came from where", asked only when it has to be.

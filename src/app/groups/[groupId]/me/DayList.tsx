@@ -58,12 +58,12 @@ export function DayList({
                   href={`/groups/${groupId}/expenses/${row.id}`}
                   caption={openCaption}
                   testId="spending-row"
-                  className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 transition-[background-color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted"
+                  className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 transition-[background-color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted"
                 >
                   <span className="min-w-0 truncate">
                     {row.title}
                     {row.personal ? (
-                      <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                      <span className="ml-2 border border-[#e4e4e4] px-2 py-0.5 text-xs text-[#8a8a8a]">
                         {personalBadge}
                       </span>
                     ) : null}

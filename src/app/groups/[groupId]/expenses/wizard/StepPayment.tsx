@@ -24,7 +24,7 @@ export { fundingKey }
 
 /** One tappable choice card; the same skin for both questions. */
 const CHOICE_CLASS = (selected: boolean): string =>
-  `flex flex-col gap-0.5 rounded-xl border px-4 py-3 text-left transition-[background-color,color,border-color,transform] duration-fast ease-swift active:scale-[0.97] ${
+  `flex flex-col gap-0.5 rounded-xl border px-4 py-3 text-left transition-[background-color,color,border-color,transform] duration-fast ease-swift active:translate-y-px ${
     selected
       ? 'border-primary bg-primary/8 ring-1 ring-primary'
       : 'border-border hover:bg-muted/60'

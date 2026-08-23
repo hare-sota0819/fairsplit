@@ -559,14 +559,21 @@ function Wizard({
                   aria-current={index === state.step ? 'step' : undefined}
                   aria-label={t(`steps.${key}`)}
                   data-testid={`step-${key}`}
-                  className={`h-1.5 w-full rounded-full transition-colors ${
-                    index <= state.step
-                      ? 'bg-primary'
-                      : reachable
-                        ? 'bg-primary/30'
-                        : 'bg-border'
-                  }`}
-                />
+                  // The rail is a hairline — progress and waiting are always
+                  // 1px in this grammar — with a real tap zone around it.
+                  className="block w-full py-2.5"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`block h-px w-full transition-colors ${
+                      index <= state.step
+                        ? 'bg-primary'
+                        : reachable
+                          ? 'bg-primary/30'
+                          : 'bg-border'
+                    }`}
+                  />
+                </button>
               </li>
             )
           })}

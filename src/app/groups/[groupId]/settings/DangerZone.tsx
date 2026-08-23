@@ -63,7 +63,11 @@ export function DangerZone({
             {isLastMember ? labels.leaveLastConfirm : labels.leaveConfirm}
           </p>
           <div className="flex items-center gap-2">
-            <SubmitButton variant="destructive" testId="leave-confirm">
+            <SubmitButton
+              variant="destructive"
+              testId="leave-confirm"
+              data-fixed-rule=""
+            >
               {labels.confirm}
             </SubmitButton>
             <Button
@@ -113,6 +117,7 @@ export function DangerZone({
                 pending={deletePending}
                 variant="destructive"
                 testId="delete-confirm"
+                data-fixed-rule=""
               >
                 {labels.deleteConfirm}
               </SubmitButton>

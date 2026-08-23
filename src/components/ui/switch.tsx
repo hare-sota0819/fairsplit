@@ -3,12 +3,17 @@
 import { cn } from '@/lib/utils'
 
 /**
- * An on/off switch.
+ * AN ON/OFF SWITCH — THE ABACUS BEAD (SPEC-INTERACTIONS §6).
+ *
+ * The track is a 1px hairline 34px wide, ink when on and #d8d8d8 when off.
+ * The knob is a 14px ink dot that slides 0→20px over .28s — and it is THE
+ * ONE ROUNDED ELEMENT IN THE APP, because a bead sliding along a wire is
+ * the whole idea. Off, the dot greys to #b8b8b8.
  *
  * The app had no such control — binary settings were checkboxes — but a
- * checkbox reads as "tick this to opt in", and the settlement flag is a thing
- * that is already ON and can be turned off. A switch says that; a cleared
- * checkbox says the opposite.
+ * checkbox reads as "tick this to opt in", and the settlement flag is a
+ * thing that is already ON and can be turned off. A switch says that; a
+ * cleared checkbox says the opposite.
  *
  * Plain `<button role="switch">` rather than a dependency: this is the only
  * switch in the app, and the accessible contract is one attribute.
@@ -43,28 +48,56 @@ export function Switch({
       data-testid={testId}
       onClick={() => onCheckedChange?.(!checked)}
       className={cn(
-        'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full',
-        // Track colour + focus outline at --dur-fast (## Press states:
-        // "press feedback, colour swaps, focus rings" is one measured
-        // cluster; the outline-color transition specifically matches the
-        // one real measured focus recipe, `outline-color 0.15s`). Scale
-        // press: this track has a fill either way (on or off), so it gets
-        // the universal scale(0.97) recipe too — `transform` has to be in
-        // the property list (review catch: it was missing, so the scale
-        // snapped instead of tweening, unlike button.tsx/toggle.tsx which
-        // both include it).
-        'transition-[background-color,outline-color,transform] duration-fast ease-swift disabled:opacity-60 active:scale-[0.97]',
+        // A 34x14 field with a comfortable tap zone around it, taken back
+        // out of the layout with a negative margin so the control still
+        // measures 34px on the page.
+        'relative inline-block h-3.5 w-[34px] shrink-0 p-3 -m-3',
+        'transition-[outline-color,transform] duration-fast ease-swift active:translate-y-px disabled:opacity-60',
         'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]',
-        checked ? 'bg-primary' : 'bg-muted-foreground/40',
       )}
     >
       <span
         aria-hidden="true"
-        className={cn(
-          'inline-block size-5 rounded-full bg-white shadow transition-transform duration-fast ease-swift',
-          checked ? 'translate-x-[22px]' : 'translate-x-0.5',
-        )}
-      />
+        className="absolute top-1/2 left-3 h-3.5 w-[34px] -translate-y-1/2"
+      >
+        {/* The wire. */}
+        <span
+          className={cn(
+            'absolute inset-x-0 top-1/2 h-px transition-colors duration-[250ms]',
+            checked ? 'bg-foreground' : 'bg-[#d8d8d8]',
+          )}
+        />
+        {/* The bead — the one rounded element in the app. */}
+        <span
+          className={cn(
+            'absolute top-1/2 left-0 -mt-[7px] size-3.5 rounded-full',
+            'transition-[transform,background-color] duration-[280ms] ease-swift',
+            checked ? 'bg-foreground' : 'bg-[#b8b8b8]',
+          )}
+          style={{ transform: `translateX(${checked ? 20 : 0}px)` }}
+        />
+      </span>
     </button>
+  )
+}
+
+/**
+ * The meta label that sits to the right of a switch (§6): 12px #a8a8a8,
+ * right-aligned in a fixed 34px column so 켬/끔 do not shift the row.
+ */
+export function SwitchState({
+  on,
+  labels,
+}: {
+  on: boolean
+  labels: { on: string; off: string }
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      className="w-[34px] text-right text-xs text-[#a8a8a8]"
+    >
+      {on ? labels.on : labels.off}
+    </span>
   )
 }

@@ -5,7 +5,7 @@ import { useId, useState } from 'react'
 import { setExpenseCancelled } from '../actions'
 import { SubmitButton } from '@/components/SubmitButton'
 import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
+import { Switch, SwitchState } from '@/components/ui/switch'
 
 /**
  * "Include in settlement" — one switch, on by default.
@@ -52,12 +52,19 @@ export function CancelExpenseForm({
           <span id={labelId} className="font-medium">
             {t('cancel')}
           </span>
-          <Switch
-            type="submit"
-            checked={false}
-            aria-labelledby={labelId}
-            testId="cancel-expense"
-          />
+          <span className="flex items-center gap-4">
+            <Switch
+              type="submit"
+              checked={false}
+              aria-labelledby={labelId}
+              testId="cancel-expense"
+            />
+            {/* §6: the state in words, meta grey, in a fixed column. */}
+            <SwitchState
+              on={false}
+              labels={{ on: tCommon('on'), off: tCommon('off') }}
+            />
+          </span>
         </div>
       </form>
     )
@@ -70,12 +77,18 @@ export function CancelExpenseForm({
           <span id={labelId} className="font-medium">
             {t('cancel')}
           </span>
-          <Switch
-            checked
-            onCheckedChange={() => setConfirming(true)}
-            aria-labelledby={labelId}
-            testId="cancel-expense"
-          />
+          <span className="flex items-center gap-4">
+            <Switch
+              checked
+              onCheckedChange={() => setConfirming(true)}
+              aria-labelledby={labelId}
+              testId="cancel-expense"
+            />
+            <SwitchState
+              on
+              labels={{ on: tCommon('on'), off: tCommon('off') }}
+            />
+          </span>
         </div>
         <p className="text-xs text-muted-foreground">{t('cancelHint')}</p>
       </div>
@@ -93,6 +106,7 @@ export function CancelExpenseForm({
           size="hero"
           className="flex-1"
           testId="cancel-expense-confirm"
+          data-fixed-rule=""
         >
           {t('cancelConfirmAction')}
         </SubmitButton>

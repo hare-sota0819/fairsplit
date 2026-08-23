@@ -73,12 +73,12 @@ export function MySpendingCard({
                   href={`/groups/${groupId}/expenses/${row.id}`}
                   caption={labels.toggle}
                   testId="home-spending-row"
-                  className="flex min-h-14 items-center justify-between gap-3 px-4 py-3 transition-[background-color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted"
+                  className="flex min-h-14 items-center justify-between gap-3 px-4 py-3 transition-[background-color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted"
                 >
                   <span className="min-w-0 truncate">
                     {row.title}
                     {row.personal ? (
-                      <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                      <span className="ml-2 border border-[#e4e4e4] px-2 py-0.5 text-xs text-[#8a8a8a]">
                         {labels.personal}
                       </span>
                     ) : null}

@@ -116,7 +116,7 @@ export default async function GroupHomePage({
             href={`/groups/${groupId}/changes`}
             caption={tLoading('general')}
             testId="pending-change-badge"
-            className="inline-flex w-fit items-center rounded-full border border-border-strong px-3 py-1 text-xs"
+            className="inline-flex w-fit items-center border border-border-strong px-3 py-1 text-xs"
           >
             {tChanges('badge', { count: 1 })}
           </NavLink>

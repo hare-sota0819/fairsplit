@@ -181,7 +181,7 @@ export function StepReview({ state, patch, data, math, market }: StepProps) {
                         <span>
                           {nameOf(id)}
                           {id === state.payerId ? (
-                            <span className="ml-2 rounded-full bg-primary/12 px-2 py-0.5 text-xs font-medium text-primary">
+                            <span className="ml-2 border border-[#e4e4e4] px-2 py-0.5 text-xs font-medium text-foreground">
                               {t('splitPaid')}
                             </span>
                           ) : null}

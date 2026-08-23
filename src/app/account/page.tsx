@@ -54,7 +54,7 @@ export default async function AccountPage() {
       <div className="flex items-center gap-4">
         <span
           aria-hidden="true"
-          className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary-soft text-2xl font-bold text-primary"
+          className="flex size-16 shrink-0 items-center justify-center border border-[#e4e4e4] font-heading text-2xl text-foreground"
         >
           {initial}
         </span>
@@ -97,7 +97,7 @@ export default async function AccountPage() {
           <NavLink
             href="/guide"
             caption={tLoading('general')}
-            className="flex min-h-14 items-center justify-between gap-3 border-b border-border px-5 py-3 transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted"
+            className="flex min-h-14 items-center justify-between gap-3 border-b border-border px-5 py-3 transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted"
             testId="account-guide"
           >
             <span>{t('guide')}</span>
@@ -106,7 +106,7 @@ export default async function AccountPage() {
           <NavLink
             href="/groups"
             caption={tLoading('general')}
-            className="flex min-h-14 items-center justify-between gap-3 px-5 py-3 transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted"
+            className="flex min-h-14 items-center justify-between gap-3 px-5 py-3 transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted"
             testId="account-groups"
           >
             <span>{t('groups')}</span>

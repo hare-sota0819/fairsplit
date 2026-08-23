@@ -148,7 +148,9 @@
     "next": "Next",
     "done": "Done",
     "confirm": "Confirm",
-    "close": "Close"
+    "close": "Close",
+    "on": "On",
+    "off": "Off"
   },
   "nav": {
     "signIn": "Sign in",
@@ -388,6 +390,8 @@
     "exchange": "Counting your cash…",
     "withMember": "Opening your shared history…",
     "saving": "Saving…",
+    "writing": "Writing it in…",
+    "written": "Written in",
     "tips": {
       "0": "Split by item when one of you skipped the wine.",
       "1": "Log a cash exchange once and every cash expense uses your real rate.",
@@ -462,7 +466,7 @@
       "itemName": "Name",
       "itemUnitPrice": "Unit price",
       "itemQty": "Qty",
-      "lineMath": "{unit} × {qty} = {total}",
+      "lineMath": "{unit} × {qty} = <total></total>",
       "qtyUp": "One more",
       "qtyDown": "One fewer",
       "addItem": "Add item",

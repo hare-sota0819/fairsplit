@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Plus, X } from 'lucide-react'
 import { formatMinor, parseAmountToMinor } from '@/lib/format'
 import { lineTotal } from '@/lib/settlement'
+import { Odometer } from '@/components/motion/Odometer'
 import { NumberField, QtyStepper } from './NumberField'
 import { ReceiptScan } from './ReceiptScan'
 import type { ItemState } from './math'
@@ -185,18 +186,34 @@ export function StepItems({ groupId, state, patch, math }: StepProps) {
                   />
                 </div>
               </div>
-              <p
-                className="mt-2 text-sm font-medium tabular-nums"
-                data-testid="line-math"
-              >
-                {total === null
-                  ? null
-                  : t('lineMath', {
+              {/* §8 — the computed total rolls per digit column rather than
+                  swapping: the line reads as a till adding up, and the
+                  static glyphs are height-matched to the strips so nothing
+                  shifts off the baseline.
+                  A rolling column IS ten digits of real text, so the figure
+                  is drawn aria-hidden and the sentence is stated once, in
+                  full, for anything that reads rather than looks — screen
+                  readers and the e2e suite alike. */}
+              {total === null ? null : (
+                <p className="mt-2 text-sm font-medium tabular-nums">
+                  <span className="sr-only" data-testid="line-math">
+                    {t.rich('lineMath', {
                       unit: formatMinor(unit!, state.currency),
                       qty: item.quantity,
-                      total: formatMinor(total, state.currency),
+                      total: () => formatMinor(total, state.currency),
                     })}
-              </p>
+                  </span>
+                  <span aria-hidden="true">
+                    {t.rich('lineMath', {
+                      unit: formatMinor(unit!, state.currency),
+                      qty: item.quantity,
+                      total: () => (
+                        <Odometer value={formatMinor(total, state.currency)} />
+                      ),
+                    })}
+                  </span>
+                </p>
+              )}
             </li>
           )
         })}

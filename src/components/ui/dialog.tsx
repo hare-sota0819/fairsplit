@@ -16,6 +16,12 @@ import { cn } from '@/lib/utils'
  * Radix rather than a hand-rolled overlay: focus trapping, restoring focus to
  * the control that opened it, Escape, and `aria-modal` are the whole point,
  * and `radix-ui` is already a dependency.
+ *
+ * THE SHEET IS PAPER (SPEC-INTERACTIONS §9): radius 0, white ground, a
+ * single 1px #dcdcdc border and NO SHADOW — the panel is a piece of paper
+ * laid on the page, not a card floating above it. The title is the display
+ * serif at 19px ink, the body 13.5px meta grey, and the actions are text
+ * links (a destructive one keeps its underline pinned on). The scrim stays.
  */
 export function Dialog({
   open,
@@ -56,7 +62,9 @@ export function Dialog({
         <DialogPrimitive.Content
           data-testid={testId}
           className={cn(
-            'fixed z-50 flex flex-col gap-4 bg-card p-5 ring-1 ring-border-strong',
+            'fixed z-50 flex flex-col gap-4 bg-white p-5 dark:bg-card',
+            // §9: one hairline, no shadow, no ring.
+            'border border-[#dcdcdc] dark:border-border',
             // On the mobile bottom-sheet layout this sits flush against the
             // real bottom edge — with `viewportFit: 'cover'` (root layout)
             // that is the home-indicator area, so the sheet's own bottom
@@ -64,12 +72,11 @@ export function Dialog({
             // `sm:` (the centred-card layout) doesn't touch any edge, so it
             // stays at the plain `p-5` the shorthand above already gives it.
             'pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pb-5',
-            // `rounded-2xl` (24px) is already the teardown's "panel" radius
-            // step (## Radii & borders derived scale) — verified correct,
-            // no change needed.
-            'inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto rounded-t-2xl',
+            // Radius 0 everywhere — the statement grammar has no rounded
+            // corners, and a sheet is no exception.
+            'inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto rounded-none',
             'sm:inset-x-auto sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:w-[min(28rem,calc(100vw-2rem))]',
-            'sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl',
+            'sm:-translate-x-1/2 sm:-translate-y-1/2',
             'data-[state=open]:animate-in data-[state=open]:fade-in-0',
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
             'duration-base ease-out',
@@ -77,11 +84,11 @@ export function Dialog({
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex flex-col gap-1">
-              <DialogPrimitive.Title className="text-base font-semibold">
+              <DialogPrimitive.Title className="font-heading text-[19px] leading-tight text-foreground">
                 {title}
               </DialogPrimitive.Title>
               {description ? (
-                <DialogPrimitive.Description className="text-xs text-muted-foreground">
+                <DialogPrimitive.Description className="text-[13.5px] leading-[21px] text-[#8a8a8a]">
                   {description}
                 </DialogPrimitive.Description>
               ) : (
@@ -95,10 +102,9 @@ export function Dialog({
             <DialogPrimitive.Close
               aria-label={closeLabel}
               data-testid={testId ? `${testId}-close` : undefined}
-              // "Opacity dim" (btn-0 in ## Press states): 1 -> 0.6 at
-              // --dur-fast, held through down — the measured recipe for an
-              // icon-only control with nothing to fill.
-              className="-m-1 rounded-lg p-1 text-muted-foreground transition-[color,opacity] duration-fast hover:text-foreground active:opacity-60"
+              // Tertiary chrome (§1 tier 3): faint grey, colour on hover,
+              // and the ink sink on press like every other control.
+              className="-m-1 rounded-none p-1 text-[#a8a8a8] transition-[color,transform] duration-fast hover:text-[#565656] active:translate-y-px"
             >
               <X aria-hidden="true" className="size-5" />
             </DialogPrimitive.Close>

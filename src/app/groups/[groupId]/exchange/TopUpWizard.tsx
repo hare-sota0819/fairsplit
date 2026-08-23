@@ -33,7 +33,7 @@ const STEP_KEYS = ['wallet', 'rate', 'amount', 'review'] as const
 
 /** One tappable wallet, the same skin the expense wizard uses for a choice. */
 const CHOICE_CLASS = (selected: boolean): string =>
-  `flex flex-col gap-0.5 rounded-xl border px-4 py-3 text-left transition-[background-color,color,border-color,transform] duration-fast ease-swift active:scale-[0.97] ${
+  `flex flex-col gap-0.5 rounded-xl border px-4 py-3 text-left transition-[background-color,color,border-color,transform] duration-fast ease-swift active:translate-y-px ${
     selected
       ? 'border-primary bg-primary/8 ring-1 ring-primary'
       : 'border-border hover:bg-muted/60'
@@ -230,10 +230,15 @@ export function TopUpWizard({
                 aria-current={index === step ? 'step' : undefined}
                 aria-label={t(`steps.${key}`)}
                 data-testid={`topup-step-${key}`}
-                className={`h-1.5 w-full rounded-full transition-colors ${
-                  index <= step ? 'bg-primary' : 'bg-border'
-                }`}
-              />
+                className="block w-full py-2.5"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`block h-px w-full transition-colors ${
+                    index <= step ? 'bg-primary' : 'bg-border'
+                  }`}
+                />
+              </button>
             </li>
           ))}
         </ol>

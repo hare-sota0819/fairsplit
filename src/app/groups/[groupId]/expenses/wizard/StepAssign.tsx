@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
+import { CheckRow } from '@/components/ui/CheckRow'
 import { Input } from '@/components/ui/input'
 import { ChevronDown } from 'lucide-react'
 import { formatMinor, parseAmountToMinor } from '@/lib/format'
@@ -178,7 +179,7 @@ export function StepAssign({ state, patch, data }: StepProps) {
                 type="button"
                 aria-expanded={expanded}
                 onClick={() => toggleOpen(item.key)}
-                className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted"
+                className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted"
                 data-testid="assign-toggle"
               >
                 <span className="flex min-w-0 flex-col gap-1">
@@ -192,7 +193,7 @@ export function StepAssign({ state, patch, data }: StepProps) {
                   </span>
                   {item.assignees.length === 0 ? (
                     <span
-                      className="w-fit rounded-full bg-negative-soft px-2 py-0.5 text-xs font-semibold text-negative"
+                      className="w-fit border border-foreground px-2 py-0.5 text-xs font-semibold text-foreground"
                       data-testid="unassigned-badge"
                     >
                       {t('unassigned')}
@@ -202,7 +203,7 @@ export function StepAssign({ state, patch, data }: StepProps) {
                       {item.assignees.map((assignee) => (
                         <span
                           key={assignee.memberId}
-                          className="flex h-6 items-center gap-0.5 rounded-full bg-primary/12 px-2 text-xs font-semibold text-primary"
+                          className="flex h-6 items-center gap-0.5 border border-[#e4e4e4] px-2 text-xs font-semibold text-foreground"
                         >
                           {initialOf(assignee.memberId)}
                           {item.quantity > 1 ? `×${assignee.quantity}` : null}
@@ -272,18 +273,19 @@ export function StepAssign({ state, patch, data }: StepProps) {
                         return (
                           <li
                             key={memberId}
-                            className="flex items-center justify-between gap-3 py-1.5"
+                            className="flex items-center gap-3"
                           >
-                            <label className="flex flex-1 items-center gap-2.5 text-sm">
-                              <input
-                                type="checkbox"
-                                checked={Boolean(assignee)}
-                                onChange={() => toggleMember(item, memberId)}
-                                className="size-5 accent-[var(--primary)]"
-                                data-testid={`assign-${memberId}`}
-                              />
-                              {nameOf(memberId)}
-                            </label>
+                            {/* §5: the whole row is the tap target, and an
+                                unticked person greys out at once. */}
+                            <CheckRow
+                              checked={Boolean(assignee)}
+                              onCheckedChange={() =>
+                                toggleMember(item, memberId)
+                              }
+                              label={nameOf(memberId)}
+                              testId={`assign-${memberId}`}
+                              className="flex-1"
+                            />
                             {assignee && item.quantity > 1 && !splitByAmount ? (
                               <QtyStepper
                                 value={assignee.quantity}

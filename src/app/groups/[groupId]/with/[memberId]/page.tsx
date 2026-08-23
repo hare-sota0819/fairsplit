@@ -110,7 +110,7 @@ export default async function WithMemberPage({
                 <NavLink
                   href={`/groups/${groupId}/expenses/${expense.id}`}
                   caption={tLoading('expense')}
-                  className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted"
+                  className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted"
                   testId="with-row"
                 >
                   <span className="flex min-w-0 flex-col gap-0.5">

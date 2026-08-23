@@ -111,7 +111,7 @@ export function ExpenseFeed({
                 aria-label={labels.expand}
                 // The whole row is the tap target, like every other
                 // disclosure in the app.
-                className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted"
+                className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted"
               >
                 <span
                   className={`min-w-0 truncate ${row.cancelled ? 'line-through' : ''}`}

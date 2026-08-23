@@ -1,10 +1,8 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
-import { Minus, Plus } from 'lucide-react'
+import { Stepper } from '@/components/ui/Stepper'
 
 /**
  * Focusing a numeric field selects what is already in it, so typing replaces
@@ -105,8 +103,9 @@ export function NumberField({
 }
 
 /**
- * Quantity: typeable AND steppable. The brief asks for both — a stepper
- * alone is slow past three, a keyboard alone is slow for one more beer.
+ * Quantity: typeable AND steppable — now in the §8 grammar (bare −/+
+ * glyphs, a serif figure rolling in a 30px window). The wrapper stays so
+ * the wizard's call sites and their test ids are untouched.
  */
 export function QtyStepper({
   value,
@@ -123,47 +122,14 @@ export function QtyStepper({
   testId?: string
   ariaLabel: string
 }) {
-  const t = useTranslations('expenses.form')
-  const clamp = (next: number): number =>
-    Math.min(max ?? Number.MAX_SAFE_INTEGER, Math.max(min, next))
   return (
-    <span className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="outline"
-        size="icon-lg"
-        className="size-11"
-        aria-label={t('qtyDown')}
-        disabled={value <= min}
-        onClick={() => onChange(clamp(value - 1))}
-        data-testid={testId ? `${testId}-down` : undefined}
-      >
-        <Minus />
-      </Button>
-      <Input
-        inputMode="numeric"
-        value={String(value)}
-        aria-label={ariaLabel}
-        {...selectOnFocusProps}
-        onChange={(e) => {
-          const parsed = Number(e.target.value.replace(/\D/g, ''))
-          onChange(clamp(Number.isFinite(parsed) && parsed > 0 ? parsed : min))
-        }}
-        className="h-11 w-12 px-0 text-center tabular-nums"
-        data-testid={testId}
-      />
-      <Button
-        type="button"
-        variant="outline"
-        size="icon-lg"
-        className="size-11"
-        aria-label={t('qtyUp')}
-        disabled={max !== undefined && value >= max}
-        onClick={() => onChange(clamp(value + 1))}
-        data-testid={testId ? `${testId}-up` : undefined}
-      >
-        <Plus />
-      </Button>
-    </span>
+    <Stepper
+      value={value}
+      onChange={onChange}
+      min={min}
+      max={max}
+      testId={testId}
+      ariaLabel={ariaLabel}
+    />
   )
 }

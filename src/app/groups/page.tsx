@@ -84,7 +84,7 @@ export default async function GroupsPage() {
               <NavLink
                 href={`/groups/${group.id}`}
                 caption={tLoading('group')}
-                className="flex min-h-14 items-center justify-between gap-3 px-4 py-3 transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted"
+                className="flex min-h-14 items-center justify-between gap-3 px-4 py-3 transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted"
                 testId="group-list-row"
               >
                 <span className="min-w-0 truncate font-medium">

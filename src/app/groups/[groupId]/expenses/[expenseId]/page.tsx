@@ -151,7 +151,7 @@ export default async function ExpenseDetailPage({
             <NavLink
               href={`/groups/${groupId}/exchange`}
               caption={tLoading('exchange')}
-              className="inline-flex h-9 items-center rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground transition-[filter,transform] duration-fast ease-swift hover:brightness-110 active:scale-[0.97]"
+              className="inline-flex h-9 items-center rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground transition-[filter,transform] duration-fast ease-swift hover:brightness-110 active:translate-y-px"
             >
               {tExchange('prompt.log')}
             </NavLink>
@@ -221,7 +221,7 @@ export default async function ExpenseDetailPage({
             href={`/groups/${groupId}/expenses/${expenseId}/edit?propose=1`}
             caption={tLoading('expense')}
             testId="request-edit"
-            className="inline-flex h-13 w-full items-center justify-center rounded-xl bg-primary px-5 text-base font-semibold text-primary-foreground transition-[filter,transform] duration-fast ease-swift hover:brightness-110 active:scale-[0.97]"
+            className="inline-flex h-13 w-full items-center justify-center rounded-xl bg-primary px-5 text-base font-semibold text-primary-foreground transition-[filter,transform] duration-fast ease-swift hover:brightness-110 active:translate-y-px"
           >
             {tExpenses('requestChange')}
           </NavLink>
@@ -236,7 +236,7 @@ export default async function ExpenseDetailPage({
         <NavLink
           href={`/groups/${groupId}/expenses/${expenseId}/edit`}
           caption={tLoading('expense')}
-          className="inline-flex h-13 w-full items-center justify-center rounded-xl bg-primary px-5 text-base font-semibold text-primary-foreground transition-[filter,transform] duration-fast ease-swift hover:brightness-110 active:scale-[0.97]"
+          className="inline-flex h-13 w-full items-center justify-center rounded-xl bg-primary px-5 text-base font-semibold text-primary-foreground transition-[filter,transform] duration-fast ease-swift hover:brightness-110 active:translate-y-px"
         >
           {t('edit')}
         </NavLink>
@@ -319,7 +319,7 @@ export default async function ExpenseDetailPage({
           </a>
         ) : null}
         {expense.isPersonal ? (
-          <span className="w-fit rounded-full bg-muted px-2 py-1 text-xs">
+          <span className="w-fit border border-[#e4e4e4] px-2 py-1 text-xs text-[#8a8a8a]">
             {t('personalBadge')}
           </span>
         ) : null}
@@ -339,7 +339,7 @@ export default async function ExpenseDetailPage({
           {expense.items.map((item) => (
             <li key={item.id} data-testid="receipt-row">
               <details className="group">
-                <summary className="flex min-h-14 w-full cursor-pointer list-none items-center gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted">
+                <summary className="flex min-h-14 w-full cursor-pointer list-none items-center gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted">
                   <span className="min-w-0 flex-1 truncate">{item.name}</span>
                   <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
                     {item.quantity > 1
@@ -398,7 +398,7 @@ export default async function ExpenseDetailPage({
               <li key={memberId}>
                 <details className="group">
                   <summary
-                    className="flex min-h-14 w-full cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted"
+                    className="flex min-h-14 w-full cursor-pointer list-none items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted"
                     aria-label={t('showDerivation')}
                   >
                     <span className="font-medium">{nameOf(memberId)}</span>

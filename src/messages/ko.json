@@ -148,7 +148,9 @@
     "next": "다음",
     "done": "완료",
     "confirm": "확인",
-    "close": "닫기"
+    "close": "닫기",
+    "on": "켬",
+    "off": "끔"
   },
   "nav": {
     "signIn": "로그인",
@@ -388,6 +390,8 @@
     "exchange": "지갑 잔액 확인하고 있어요…",
     "withMember": "함께한 내역 불러오고 있어요…",
     "saving": "저장하고 있어요…",
+    "writing": "적는 중…",
+    "written": "적혔습니다",
     "tips": {
       "0": "한 명이 와인을 안 마셨다면 품목별로 나눠 보세요.",
       "1": "환전 기록을 한 번만 남기면, 현금 지출마다 실제 환율이 적용돼요.",
@@ -462,7 +466,7 @@
       "itemName": "품명",
       "itemUnitPrice": "단가",
       "itemQty": "수량",
-      "lineMath": "{unit} × {qty} = {total}",
+      "lineMath": "{unit} × {qty} = <total></total>",
       "qtyUp": "하나 더",
       "qtyDown": "하나 덜",
       "addItem": "품목 추가",

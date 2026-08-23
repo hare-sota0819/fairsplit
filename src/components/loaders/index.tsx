@@ -1,3 +1,4 @@
+import { MiniShuttle } from '../motion/rules'
 import { LOADERS, LOADER_IDS, type LoaderId } from './registry'
 
 export { ACTIVE_LOADERS, nextLoader } from './config'
@@ -7,12 +8,10 @@ export type { LoaderId, LoaderDef } from './registry'
 /**
  * The app's loading indicators.
  *
- * Phase 4B deleted the six illustrated animations (airliner, coins,
- * banknotes, baggage carousel, passport stamp, receipt) and the
- * `/dev/loaders` gallery. What replaced them is a set drawn from the SAME
- * traditional motifs as the background patterns — five frames of one visual
- * idea rather than a cast of characters. See registry.tsx and
- * docs/DESIGN_SPEC.md §5.8.
+ * There are no spinners and no rotation anywhere: waiting is a ledger
+ * writing itself (SPEC-LOADERS §A) for a route or a cold start, a hairline
+ * shuttle where an action happened, and the commit button's own underline
+ * for a save. See registry.tsx.
  */
 
 /**
@@ -56,15 +55,16 @@ export function RouteLoader({
         onScrim ? 'text-scrim-foreground' : 'text-primary'
       }`}
     >
-      {/* The ring + dots family (registry.tsx). Sem's body lives only in
-          chat (docs/BRAND.md v2 §4e), so a route loader is monochrome ink
-          — its voice is the caption. */}
+      {/* The ledger writing itself (registry.tsx) — monochrome ink; its
+          voice is the caption. */}
       <Art onScrim={onScrim} />
       <span
+        // Caption: 13.5px meta grey on paper (SPEC-LOADERS §A). On the
+        // scrim it stays a shade heavier so it survives the dimmed page.
         className={`max-w-xs text-center text-balance ${
           onScrim
             ? 'text-base font-medium text-scrim-foreground'
-            : 'text-sm text-muted-foreground'
+            : 'text-[13.5px] text-[#8a8a8a]'
         }`}
       >
         {caption}
@@ -73,30 +73,14 @@ export function RouteLoader({
   )
 }
 
-/** In-place spinner for buttons and cards (never full-screen). */
+/**
+ * In-place wait, for buttons and cards (never full-screen).
+ *
+ * NOT A SPINNER — the grammar has none. A wait is a hairline whose ink
+ * segment shuttles across a 56px track, stated where the action happened
+ * (SPEC-LOADERS "인라인 배치"). The export keeps its old name so the call
+ * sites that already say "show that this is working" do not have to change.
+ */
 export function Spinner({ className = '' }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      className={`fs-spin size-4 ${className}`}
-    >
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        opacity="0.25"
-      />
-      <path
-        d="M21 12a9 9 0 0 0-9-9"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
+  return <MiniShuttle className={className} />
 }

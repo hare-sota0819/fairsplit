@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useActionState, useRef, useState } from 'react'
 import { SubmitButton } from '@/components/SubmitButton'
 import { Input } from '@/components/ui/input'
+import { Segmented } from '@/components/ui/Segmented'
 import {
   DestinationPicker,
   type DestinationLabels,
@@ -56,6 +57,9 @@ export function GroupSettingsForm({
     SettingsFormState,
     FormData
   >(action, {})
+  const [rateMode, setRateMode] = useState<'AVG_COST' | 'MARKET'>(
+    initial.rateMode,
+  )
   return (
     <form action={formAction} className="flex flex-col gap-3">
       <input type="hidden" name="groupId" value={groupId} />
@@ -98,28 +102,21 @@ export function GroupSettingsForm({
         defaultCity={initial.tripCity}
         idPrefix="settings-trip"
       />
+      {/* §7 — the rate mode is a segmented control: no boxes, one 1px ink
+          underline sliding to whichever option is selected. The form still
+          posts a plain `rateMode` field. */}
       <fieldset className="flex flex-col gap-2 text-sm">
         <legend className="mb-1">{labels.rateMode}</legend>
-        <label className="flex items-center gap-2">
-          <input
-            type="radio"
-            className="size-5 shrink-0 accent-[var(--primary)]"
-            name="rateMode"
-            value="AVG_COST"
-            defaultChecked={initial.rateMode === 'AVG_COST'}
-          />
-          {labels.rateModeAvg}
-        </label>
-        <label className="flex items-center gap-2">
-          <input
-            type="radio"
-            className="size-5 shrink-0 accent-[var(--primary)]"
-            name="rateMode"
-            value="MARKET"
-            defaultChecked={initial.rateMode === 'MARKET'}
-          />
-          {labels.rateModeMarket}
-        </label>
+        <Segmented
+          value={rateMode}
+          onValueChange={setRateMode}
+          ariaLabel={labels.rateMode}
+          options={[
+            { value: 'AVG_COST', label: labels.rateModeAvg },
+            { value: 'MARKET', label: labels.rateModeMarket },
+          ]}
+        />
+        <input type="hidden" name="rateMode" value={rateMode} />
       </fieldset>
       {state.error ? (
         <p role="alert" className="text-sm text-destructive">
@@ -229,7 +226,7 @@ export function MemberRow({
         className="h-11 min-w-0 flex-1"
       />
       {member.left ? (
-        <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+        <span className="border border-[#e4e4e4] px-2 py-0.5 text-xs text-[#8a8a8a]">
           {labels.leftBadge}
         </span>
       ) : null}

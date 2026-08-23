@@ -48,7 +48,7 @@ export function LanguageChoice({
             disabled={pending}
             onClick={() => choose(locale)}
             data-testid={`locale-${locale}`}
-            className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:scale-[0.97] active:bg-muted disabled:opacity-60"
+            className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted disabled:opacity-60"
           >
             <span>{labels[locale]}</span>
             {current === locale ? (

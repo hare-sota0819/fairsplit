@@ -12,6 +12,7 @@ import { RECEIPT_PARSE_TIMEOUT_MS } from '@/lib/receipts/config'
 import { checkTotal } from '@/lib/receipts/invariant'
 import { resizeReceiptImage } from '@/lib/receipts/resize'
 import { parsedReceiptSchema, type ParsedReceipt } from '@/lib/receipts/schema'
+import { LedgerLeader } from '@/components/motion/rules'
 import { NumberField, QtyStepper } from './NumberField'
 
 /** One editable row on the confirm screen. Amounts are text, as typed. */
@@ -305,9 +306,15 @@ export function ReceiptScan({
         ) : null}
 
         {phase.k === 'reading' ? (
-          <div className="flex flex-col gap-1" data-testid="scan-reading" aria-live="polite">
-            <span className="text-sm font-medium">{t('reading')}</span>
-            <span className="text-xs text-muted-foreground">{t('readingHint')}</span>
+          <div className="flex flex-col gap-3" data-testid="scan-reading" aria-live="polite">
+            {/* SPEC-LOADERS: reading a receipt has no honest percentage to
+                report, so it gets the contextual ledger — dotted leaders
+                flowing, closed by the double rule — not a spinner. */}
+            <LedgerLeader className="text-primary" />
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-medium">{t('reading')}</span>
+              <span className="text-xs text-muted-foreground">{t('readingHint')}</span>
+            </div>
           </div>
         ) : null}
 

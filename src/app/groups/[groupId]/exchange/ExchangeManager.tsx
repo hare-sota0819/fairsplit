@@ -131,6 +131,7 @@ function DeleteTopUpButton({
           variant="destructive"
           size="sm"
           testId="exchange-delete"
+          data-fixed-rule=""
         >
           {tCommon('confirm')}
         </SubmitButton>
@@ -193,6 +194,7 @@ function RemoveAdjustmentButton({
           variant="destructive"
           size="sm"
           testId="wallet-adjustment-remove"
+          data-fixed-rule=""
         >
           {tCommon('confirm')}
         </SubmitButton>
@@ -648,6 +650,7 @@ function WalletCardItem({
                   variant="destructive"
                   size="sm"
                   testId="wallet-delete-confirm"
+                  data-fixed-rule=""
                 >
                   {tCommon('confirm')}
                 </SubmitButton>

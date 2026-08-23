@@ -1,9 +1,8 @@
 'use client'
 
 import { useActionState } from 'react'
+import { StatementField } from '@/components/StatementField'
 import { SubmitButton } from '@/components/SubmitButton'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import type { AuthFormState } from '@/app/(auth)/signup/actions'
 
 type Action = (
@@ -29,28 +28,32 @@ export function CredentialsForm({
     {},
   )
   return (
-    <form action={formAction} className="flex w-72 flex-col gap-4">
+    <form action={formAction} className="flex w-full flex-col gap-7">
       <input type="hidden" name="callbackUrl" value={callbackUrl} />
       {fields.map((name) => (
-        <div key={name} className="flex flex-col gap-1.5">
-          <Label htmlFor={`auth-${name}`}>{labels[name]}</Label>
-          <Input
-            id={`auth-${name}`}
-            name={name}
-            type={name === 'name' ? 'text' : name}
-            required
-            minLength={name === 'password' ? 8 : undefined}
-            className="h-11"
-          />
-        </div>
+        <StatementField
+          key={name}
+          id={`auth-${name}`}
+          name={name}
+          label={labels[name]}
+          type={name === 'name' ? 'text' : name}
+          required
+          minLength={name === 'password' ? 8 : undefined}
+        />
       ))}
       {state.error ? (
         <p role="alert" className="text-sm text-destructive">
           {state.error}
         </p>
       ) : null}
-      <SubmitButton pending={pending} size="hero">
+      <SubmitButton
+        pending={pending}
+        variant="statement"
+        size="text"
+        className="w-fit"
+      >
         {submitLabel}
+        <span aria-hidden="true">&rarr;</span>
       </SubmitButton>
     </form>
   )

@@ -20,7 +20,7 @@ export function RateChip({
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="inline-flex h-8 w-fit items-center rounded-full border border-border-strong px-3 text-xs text-muted-foreground outline-none transition-transform duration-fast ease-swift focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.97]"
+        className="inline-flex h-8 w-fit items-center border border-border-strong px-3 text-xs text-muted-foreground outline-none transition-transform duration-fast ease-swift focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px"
         data-testid="rate-chip"
       >
         {label}
