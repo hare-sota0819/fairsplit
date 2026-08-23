@@ -4,69 +4,116 @@
     "tagline": "Split group expenses fairly — at your own exchange rate."
   },
   "landing": {
-    "headline": "Text it in. FairSplit settles it.",
-    "subhead": "Type an expense the way you'd text a friend — the rate, the receipt and who had what get sorted for you.",
-    "cta": "Get started",
-    "haveAccount": "Already have an account?",
-    "signIn": "Sign in",
-    "guideLink": "See how it works",
-    "points": {
-      "rate": "The rate is fetched for you, and money from a travel card is counted at what you actually paid for it.",
-      "receipt": "Photograph the receipt and the line items fill themselves in.",
-      "items": "Tick who had what, quantity included. Nobody pays for a dish they never touched."
-    },
-    "caption": "FairSplit is the treasurer of your group trip — text an expense in, Sem settles it.",
+    "brand": "FairSplit",
+    "tagline": "Settle as you spend",
+    "scroll": "Scroll",
+    "copyright": "© 2026 FairSplit",
     "links": {
-      "start": "Get started",
+      "start": "Start free",
       "signIn": "Sign in",
-      "guide": "How it works",
-      "language": "Language"
+      "guide": "Guide"
     },
-    "letter": {
-      "from": "Sem, treasurer",
-      "org": "FairSplit",
-      "greeting": "Dear traveler,",
-      "p1": "Text me what you spent the way you would text a friend — \"lunch 12000, Minsu and me\" — and I settle it. No forms, no spreadsheet.",
-      "p1Highlight": "text me what you spent the way you would text a friend",
-      "p2": "The exchange rate is fetched for you, and money from a travel card is counted at what you actually paid for it. Photograph the receipt and the line items fill themselves in.",
-      "p3": "Tick who had what, quantity included. Nobody pays for a dish they never touched. When the trip ends, I hand everyone the shortest list of who pays whom.",
-      "signoff": "Yours in arithmetic,",
-      "signature": "Sem"
+    "nav": {
+      "problem": "The problem",
+      "method": "The method",
+      "rates": "Rates",
+      "principle": "The principle",
+      "product": "Product"
     },
-    "receipt": {
-      "title": "Izakaya, night 2",
-      "meta": "3 people · paid by Minsu",
-      "items": {
-        "a": "Sashimi platter",
-        "b": "Highball x4",
-        "c": "Yakitori"
+    "hero": {
+      "before": "Settle as you ",
+      "em": "spend.",
+      "sub": "Split group expenses in one sentence, at the table — converted at the rate you actually paid, not the one on the news."
+    },
+    "problem": {
+      "marker": "01 — The problem",
+      "title": {
+        "before": "Settling up always waits for ",
+        "em": "later."
       },
-      "total": "Total",
-      "each": "Each",
-      "settled": "Settled by Sem"
+      "p1": "Collect the receipts. Remember who ate what. Dig the exchange rate out of a card statement. Open the calculator on the last night of the trip — the least pleasant thirty minutes of the whole vacation.",
+      "p2": {
+        "before": "And the math is usually wrong anyway. Splitting at the market rate ignores what the card actually charged, and a blanket ",
+        "after": " convinces nobody."
+      }
     },
-    "table": {
-      "caption": "What it does",
-      "rows": {
-        "rate": {
-          "k": "Rate",
-          "v": "Fetched for you. Travel-card money counts at what you paid for it."
-        },
-        "receipt": {
-          "k": "Receipt",
-          "v": "Photograph it — the line items fill themselves in."
+    "method": {
+      "marker": "02 — The method",
+      "title": {
+        "before": "One sentence in. A closed entry ",
+        "em": "out."
+      },
+      "sub": "Nothing is deferred. Say what happened where it happened, and the amount is fixed with that moment’s rate and that table’s people.",
+      "pillars": {
+        "chat": {
+          "title": "Type it like a text",
+          "body": "“Ramen 11875 yen, I paid.” That’s the whole interface — amount, currency and payer are read from the sentence."
         },
         "items": {
-          "k": "Items",
-          "v": "Tick who had what, quantity included."
+          "title": "Split by line item",
+          "body": "Receipts break into items, and items attach to the people who had them. Whoever skipped the drinks doesn’t pay for the drinks."
         },
-        "settle": {
-          "k": "Settle",
-          "v": "The shortest list of who pays whom, in your currency."
+        "checkpoint": {
+          "title": "Close the books mid-trip",
+          "body": "Don’t wait for the last night. Settle to a checkpoint anywhere, and everything before it is frozen at its rate."
         }
       }
     },
-    "footer": "© 2026 FairSplit"
+    "demo": {
+      "title": "Try a split.",
+      "sub": "Tap names and rates — the figures below follow the exact rules of the settlement engine. Your language sets the home currency: English defaults to USD, Korean to KRW.",
+      "item": "Ramen",
+      "paidBy": "Alex paid · travel card",
+      "people": "People",
+      "rate": "Rate",
+      "names": {
+        "payer": "Alex",
+        "a": "Noah",
+        "b": "Mia",
+        "c": "Sam"
+      },
+      "paidTag": "paid",
+      "rateAvg": "Average cost",
+      "rateMkt": "Market",
+      "total": "Total in USD",
+      "per": "per person",
+      "owed": "Alex is owed",
+      "personOne": "1 person",
+      "personMany": "people",
+      "soloNote": "Alex alone — nothing owed.",
+      "evenNote": "Divides evenly — everyone pays the same.",
+      "remNote": {
+        "before": "The leftover goes to the payer — Alex pays ",
+        "after": "."
+      }
+    },
+    "rates": {
+      "marker": "03 — Rates",
+      "title": {
+        "before": "The rate you ",
+        "em": "actually paid."
+      },
+      "p1": "A travel card is loaded at different prices on different days. The same ¥11,875 costs each payer a different real amount.",
+      "p2": {
+        "before": "FairSplit converts at the payer’s ",
+        "strong": "average cost",
+        "after": " — what the money actually cost them. The market rate stays visible for reference, never as the basis."
+      },
+      "rows": {
+        "avg": "Average cost",
+        "market": "Market rate"
+      },
+      "note": "A $2.85 difference on one bowl of ramen — 71¢ per person, four ways."
+    },
+    "principle": {
+      "marker": "04 — The principle",
+      "title": {
+        "before": "The leftover cent goes to ",
+        "em": "whoever paid."
+      },
+      "p1": "When an amount doesn’t divide evenly, the remainder always lands in the payer’s favor. No banker’s rounding, no averaging it away.",
+      "p2": "The person who fronted the money should never lose by it. That’s a matter of trust before it’s a matter of arithmetic."
+    }
   },
   "guide": {
     "title": "How to use FairSplit",

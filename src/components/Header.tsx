@@ -17,7 +17,7 @@ export async function Header() {
     <NavLink
       href="/"
       caption={tLoading('general')}
-      className="bg-primary-soft px-1.5 text-[13px] leading-[1.6] tracking-[0.04em] text-primary uppercase transition-colors duration-fast hover:bg-primary hover:text-primary-foreground"
+      className="text-[13px] leading-[1.6] text-foreground transition-colors duration-fast hover:text-muted-foreground"
     >
       {tApp('name')}
     </NavLink>
@@ -63,11 +63,8 @@ export async function Header() {
             ) : (
               <Link
                 href="/signin"
-                className="flex h-11 items-center px-2 text-[13px] text-muted-foreground uppercase transition-colors duration-fast hover:text-primary"
+                className="flex h-11 items-center px-2 text-[13px] text-muted-foreground transition-colors duration-fast hover:text-foreground"
               >
-                <span aria-hidden="true" className="mr-1">
-                  {'>'}
-                </span>
                 {t('signIn')}
               </Link>
             )}

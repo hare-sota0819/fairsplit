@@ -21,6 +21,7 @@ const eslintConfig = defineConfig([
     // Verbatim design patch drops (patches/PATCHES.md): applied by copying
     // over src/, never compiled in place.
     'patches/**',
+    'patches2/**',
     // Owner's design-review drops (design-tool canvas exports + their
     // runtime, e.g. `step 1 피드백/support.js`): reference material, not
     // product code.

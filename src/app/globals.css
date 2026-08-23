@@ -324,6 +324,15 @@
 .landing-step-4 { animation-delay: calc(var(--dur-fast) * 1.6); }
 .landing-step-5 { animation-delay: calc(var(--dur-fast) * 2); }
 
+@keyframes fs-cue {
+  0%   { transform: scaleY(0); transform-origin: top; }
+  42%  { transform: scaleY(1); transform-origin: top; }
+  58%  { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+.landing-cue { animation: fs-cue 2.6s cubic-bezier(.4,0,.2,1) infinite; }
+@media (prefers-reduced-motion: reduce) { .landing-cue { animation: none; } }
+
 @keyframes fs-spin {
   to { transform: rotate(360deg); }
 }
