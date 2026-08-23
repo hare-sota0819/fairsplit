@@ -70,6 +70,12 @@ interface ExpenseFormProps {
   ) => Promise<ExpenseFormState>
   data: ExpenseFormData
   initial?: ExpenseInitial
+  /**
+   * Mounted inside another screen (home) rather than owning its own route.
+   * The only difference is the "Cancel" link at the foot: it goes back to
+   * the screen the form was opened from, and on home that is this screen.
+   */
+  embedded?: boolean
 }
 
 const STEP_KEYS = ['amount', 'payment', 'items', 'assign', 'review'] as const
@@ -246,6 +252,7 @@ function Wizard({
   action,
   data,
   initial,
+  embedded,
   draft,
   draftKey,
 }: ExpenseFormProps & { draft: ExpenseDraft | null; draftKey: string }) {
@@ -602,7 +609,11 @@ function Wizard({
         </div>
       ) : null}
       {result.error ? (
-        <p role="alert" className="text-sm text-destructive">
+        <p
+          role="alert"
+          className="text-sm text-destructive"
+          data-testid="wizard-error"
+        >
           {result.error}
         </p>
       ) : null}
@@ -647,17 +658,21 @@ function Wizard({
         )}
       </div>
 
-      <Link
-        href={
-          expenseId
-            ? `/groups/${groupId}/expenses/${expenseId}`
-            : `/groups/${groupId}`
-        }
-        className={buttonVariants({ variant: 'ghost', size: 'touch' })}
-        data-testid="cancel-expense"
-      >
-        {tCommon('cancel')}
-      </Link>
+      {/* Cancel goes back where the form was opened from. Mounted on home
+          that is this very screen, so there is nothing to cancel TO. */}
+      {embedded ? null : (
+        <Link
+          href={
+            expenseId
+              ? `/groups/${groupId}/expenses/${expenseId}`
+              : `/groups/${groupId}`
+          }
+          className={buttonVariants({ variant: 'ghost', size: 'touch' })}
+          data-testid="cancel-expense"
+        >
+          {tCommon('cancel')}
+        </Link>
+      )}
     </form>
   )
 }

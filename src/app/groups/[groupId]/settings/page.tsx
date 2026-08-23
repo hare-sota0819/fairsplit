@@ -3,6 +3,7 @@ import { NavLink } from '@/components/NavLoader'
 import { requireGroupMember } from '@/lib/membership'
 import { prisma } from '@/lib/prisma'
 import {
+  addMember,
   deleteGroup,
   leaveGroup,
   setWalletHidden,
@@ -11,6 +12,7 @@ import {
 } from './actions'
 import { DangerZone } from './DangerZone'
 import {
+  AddMemberForm,
   GroupSettingsForm,
   MemberRow,
   WalletPrivacyForm,
@@ -118,6 +120,19 @@ export default async function GroupSettingsPage({
             />
           ))}
         </div>
+        {/* Adding a person is a group-management act, so it lives on the
+            group-management screen — the one the account menu's "Manage
+            group" opens (owner, 2026-08-22). */}
+        <h3 className="mt-2 text-sm font-medium">{t('addMember')}</h3>
+        <AddMemberForm
+          action={addMember}
+          groupId={groupId}
+          labels={{
+            name: t('addMemberName'),
+            submit: t('addMemberSubmit'),
+            hint: t('addMemberHint'),
+          }}
+        />
       </section>
       <DangerZone
         leaveAction={leaveGroup}

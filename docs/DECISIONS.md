@@ -870,8 +870,9 @@ entries, so they outrank PLAN.md and WORKERS.md wherever they speak
 ### D3-1 — Free-text entry is abandoned; the flow becomes guided (2026-08-21)
 
 - **Decision**: the chat surface and the natural-language parser are removed
-  from the product and sealed outside this repository. Expense entry will be
-  a guided, step-by-step flow. Every earlier decision that only exists to serve
+  from the product and sealed in `archive/chat-sealed-2026-08-21.tar.gz`
+  (git tag `pre-chat-removal-2026-08-21`). Expense entry will be a guided,
+  step-by-step flow. Every earlier decision that only exists to serve
   free-text entry — the parser rulings, the corpus programme, the dialogue
   layer, the dev-mode mining loop — is void as a standing rule and kept only
   as a record.

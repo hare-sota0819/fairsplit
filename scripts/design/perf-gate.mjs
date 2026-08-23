@@ -1,5 +1,5 @@
 // Landing-page performance gate — Task 8 of the design-overhaul-rev2 plan
-// (docs/superpowers/plans/2026-08-09-pitch-design-overhaul.md §Task 8 Step 1).
+// (the design plan §Task 8 Step 1).
 //
 // The landing route runs the backdrop (Task 6: layered CSS radial/conic
 // gradients drifting via transform/opacity keyframes) at full

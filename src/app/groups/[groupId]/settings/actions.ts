@@ -117,6 +117,41 @@ export async function updateMember(
   return { saved: true }
 }
 
+const addMemberSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+})
+
+/**
+ * Add someone by name alone — no account, no invitation, no waiting.
+ *
+ * A placeholder member (`userId: null`) is a full participant to the
+ * settlement engine: they can be a payer, an item's eater and a debtor.
+ * The join flow already knows how to hand one of these places over to a
+ * real account (`/join/[code]` lists exactly the `userId: null` members),
+ * so the name typed here is not a dead end — it is the same seat, claimed
+ * later or never.
+ */
+export async function addMember(
+  _prev: SettingsFormState,
+  formData: FormData,
+): Promise<SettingsFormState> {
+  const groupId = formData.get('groupId')?.toString() ?? ''
+  await requireGroupMember(groupId)
+  const t = await getTranslations('groups.errors')
+
+  const parsed = addMemberSchema.safeParse({
+    name: formData.get('name')?.toString(),
+  })
+  if (!parsed.success) {
+    return { error: t('invalidInput') }
+  }
+  await prisma.member.create({
+    data: { groupId, name: parsed.data.name },
+  })
+  revalidatePath(`/groups/${groupId}`, 'layout')
+  return { saved: true }
+}
+
 const walletHiddenSchema = z.object({ hidden: z.enum(['true', 'false']) })
 
 /**
@@ -146,9 +181,9 @@ export async function setWalletHidden(
 }
 
 /**
- * Hard delete. Expense.enteredById and ChatMessage.memberId/groupId are both
- * ON DELETE RESTRICT, so the expense rows and chat message rows must go
- * before the members/group they point at; everything else (members, items,
+ * Hard delete. Expense.enteredById is ON DELETE RESTRICT, so the expense
+ * rows must go before the members/group they point at; everything else
+ * (members, items,
  * participants, assignments, exchange records, checkpoints) cascades from the
  * group. Soft delete was rejected deliberately: with no restore UI it would
  * only leave unreachable rows behind, and it would push a `deletedAt: null`

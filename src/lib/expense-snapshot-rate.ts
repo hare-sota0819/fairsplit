@@ -4,10 +4,10 @@
  * Split out of `expense-create.ts` (review round 1, IMPORTANT 2): that module
  * is a pure function of its input and is pinned as such by a test, which it
  * could not be while it also reached the database and the rate provider
- * through this. Both halves are shared by the same two callers —
- * `saveExpense` (expenses/actions.ts) and the chat's currency swap
- * (`applyCurrencyChange`, chat-edit-actions.ts) — so a re-created expense is
- * priced exactly as a fresh entry at the same instant would be.
+ * through this. Its caller is `saveExpense` (expenses/actions.ts); the
+ * chat's currency swap, which shared it so a re-created expense was priced
+ * exactly as a fresh entry at the same instant would be, went with the chat
+ * programme on 2026-08-21.
  */
 import { prisma } from '@/lib/prisma'
 import { getSnapshotRate } from '@/lib/rates/cached'

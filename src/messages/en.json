@@ -85,8 +85,8 @@
       "groupBody": "An invite link puts you straight into your friend's group. Starting your own takes a name, the currency you will settle in, and where you are going.",
       "walletTitle": "Add a wallet, then top it up",
       "walletBody": "Exchanged cash, a travel card, a prepaid card — each one is a wallet. Add one from Wallets & top-ups in the menu, and recording a top-up is what teaches the app your own exchange rate.",
-      "chatTitle": "Add an expense",
-      "chatBody": "Add manually from the menu walks you through it — amount, who paid, who is in. You can photograph the receipt there too and the items come back as lines.",
+      "entryTitle": "Add an expense",
+      "entryBody": "The form sits right on the home screen — amount, who paid, who was in, one step at a time, without leaving the page. You can photograph a receipt there too, and the items come across with their prices.",
       "assignTitle": "Say who had what",
       "assignBody": "Tick the people on each line, quantity included. Anything nobody ticks is shared between everyone on that expense.",
       "settleTitle": "See where everyone stands",
@@ -107,6 +107,7 @@
     "signIn": "Sign in",
     "signOut": "Sign out",
     "newGroup": "New group",
+    "manageGroup": "Manage group",
     "tabs": {
       "status": "Status",
       "me": "Spending",
@@ -117,9 +118,12 @@
       "history": "History",
       "manualEntry": "Add manually",
       "invite": "Invite",
-      "allGroups": "All groups",
+      "allGroups": "My groups",
       "switchGroup": "Switch group",
-      "currentGroup": "Current group"
+      "currentGroup": "Current group",
+      "checkpoints": "Checkpoints",
+      "modeCompare": "Mode comparison",
+      "changes": "Change requests"
     },
     "account": "Account",
     "accountMenu": "Your account",
@@ -199,7 +203,7 @@
   "empty": {
     "inviteTitle": "Invite the others",
     "noSpending": "Nothing yet. When spending happens, Sem will gather it here.",
-    "statusAlone": "You are the only member. Send the invite link from Invite in the menu and balances will appear here."
+    "statusAlone": "It is just you so far. Send an invite link from the account menu at the top right, or add someone by name under “Manage group”, and the settlement will show up here."
   },
   "errors": {
     "notFound": {
@@ -274,7 +278,8 @@
       "question": "Exchanged cash or loaded a travel card for this trip? Log it once and we'll track the balance and your real rate.",
       "log": "Set up a wallet",
       "skip": "Skip"
-    }
+    },
+    "beforeCheckpoint": "This record will not affect already-settled periods."
   },
   "wallet": {
     "title": "Wallets",
@@ -373,8 +378,11 @@
       "ACTUAL_CHARGED": "Uses the amount the payer's bank actually billed.",
       "MARKET_FALLBACK": "That wallet has no top-ups logged yet, so the market rate was used.",
       "OWN_EXCHANGE_RATE": "Converted at the rate you told us you exchanged at — money you prepaid but keep no wallet for.",
-      "SPLIT_FUNDING": "Paid from more than one source. Each part was converted at its own rate, so no single rate covers the whole amount."
-    }
+      "SPLIT_FUNDING": "Paid from more than one source. Each part was converted at its own rate, so no single rate covers the whole amount.",
+      "FROZEN": "Settled at a checkpoint. The amount was pinned when that period closed, so nothing entered since can move it."
+    },
+    "FROZEN": "frozen",
+    "frozenOriginal": "It was converted at the {source}."
   },
   "expenses": {
     "new": {
@@ -395,7 +403,8 @@
       "payer": "Who paid",
       "payerMe": "{name} (me)",
       "when": "Date & time",
-      "note": "Note (optional)",
+      "note": "What was it for?",
+      "notePlaceholder": "Dinner, hotel, taxi",
       "participants": "Shared between",
       "personal": "Personal expense (not settled with the group)",
       "actualCharged": "Bank actually charged ({settlement}, optional)",
@@ -620,187 +629,11 @@
       "keepPhotoNote": "Your photo is kept — you can type the items in yourself.",
       "manualEntry": "Type it in myself",
       "retry": "Try again"
-    }
-  },
-  "chat": {
-    "placeholder": "What did you spend?",
-    "send": "Send",
-    "confirmTitle": "Save this expense?",
-    "descriptionLabel": "Title",
-    "paidBy": "{name} paid",
-    "perPerson": "{amount} each",
-    "everyone": "Everyone",
-    "save": "Save",
-    "openForm": "Open full form",
-    "askAmount": "How much was it?",
-    "askAmountSubmit": "OK",
-    "rateUnavailable": "Couldn't fetch the exchange rate — finish this one in the full form.",
-    "multiAmountNotice": "Looks like there are several items here. Send a photo of the receipt, or add them one by one in the full form.",
-    "duplicateAsk": "A similar expense exists. Save anyway?",
-    "cancel": "Cancel",
-    "greeting": "What did you spend today?",
-    "greetingHint": "Try something like \"lunch 12000, Minsu and me\".",
-    "poke": {
-      "p0": "How can I help?",
-      "p1": "Leave the math to Sem.",
-      "p2": "Tell me what you spent — I keep the tab.",
-      "p3": "Ready to settle up whenever you are."
     },
-    "savedSummary": "Noted. The full details are in your history.",
-    "attach": "Attach a receipt photo",
-    "scan": {
-      "reading": "Reading your receipt…",
-      "imageAlt": "Receipt photo",
-      "viewPhoto": "View the photo",
-      "closePhoto": "Close",
-      "notAReceipt": "That doesn't look like a receipt.",
-      "retryHint": "Send another photo, or just type the expense in instead.",
-      "totalOnlyNotice": "The items couldn't be read — using just the printed total.",
-      "sumMismatchNotice": "The items didn't add up to the printed total, so the printed total was used instead.",
-      "notConfigured": "Photo scanning isn't set up on this server yet — type the expense in instead.",
-      "dailyLimit": "You've used today's {limit} scans. Type the expense in instead.",
-      "tooLarge": "That photo is too large. Try a smaller one, or type the expense in.",
-      "failed": "Couldn't read that receipt. Try another photo, or type the expense in.",
-      "offline": "Lost connection while reading the receipt. Try again, or type the expense in.",
-      "photoKept": "The photo was still saved, even though the scan failed."
-    },
-    "items": {
-      "title": "Who had what?",
-      "summary": "{count, plural, one {# item} other {# items}} · {total}",
-      "confirm": "Looks good",
-      "autoTitle": "{name} +{count} more",
-      "priceAsk": "How much was it?",
-      "priceMissing": "{count, plural, one {# item has} other {# items have}} no price yet. Tap an item to fill it in.",
-      "priceMissingError": "Every item needs a price before saving."
-    },
-    "funding": {
-      "label": "Paid with",
-      "onTheSpot": "Paid on the spot",
-      "wallet": "From {label}"
-    },
-    "chipSeed": {
-      "myBalance": "how much do I owe",
-      "groupTotal": "how much have we spent",
-      "mySpending": "how much have I spent",
-      "wallet": "how much cash do I have left",
-      "help": "help",
-      "pairwise": "how much do I owe {name}"
-    },
-    "history": {
-      "loadEarlier": "View earlier messages",
-      "retentionNotice": "Only your latest {cap} messages are kept — older ones are tidied up automatically.",
-      "photoPlaceholder": "Photo"
-    },
-    "persist": {
-      "pending": "Saving to your history…",
-      "failed": "Sem couldn't save this to your history",
-      "retry": "Retry",
-      "explainer": "The clock next to a message means it's still saving to your history — don't close the app or refresh while it's showing."
-    },
-    "edit": {
-      "whichOne": "Which expense do you mean?",
-      "noneFound": "I couldn't find that one. Here are your latest expenses — is it one of these?",
-      "apply": "Yes, do it",
-      "confirmAdd": "Add {name} to {note}?",
-      "confirmRemove": "Take {name} out of {note}?",
-      "confirmAmount": "Change {note} to {amount}?",
-      "confirmCancel": "Cancel {note}?",
-      "done": "Done — {note} is updated.",
-      "doneCancelled": "Done — {note} is cancelled.",
-      "notFound": "That expense isn't there any more.",
-      "cancelledAlready": "That one is already cancelled, so there's nothing to change.",
-      "notMember": "That person isn't in this group.",
-      "lastParticipant": "An expense has to be shared by at least one person, so that one can't be taken out.",
-      "failed": "Something went wrong — try that again.",
-      "badAmount": "That amount doesn't look right — try saying it again.",
-      "currencyBlocked": "An expense keeps the currency it was saved in. Change just the amount, or add it again as a new expense.",
-      "currencySwap": {
-        "question": "Change {note} from {from} to {to}? An expense keeps the currency it was saved in, so I'll cancel this one and add it again in the new currency.",
-        "detail": "Payer, participants, time and note stay the same, and the new expense is priced again for that day.",
-        "done": "Done — {note} was cancelled and added again in the new currency.",
-        "rateUnavailable": "Couldn't fetch the exchange rate, so nothing was changed. Try that again in a moment."
-      },
-      "tooComplex": "This one has items or split funding, so it can't be changed from chat. Edit it in the full form."
-    },
-    "wallet": {
-      "title": "Create this wallet?",
-      "currencyLabel": "Currency",
-      "typeLabel": "Type",
-      "typeCash": "Cash",
-      "typeCard": "Reloadable card",
-      "typePrepaid": "Other prepaid",
-      "labelLabel": "Name",
-      "labelPlaceholder": "e.g. Yen cash",
-      "autoLabel": "{currency} {type}",
-      "create": "Create",
-      "needCurrency": "Pick which currency this wallet holds."
-    },
-    "panel": {
-      "historyTitle": "History",
-      "mineTitle": "My expenses",
-      "mySpendingTitle": "What I spent",
-      "close": "Close panel",
-      "openFull": "Open full page",
-      "loadMore": "Show more",
-      "empty": "Nothing here yet.",
-      "count": "{count, plural, =1 {1 expense} other {# expenses}}",
-      "total": "Total",
-      "evenAmong": "Split evenly, {count} people",
-      "itemised": "Itemised"
-    },
-    "batch": {
-      "title": "Review before saving",
-      "summary": "{rows, plural, one {# line read} other {# lines read}}. Nothing is saved until you confirm.",
-      "checksumMismatch": "Total line says {declared}, but the rows add up to {sum}.",
-      "checksumOk": "Total line {declared} matches the rows.",
-      "checksumExcluded": "{count, plural, one {# row in another currency is not counted} other {# rows in another currency are not counted}}.",
-      "status": {
-        "completed": "Ready",
-        "ask": "Needs an answer",
-        "unread": "Not read",
-        "total": "Total",
-        "scope": "Applies to all"
-      },
-      "amountLabel": "Amount",
-      "payerLabel": "Paid by",
-      "descriptionLabel": "Description",
-      "payerUnset": "Ask who paid",
-      "merge": "Merge with next",
-      "split": "Split apart",
-      "confirm": "{count, plural, =0 {Nothing ready to save} one {Save 1 row} other {Save # rows}}",
-      "skipped": "{count, plural, one {# row is left open} other {# rows are left open}} — nothing is discarded.",
-      "checksumUnreadable": "The total line's amount could not be read, so nothing is compared against it.",
-      "checksumUnparsable": "{count, plural, one {# row's amount could not be read} other {# rows' amounts could not be read}}.",
-      "checksumNotAllReady": "{count, plural, one {# of the rows it adds up is still open} other {# of the rows it adds up are still open}}.",
-      "payerUnknown": "Not in this group ({id})",
-      "asks": {
-        "amount": "Needs an amount",
-        "payer": "Needs a payer",
-        "participants": "Needs someone to split with",
-        "counterparty": "Needs the other side",
-        "interpretation": "Needs a reading chosen"
-      },
-      "participantsLabel": "Split with",
-      "asksUnanswerable": "(cannot be answered here)",
-      "memberUnknown": "Not in this group ({id})",
-      "mergeBlocked": "Cannot merge: there is no boundary between this row and the next.",
-      "scopeApplied": "Applied across rows ({scope}).",
-      "scopeRevoke": "Revoke",
-      "scopeRestore": "Apply again",
-      "scopeRevoked": "Revoked — this line no longer applies across rows.",
-      "scopeKind": {
-        "payer": "payer",
-        "split": "split"
-      },
-      "unreadReason": {
-        "no-amount": "No amount on this line.",
-        "unparsed": "An amount was found but no expense could be read around it.",
-        "cross-row-reference": "Refers to another line, so it cannot be read alone.",
-        "residual-arithmetic": "States a remainder, not an amount of its own.",
-        "spans-rows": "Continues across lines."
-      },
-      "itemUnpriced": "no price"
-    }
+    "frozenNotice": "This expense is inside a settled period, so it cannot be edited or cancelled here.",
+    "frozenError": "This expense is frozen at a checkpoint and cannot be changed directly.",
+    "requestChange": "Request a change",
+    "proposeNotice": "This expense is settled. Save it and the group is asked, not changed — everyone it would cost has to agree first."
   },
   "balance": {
     "receivable": "To receive",
@@ -839,7 +672,12 @@
     "enteredByShort": "entered by {name}",
     "cancelledBy": "taken out by {name}",
     "recalcBanner": "{name}'s exchange records were applied — balances updated.",
-    "recalcDismiss": "Dismiss"
+    "recalcDismiss": "Dismiss",
+    "mySpendingTitle": "My spending",
+    "spendingToggle": "Show my spending",
+    "spendingMore": "See all",
+    "statusDetail": "See details",
+    "addExpense": "Add an expense"
   },
   "history": {
     "title": "History",
@@ -864,6 +702,83 @@
     "pairSettled": "You're all square with {other}",
     "pairNone": "You're all square with everyone.",
     "pairLegend": "→ pays · ← is paid"
+  },
+  "checkpoints": {
+    "title": "Checkpoints",
+    "intro": "A checkpoint closes a period. Everything before it is settled: its converted amounts are pinned, and nothing entered afterwards can move them.",
+    "createHeading": "Draw a checkpoint",
+    "name": "Name",
+    "namePlaceholder": "Day 3 settle-up",
+    "when": "Closes at",
+    "submit": "Draw checkpoint",
+    "submitting": "Freezing",
+    "warning": "Expenses up to this moment are frozen at the rates they convert at now, and can no longer be edited or cancelled directly.",
+    "frozen": "{count} expenses frozen.",
+    "listHeading": "Drawn so far",
+    "empty": "No checkpoints yet, so nothing is settled.",
+    "frozenCount": "{count} expenses frozen",
+    "drawnBy": "drawn by {name}",
+    "errors": {
+      "invalidInput": "Give the checkpoint a name and a moment to close at.",
+      "duplicateTimestamp": "This group already has a checkpoint at that exact moment.",
+      "nothingToFreeze": "There is nothing before that moment left to freeze."
+    }
+  },
+  "changes": {
+    "title": "Change requests",
+    "intro": "A settled period can still be corrected, but only with the agreement of everyone it would cost.",
+    "badge": "{count} pending change",
+    "pendingHeading": "Waiting on an answer",
+    "nonePending": "Nothing is waiting. The numbers on the balance screen are final.",
+    "kind": {
+      "EDIT": "{name} wants to correct “{expense}”.",
+      "CANCEL": "{name} wants to cancel “{expense}”.",
+      "RESTORE": "{name} wants to bring “{expense}” back."
+    },
+    "worseBy": "{amount} worse off",
+    "betterBy": "{amount} better off",
+    "answerApproved": "{name} agreed",
+    "answerRejected": "{name} said no",
+    "answerWaiting": "Waiting on {name}",
+    "answerNoResponse": "{name} never answered",
+    "reminded": "reminder sent",
+    "approve": "Agree",
+    "reject": "Say no",
+    "submitting": "Sending",
+    "youAnswered": "You have answered. It applies once everyone asked has.",
+    "notAsked": "You were not asked: this change does not cost you anything.",
+    "requestChange": "Request a change",
+    "requestCancel": "Request cancellation",
+    "requestRestore": "Request restoring this",
+    "opened": "Asked. It applies once everyone it would cost agrees.",
+    "appliedNoConsent": "Done. Nobody ends up worse off, so nobody had to be asked.",
+    "historyHeading": "Decided",
+    "historyEmpty": "Nothing has been decided yet.",
+    "auditCheckpoints": "{count} checkpoints affected",
+    "auditNoStakeholders": "nobody had to be asked",
+    "outcome": {
+      "RETRO_CHANGE_APPROVED": "{name}’s change was agreed and applied.",
+      "RETRO_CHANGE_AUTO_APPROVED": "{name}’s change applied straight away — nobody was worse off.",
+      "RETRO_CHANGE_REJECTED": "{name}’s change was refused.",
+      "RETRO_CHANGE_EXPIRED": "{name}’s change expired without an answer, so it was refused."
+    },
+    "errors": {
+      "invalidInput": "That change could not be read.",
+      "anotherPending": "Another change is pending. Only one can be open at a time.",
+      "notPending": "That request is no longer open.",
+      "notStakeholder": "You were not asked about this change."
+    }
+  },
+  "modeCompare": {
+    "title": "Mode comparison",
+    "intro": "The same expenses settled both ways: at what each wallet's money actually cost, and at the market rates captured when the expenses were entered.",
+    "avgCost": "Average cost",
+    "market": "Market",
+    "difference": "Difference",
+    "member": "Member",
+    "current": "This group settles in {mode} mode.",
+    "empty": "No expenses to compare yet.",
+    "note": "Nothing here changes any number. Switching mode is done in group settings."
   },
   "myspending": {
     "title": "My spending",
@@ -890,6 +805,10 @@
     "exchangeRecords": "My exchange records",
     "members": "Members",
     "rename": "Rename",
+    "addMember": "Add someone",
+    "addMemberName": "Name",
+    "addMemberSubmit": "Add",
+    "addMemberHint": "They do not need an account. Add a name and you can split with them right away — they can claim that place later through the invite link.",
     "leftBadge": "left",
     "saved": "Saved.",
     "danger": {

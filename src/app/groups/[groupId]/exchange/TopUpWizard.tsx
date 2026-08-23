@@ -7,7 +7,7 @@ import { SubmitButton } from '@/components/SubmitButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { toLocalInputValue } from '@/lib/datetime'
+import { toLocalDateKey, toLocalInputValue } from '@/lib/datetime'
 import { minorToDecimalInput, parseAmountToMinor } from '@/lib/format'
 import { convertAtDisplayRate, quoteUnitFor } from '@/lib/rate-units'
 import {
@@ -67,6 +67,7 @@ export function TopUpWizard({
   today,
   initialWalletId,
   newWalletCurrency,
+  latestCheckpointIso,
   editing,
   onWallets,
   onSaved,
@@ -81,6 +82,8 @@ export function TopUpWizard({
   today: string
   initialWalletId?: string
   newWalletCurrency?: string
+  /** The newest checkpoint's instant, or null when nothing is settled yet. */
+  latestCheckpointIso: string | null
   /** Set when an existing record is being corrected rather than added. */
   editing?: TopUpEdit
   onWallets: (wallets: WalletView[]) => void
@@ -119,12 +122,50 @@ export function TopUpWizard({
     dateRef.current = node
     if (node && !localised.current) {
       localised.current = true
-      node.value = toLocalInputValue(
+      const local = toLocalInputValue(
         new Date(),
         new Date().getTimezoneOffset(),
       ).slice(0, 10)
+      node.value = local
+      // Kept in state as well as on the node: the settled-period notice below
+      // reads the state, and writing the node alone would leave it judging
+      // the server's date instead of the one on screen.
+      setDate(local)
     }
   }
+
+  /**
+   * Whether this record is dated inside a period a checkpoint has settled.
+   *
+   * Compared as DEVICE-LOCAL CALENDAR DAYS, not as instants. Both sides are
+   * what the user is looking at — the day they picked, and the day the
+   * checkpoint reads as on their screen — and comparing the stored instants
+   * instead makes the notice flip on and off with the UTC offset: a top-up
+   * dated today is stored at midnight UTC, which is AFTER a checkpoint drawn
+   * this morning anywhere east of Greenwich.
+   *
+   * Being generous here costs nothing. The sentence is true of every record,
+   * whatever its date — a settled period is frozen outright — so the date only
+   * decides when it is worth saying.
+   */
+  const beforeCheckpoint =
+    latestCheckpointIso !== null &&
+    date !== '' &&
+    date <=
+      toLocalDateKey(
+        new Date(latestCheckpointIso),
+        new Date().getTimezoneOffset(),
+      )
+
+  const settledNotice = beforeCheckpoint ? (
+    <p
+      className="text-xs text-muted-foreground"
+      role="status"
+      data-testid="exchange-before-checkpoint"
+    >
+      {t('beforeCheckpoint')}
+    </p>
+  ) : null
 
   const wallet = wallets.find((w) => w.id === walletId) ?? null
   const currency = wallet?.currency ?? ''
@@ -391,9 +432,11 @@ export function TopUpWizard({
               type="date"
               defaultValue={date}
               ref={attachDate}
+              onChange={(event) => setDate(event.target.value)}
               required
               className="h-11"
             />
+            {settledNotice}
           </div>
         </fieldset>
       ) : null}
@@ -430,6 +473,8 @@ export function TopUpWizard({
             </span>
             <span className="text-xs text-muted-foreground">{date}</span>
           </div>
+
+          {settledNotice}
 
           {state.error ? (
             <p role="alert" className="text-sm text-destructive">

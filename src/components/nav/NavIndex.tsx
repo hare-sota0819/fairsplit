@@ -54,7 +54,6 @@ export function NavIndex({ children }: { children?: React.ReactNode }) {
   const groupId = useGroupId()
   const t = useTranslations('nav')
   const tExchange = useTranslations('exchange')
-  const tAccount = useTranslations('account')
   const tLoading = useTranslations('loading')
 
   const [open, setOpen] = useState(false)
@@ -123,21 +122,20 @@ export function NavIndex({ children }: { children?: React.ReactNode }) {
     }
   }, [open, closeNow])
 
+  // FOUR destinations, nothing else (owner, 2026-08-22). Everything that
+  // manages the group rather than reading it — creating a group, leaving
+  // one, adding a person, the invite link, group settings — moved to the
+  // account menu on the right; the screens that only qualified numbers
+  // (history, checkpoints, change requests, the mode comparison) are
+  // reached from the screen whose numbers they qualify, not from here.
   const groupItems: IndexItem[] = groupId
     ? [
         {
-          key: 'history',
-          href: `/groups/${groupId}/history`,
-          label: t('sidebar.history'),
-          caption: tLoading('general'),
-          testid: 'nav-history',
-        },
-        {
-          key: 'status',
-          href: `/groups/${groupId}/status`,
-          label: t('tabs.status'),
-          caption: tLoading('status'),
-          testid: 'nav-status',
+          key: 'exchange',
+          href: `/groups/${groupId}/exchange`,
+          label: tExchange('title'),
+          caption: tLoading('exchange'),
+          testid: 'nav-exchange',
         },
         {
           key: 'me',
@@ -147,32 +145,11 @@ export function NavIndex({ children }: { children?: React.ReactNode }) {
           testid: 'nav-me',
         },
         {
-          key: 'exchange',
-          href: `/groups/${groupId}/exchange`,
-          label: tExchange('title'),
-          caption: tLoading('exchange'),
-          testid: 'nav-exchange',
-        },
-        {
-          key: 'manualEntry',
-          href: `/groups/${groupId}/expenses/new`,
-          label: t('sidebar.manualEntry'),
-          caption: tLoading('expense'),
-          testid: 'nav-manual-entry',
-        },
-        {
-          key: 'invite',
-          href: `/groups/${groupId}/invite`,
-          label: t('sidebar.invite'),
-          caption: tLoading('general'),
-          testid: 'nav-invite',
-        },
-        {
-          key: 'settings',
-          href: `/groups/${groupId}/settings`,
-          label: t('tabs.settings'),
-          caption: tLoading('general'),
-          testid: 'nav-settings',
+          key: 'status',
+          href: `/groups/${groupId}/status`,
+          label: t('tabs.status'),
+          caption: tLoading('status'),
+          testid: 'nav-status',
         },
       ]
     : []
@@ -185,27 +162,6 @@ export function NavIndex({ children }: { children?: React.ReactNode }) {
       caption: tLoading('general'),
       testid: 'nav-all-groups',
       exact: true,
-    },
-    {
-      key: 'newGroup',
-      href: '/groups/new',
-      label: t('newGroup'),
-      caption: tLoading('general'),
-      testid: 'nav-new-group',
-    },
-    {
-      key: 'guide',
-      href: '/guide',
-      label: tAccount('guide'),
-      caption: tLoading('general'),
-      testid: 'nav-guide',
-    },
-    {
-      key: 'account',
-      href: '/account',
-      label: tAccount('title'),
-      caption: tLoading('general'),
-      testid: 'nav-account',
     },
   ]
 

@@ -108,12 +108,6 @@ export default defineConfig({
       // `.env.example` when it is missing entirely. The address is the one
       // `e2e/dev-account.ts` exports, so config and specs cannot drift.
       DEV_EMAILS: E2E_DEV_EMAILS.join(', '),
-      // D2-3: the chat fallback is rules-only in dev, test AND e2e. The
-      // default is keyed off NODE_ENV, and this suite runs a PRODUCTION
-      // build (`next start` below) — so without the explicit flag the
-      // fallback would be live here, quietly producing cards for exactly
-      // the sentences the corpus exists to catch the parser failing on.
-      CHAT_FALLBACK_ENABLED: 'false',
     },
   },
 })

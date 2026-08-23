@@ -23,13 +23,11 @@ export function RecalcBanner({
   groupId: string
   message: string
   dismissLabel: string
-  /** Chat-first entry (Task 5): this banner now renders as an assistant
-   *  bubble parked in the transcript's message list. Once dismissed, the
-   *  bubble itself should disappear rather than leave an empty shell behind
-   *  — the transcript owns that removal, so this component reports the
-   *  moment rather than doing it. Optional so the banner still works
-   *  standalone (its local `dismissed` state below still hides its own
-   *  content either way). */
+  /** Reports the dismissal so a container can drop the banner's own slot
+   *  rather than leave an empty shell behind. Optional, and unused since
+   *  the chat transcript that needed it went (2026-08-21) — home renders
+   *  the banner standalone and its local `dismissed` state below hides the
+   *  content either way. */
   onDismissed?: () => void
 }) {
   const [dismissed, setDismissed] = useState(false)

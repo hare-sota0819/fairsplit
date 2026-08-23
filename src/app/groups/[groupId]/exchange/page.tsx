@@ -37,21 +37,30 @@ export default async function ExchangePage({
   const { groupId } = await params
   const { returnTo, wallet, newWalletCurrency } = await searchParams
   const { member: me } = await requireGroupMember(groupId)
-  const [group, wallets, t, tLoading, tWallet, locale] = await Promise.all([
-    prisma.group.findUniqueOrThrow({ where: { id: groupId } }),
-    loadWalletViews(groupId, me.id),
-    getTranslations('exchange'),
-    getTranslations('loading'),
-    getTranslations('wallet'),
-    getLocale(),
-  ])
+  const [group, wallets, latestCheckpoint, t, tLoading, tWallet, locale] =
+    await Promise.all([
+      prisma.group.findUniqueOrThrow({ where: { id: groupId } }),
+      loadWalletViews(groupId, me.id),
+      // Only the LATEST matters: everything before it is already frozen, so
+      // that one instant is the whole answer to "can this record still move
+      // a settled number?".
+      prisma.checkpoint.findFirst({
+        where: { groupId },
+        orderBy: { timestamp: 'desc' },
+        select: { timestamp: true },
+      }),
+      getTranslations('exchange'),
+      getTranslations('loading'),
+      getTranslations('wallet'),
+      getLocale(),
+    ])
   const settlement = group.settlementCurrency
   const currencies = CURATED_CURRENCIES.filter((code) => code !== settlement)
   // Name the country, not the currency code — same reasoning as home's old
   // prompt (docs/BUGS.md 2026-08-07 / the fix note below), which this
-  // replaces now that wallets no longer have a home-page slot (Task 5,
-  // app-shell restructure: home is chat-only, so this is now the only place
-  // a member with no wallet yet is told WHY they might want one).
+  // replaces now that wallets no longer have a home-page slot — home is
+  // expense entry plus the two readings, so this is the only place a member
+  // with no wallet yet is told WHY they might want one.
   const tripPlace = group.tripCountry
     ? countryName(group.tripCountry, locale)
     : null
@@ -106,6 +115,7 @@ export default async function ExchangePage({
         initialWalletId={wallet}
         newWalletCurrency={safeCurrency(newWalletCurrency)}
         returnTo={safeReturnTo(returnTo, groupId)}
+        latestCheckpointIso={latestCheckpoint?.timestamp.toISOString() ?? null}
       />
     </main>
   )

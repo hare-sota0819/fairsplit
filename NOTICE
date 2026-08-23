@@ -13,9 +13,10 @@ Sealed, no longer part of the product:
 
 The natural-language expense parser and its corpus tooling were removed on
 2026-08-21 when the product moved from free-text chat entry to a guided
-flow. Neither the ported code nor the staged corpora are present in this
-repository any more. The attributions below are kept as the record of what
-that work was built from.
+flow. The code is not shipped and is not in this tree; it is kept, whole, in
+`archive/chat-sealed-2026-08-21.tar.gz` and at the git tag
+`pre-chat-removal-2026-08-21`. The attributions below are retained because
+that archive still contains the ported code and the staged corpora.
 
 - kor-to-number.js (https://github.com/dragonteros/kor-to-number.js)
   Copyright (c) dragonteros — MIT License

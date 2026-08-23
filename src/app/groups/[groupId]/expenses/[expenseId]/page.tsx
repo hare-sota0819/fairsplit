@@ -9,6 +9,10 @@ import { BackLink } from '@/components/BackLink'
 import { LocalTime } from '@/components/LocalTime'
 import { NavLink } from '@/components/NavLoader'
 import { RateChip } from '@/components/RateChip'
+import { proposeExpenseCancel } from '../../changes/actions'
+import { RequestCancelForm } from '../../changes/RequestCancelForm'
+import { isFrozenExpense } from '@/lib/checkpoint-freeze'
+import { rateChipCopy } from '@/lib/rate-chip'
 import { SubmitButton } from '@/components/SubmitButton'
 import { Money } from '@/components/Money'
 import { ChevronDown } from 'lucide-react'
@@ -51,28 +55,29 @@ export default async function ExpenseDetailPage({
   }
   const nameOf = (id: string): string =>
     members.find((m) => m.id === id)?.name ?? '?'
-  const [t, tForm, tChip, tExchange, tLoading, tCommon] = await Promise.all([
-    getTranslations('expenses.detail'),
-    getTranslations('expenses.form'),
-    getTranslations('rateChip'),
-    getTranslations('exchange'),
-    getTranslations('loading'),
-    getTranslations('common'),
-  ])
+  const [t, tForm, tChip, tExchange, tLoading, tCommon, tExpenses] =
+    await Promise.all([
+      getTranslations('expenses.detail'),
+      getTranslations('expenses.form'),
+      getTranslations('rateChip'),
+      getTranslations('exchange'),
+      getTranslations('loading'),
+      getTranslations('common'),
+      getTranslations('expenses'),
+    ])
 
   const cancelled = expense.cancelledAt !== null
+  const frozen = isFrozenExpense(expense)
   const engineExpense = toEngineExpense(expense)
   const converted = convertExpense(engineExpense, mode, context)
   const showConversion =
     expense.currency !== group.settlementCurrency ||
     converted.source === 'ACTUAL_CHARGED'
-  // Name the wallet only when its own rate was actually used. A fallback
-  // carries the label too (so the copy can say WHICH wallet has no top-ups),
-  // but calling a market rate "Cash rate" would be a lie.
-  const chipLabel =
-    converted.source === 'WALLET_AVG_COST' && converted.walletLabel
-      ? tChip('withLabel', { label: converted.walletLabel })
-      : tChip(converted.source)
+  // Label and explanation both come from `rateChipCopy`, which is also what
+  // the feed rows use — a frozen conversion has to read the same in both
+  // places, and it names the rate that applied inside the explanation.
+  const chip = rateChipCopy(converted, tChip)
+  const chipLabel = chip.label
 
   // One-time onboarding: right after creating an expense, nudge members who
   // never logged an exchange (Skip sets the flag forever).
@@ -197,13 +202,45 @@ export default async function ExpenseDetailPage({
       >
         {expense.title || t('title')}
       </h1>
-      <NavLink
-        href={`/groups/${groupId}/expenses/${expenseId}/edit`}
-        caption={tLoading('expense')}
-        className="inline-flex h-13 w-full items-center justify-center rounded-xl bg-primary px-5 text-base font-semibold text-primary-foreground transition-[filter,transform] duration-fast ease-swift hover:brightness-110 active:scale-[0.97]"
-      >
-        {t('edit')}
-      </NavLink>
+      {/* A settled expense offers no edit, no cancel and no bank-statement
+          correction: all three move balances behind a checkpoint. The notice
+          replaces the button rather than sitting beside a disabled one, so
+          there is nothing to press and wonder about. */}
+      {frozen ? (
+        <div className="flex flex-col gap-3">
+          <p
+            className="rounded-xl border border-border p-3 text-sm text-muted-foreground"
+            data-testid="expense-frozen-notice"
+          >
+            {tExpenses('frozenNotice')}
+          </p>
+          {/* The dead end is a ROUTE. Stage 1 made these three refuse; this is
+              where the refusal turns into the request flow, which is the whole
+              seam between the two halves of the feature. */}
+          <NavLink
+            href={`/groups/${groupId}/expenses/${expenseId}/edit?propose=1`}
+            caption={tLoading('expense')}
+            testId="request-edit"
+            className="inline-flex h-13 w-full items-center justify-center rounded-xl bg-primary px-5 text-base font-semibold text-primary-foreground transition-[filter,transform] duration-fast ease-swift hover:brightness-110 active:scale-[0.97]"
+          >
+            {tExpenses('requestChange')}
+          </NavLink>
+          <RequestCancelForm
+            action={proposeExpenseCancel}
+            groupId={groupId}
+            expenseId={expenseId}
+            cancelled={cancelled}
+          />
+        </div>
+      ) : (
+        <NavLink
+          href={`/groups/${groupId}/expenses/${expenseId}/edit`}
+          caption={tLoading('expense')}
+          className="inline-flex h-13 w-full items-center justify-center rounded-xl bg-primary px-5 text-base font-semibold text-primary-foreground transition-[filter,transform] duration-fast ease-swift hover:brightness-110 active:scale-[0.97]"
+        >
+          {t('edit')}
+        </NavLink>
+      )}
 
       <span
         className={cancelled ? 'line-through opacity-50' : ''}
@@ -220,10 +257,7 @@ export default async function ExpenseDetailPage({
               amount: formatMinor(converted.amount, group.settlementCurrency),
             })}
           </span>
-          <RateChip
-            label={chipLabel}
-            explanation={tChip(`explain.${converted.source}`)}
-          />
+          <RateChip label={chip.label} explanation={chip.explanation} />
         </div>
       ) : null}
 
@@ -266,7 +300,6 @@ export default async function ExpenseDetailPage({
         <span>
           <LocalTime iso={expense.timestamp.toISOString()} />
         </span>
-        {expense.note ? <span>{expense.note}</span> : null}
         {expense.receiptImagePath ? (
           <a
             href={`/api/receipts/image?path=${encodeURIComponent(expense.receiptImagePath)}`}
@@ -462,7 +495,7 @@ export default async function ExpenseDetailPage({
         </ul>
       </section>
 
-      {showBankCharged ? (
+      {showBankCharged && !frozen ? (
         <BankChargedForm
           groupId={groupId}
           expenseId={expenseId}
@@ -488,11 +521,13 @@ export default async function ExpenseDetailPage({
         />
       ) : null}
 
-      <CancelExpenseForm
-        groupId={groupId}
-        expenseId={expenseId}
-        cancelled={cancelled}
-      />
+      {frozen ? null : (
+        <CancelExpenseForm
+          groupId={groupId}
+          expenseId={expenseId}
+          cancelled={cancelled}
+        />
+      )}
     </main>
   )
 }

@@ -5,11 +5,10 @@ const AT = new Date('2026-08-13T03:00:00.000Z')
 
 describe('cancelledFields', () => {
   /**
-   * This is the drift guard, not a formality: `setExpenseCancelled` (the
-   * expense detail toggle) and `applyCancel` (the chat's "그거 취소해줘") both
-   * write this object, and prose promising they agree is exactly the kind of
-   * claim that rots. Pinning the EXACT key set means adding a field to one
-   * caller's write without adding it here fails loudly.
+   * This is the drift guard, not a formality: prose promising that every
+   * writer of this object agrees is exactly the kind of claim that rots.
+   * Pinning the EXACT key set means adding a field to one caller's write
+   * without adding it here fails loudly.
    */
   it('cancelling records when, who cancelled, and who edited — and nothing else', () => {
     const fields = cancelledFields(true, 'm1', AT)

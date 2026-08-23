@@ -42,6 +42,25 @@ export function StepAmount({
     <div className="flex flex-col gap-6">
       <Card>
         <CardContent className="flex flex-col gap-3">
+          {/* WHAT it was, before how much (owner sketch, 2026-08-22): this
+              one line is the expense's name everywhere else in the app —
+              the receipt heading, the "my spending" rows, the duplicate
+              warning — and asking for it on the last step meant most
+              expenses ended up named after a receipt line or nothing at
+              all. It is still optional; an unnamed expense falls back to
+              the first item, then to the payer. */}
+          <div className="flex flex-col gap-1.5 text-sm">
+            <Label htmlFor="note">{t('note')}</Label>
+            <Input
+              id="note"
+              value={state.note}
+              onChange={(e) => patch({ note: e.target.value })}
+              placeholder={t('notePlaceholder')}
+              className="h-13"
+              data-testid="note"
+            />
+          </div>
+
           <div className="flex items-end gap-2">
             <NumberField
               id="amount"

@@ -794,6 +794,7 @@ export function ExchangeManager({
   initialWalletId,
   newWalletCurrency,
   returnTo,
+  latestCheckpointIso,
 }: {
   groupId: string
   settlementCurrency: string
@@ -806,6 +807,8 @@ export function ExchangeManager({
   newWalletCurrency?: string
   /** Set when the user detoured here mid-expense; offers the way back. */
   returnTo?: string
+  /** The newest checkpoint's instant, or null when nothing is settled yet. */
+  latestCheckpointIso: string | null
 }) {
   const t = useTranslations('exchange')
   const tWallet = useTranslations('wallet')
@@ -853,6 +856,7 @@ export function ExchangeManager({
         today={today}
         initialWalletId={initialWalletId}
         newWalletCurrency={newWalletCurrency}
+        latestCheckpointIso={latestCheckpointIso}
         editing={editing}
         onWallets={applyWallets}
         onSaved={afterSave}

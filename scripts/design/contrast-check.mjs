@@ -19,7 +19,7 @@
 // loudly if that isn't exactly one block, so a future reorder or a third
 // block fails the run instead of silently gating the wrong tokens.
 //
-// Pair table + floors: docs/superpowers/plans/2026-08-09-pitch-design-overhaul.md
+// Pair table + floors: the design plan
 // §Task 3, Step 1. Palette sourcing: docs/PITCH_TEARDOWN.md.
 //
 // Usage: node scripts/design/contrast-check.mjs

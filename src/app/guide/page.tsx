@@ -52,7 +52,7 @@ export default async function GuidePage({
   const steps = [
     { key: 'group', Icon: UsersRound },
     { key: 'wallet', Icon: Wallet },
-    { key: 'chat', Icon: PenLine },
+    { key: 'entry', Icon: PenLine },
     { key: 'assign', Icon: ClipboardCheck },
     { key: 'settle', Icon: Handshake },
   ] as const

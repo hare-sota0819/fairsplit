@@ -1,5 +1,5 @@
 // All-screens screenshot sweep — Task 7 of the design-overhaul-rev2 plan
-// (docs/superpowers/plans/2026-08-11-design-overhaul-rev2.md §Task 7).
+// (the design plan §Task 7).
 //
 // Boots the app against a disposable scratch database (never the dev DB —
 // same guard rule as e2e), seeds one signed-up owner + two joined members +

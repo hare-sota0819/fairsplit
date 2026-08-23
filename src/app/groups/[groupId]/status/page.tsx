@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 import { FreshnessLabel } from '@/components/FreshnessLabel'
+import { NavLink } from '@/components/NavLoader'
 import { directionOf } from '@/components/Money'
 import { TotalsGrid } from '@/components/TotalsGrid'
 import { formatMinor } from '@/lib/format'
@@ -19,13 +20,16 @@ export default async function GroupStatusPage({
   const { member: me } = await requireGroupMember(groupId)
   const data = await loadGroupData(groupId)
   const { group, members, expenses, engineExpenses, context, mode } = data
-  const [t, tHome, tEmpty, tBalance, tWallet] = await Promise.all([
-    getTranslations('status'),
-    getTranslations('home'),
-    getTranslations('empty'),
-    getTranslations('balance'),
-    getTranslations('wallet'),
-  ])
+  const [t, tHome, tEmpty, tBalance, tWallet, tNav, tLoading] =
+    await Promise.all([
+      getTranslations('status'),
+      getTranslations('home'),
+      getTranslations('empty'),
+      getTranslations('balance'),
+      getTranslations('wallet'),
+      getTranslations('nav'),
+      getTranslations('loading'),
+    ])
   const balanceLabels = {
     owed: tBalance('receivable'),
     owing: tBalance('payable'),
@@ -74,6 +78,18 @@ export default async function GroupStatusPage({
           updatedTemplate={t('updated', { ago: '{ago}' })}
           refreshLabel={t('refresh')}
         />
+        {/* Checkpoints left the navigation index when it was cut to four
+            reading destinations (owner, 2026-08-22). They belong to these
+            numbers — freezing them is what a checkpoint IS — so this is the
+            screen that carries the way in. */}
+        <NavLink
+          href={`/groups/${groupId}/checkpoints`}
+          caption={tLoading('general')}
+          testId="status-checkpoints-link"
+          className="w-fit text-sm font-medium text-primary underline"
+        >
+          {tNav('sidebar.checkpoints')}
+        </NavLink>
       </header>
 
       {hasExpenses ? (

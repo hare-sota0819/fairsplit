@@ -3,16 +3,15 @@
  *
  * Cancelling an expense is not a delete: the row stays, leaves every
  * settlement and wallet computation, and remains visible in feeds with its
- * audit trail intact. Two call sites perform that write — the expense detail
- * screen's toggle (`setExpenseCancelled`, expenses/actions.ts) and the chat's
- * "그거 취소해줘" (`applyCancel`, chat-edit-actions.ts) — and they must write
- * EXACTLY the same fields. Only their navigation differs (the detail screen
- * redirects back to itself; chat stays in the conversation and returns fresh
- * state), which is the whole reason there are two of them.
+ * audit trail intact.
  *
- * It lives in `src/lib` rather than beside either caller because both callers
- * are `'use server'` modules, and a Server Actions file may only export async
- * functions — a shared plain helper cannot live in one of them.
+ * It was split out when TWO call sites performed that write and had to write
+ * exactly the same fields; the second (the chat's "그거 취소해줘") went with
+ * the chat programme on 2026-08-21, leaving the expense detail screen's
+ * toggle (`setExpenseCancelled`, expenses/actions.ts). It stays a separate
+ * pure module because the pinning test below is worth more than the
+ * inlining: the retroactive-change flow writes these same fields on the far
+ * side of a consent request.
  *
  * `at` is a parameter rather than a `new Date()` here so the function stays
  * pure and its contract is pinnable in a test (which is the point: prose

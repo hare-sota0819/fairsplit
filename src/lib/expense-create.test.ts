@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { expenseCreateData, type NewExpenseInput } from './expense-create'
 
 /**
- * The seam test (review round 1, IMPORTANT 2): the SAVE path and the chat's
- * currency swap both create an expense through `expenseCreateData`, and the
- * whole point of that is that a re-created expense cannot quietly miss a
- * column the save path fills. This pins the shape against a fixture so the
- * guarantee is a test, not a comment — including the twelve scalar columns,
+ * The seam test (review round 1, IMPORTANT 2): every expense is created
+ * through `expenseCreateData`, and the whole point of that is that a row
+ * created off the save path cannot quietly miss a column the save path
+ * fills. This pins the shape against a fixture so the guarantee is a test,
+ * not a comment — including the twelve scalar columns,
  * because a thirteenth added to the schema and wired into only one caller is
  * exactly the drift this exists to catch.
  */

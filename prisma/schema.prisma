@@ -42,6 +42,33 @@ enum ItemSplitMode {
   BY_AMOUNT
 }
 
+// What a retroactive change proposes to do to a settled expense. The three
+// things Stage 1 made impossible in place, and nothing else: anything that
+// moves money behind a checkpoint has to come through here.
+enum RetroChangeKind {
+  EDIT
+  CANCEL
+  RESTORE
+}
+
+enum RetroChangeStatus {
+  PENDING
+  // Every member who would be worse off agreed.
+  APPROVED
+  // Nobody would be worse off, so nobody was asked.
+  AUTO_APPROVED
+  // At least one stakeholder said no.
+  REJECTED
+  // Nobody said no, but somebody never answered. Silence never moves money,
+  // so the deadline rejects rather than approves.
+  EXPIRED
+}
+
+enum RetroResponse {
+  APPROVED
+  REJECTED
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -153,6 +180,8 @@ model Group {
   expenses      Expense[]
   checkpoints   Checkpoint[]
   receiptScans  ReceiptScan[]
+  retroRequests RetroChangeRequest[]
+  auditEvents   AuditEvent[]
 }
 
 model Member {
@@ -181,13 +210,17 @@ model Member {
 
   wallets           Wallet[]
   exchangeRecords   ExchangeRecord[]
-  expensesPaid      Expense[]            @relation("ExpensePayer")
-  expensesEntered   Expense[]            @relation("ExpenseEnteredBy")
-  expensesUpdated   Expense[]            @relation("ExpenseUpdatedBy")
-  expensesCancelled Expense[]            @relation("ExpenseCancelledBy")
+  expensesPaid      Expense[]             @relation("ExpensePayer")
+  expensesEntered   Expense[]             @relation("ExpenseEnteredBy")
+  expensesUpdated   Expense[]             @relation("ExpenseUpdatedBy")
+  expensesCancelled Expense[]             @relation("ExpenseCancelledBy")
   expenseShares     ExpenseParticipant[]
-  expenseFunding    ExpenseFunding[]     @relation("ExpenseFundingMember")
+  expenseFunding    ExpenseFunding[]      @relation("ExpenseFundingMember")
   itemAssignments   ItemAssignment[]
+  checkpointsDrawn  Checkpoint[]          @relation("CheckpointCreatedBy")
+  retroRequested    RetroChangeRequest[]  @relation("RetroRequestedBy")
+  retroResponses    RetroChangeResponse[] @relation("RetroStakeholder")
+  auditEvents       AuditEvent[]          @relation("AuditActor")
 
   @@unique([groupId, userId])
   @@index([groupId])
@@ -237,11 +270,11 @@ model ExchangeRecord {
 }
 
 model Expense {
-  id                    String    @id @default(cuid())
-  group                 Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  id                    String      @id @default(cuid())
+  group                 Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId               String
   title                 String
-  payer                 Member    @relation("ExpensePayer", fields: [payerId], references: [id], onDelete: Cascade)
+  payer                 Member      @relation("ExpensePayer", fields: [payerId], references: [id], onDelete: Cascade)
   payerId               String
   // Total in `currency` minor units.
   amount                BigInt
@@ -249,7 +282,7 @@ model Expense {
   timestamp             DateTime
   // Market rate foreign -> settlement captured at input time; immutable
   // afterwards (application-enforced: no update path may touch it).
-  marketRateSnapshot    Decimal   @db.Decimal(24, 10)
+  marketRateSnapshot    Decimal     @db.Decimal(24, 10)
   // True when no market rate could be reached at input time and the wallet's
   // own average cost was stored above instead. The number is still the right
   // one for THIS expense — a prepaid expense converts at its wallet's cost,
@@ -257,23 +290,23 @@ model Expense {
   // would read it as one (a group switched to MARKET mode, or this wallet
   // losing its last top-up) must not pretend otherwise. The expense carries a
   // banner asking for the real rate until someone supplies it.
-  marketRateProvisional Boolean   @default(false)
+  marketRateProvisional Boolean     @default(false)
   note                  String?
   // Personal spending: shown in the payer's own spending, excluded from
   // settlement.
-  isPersonal            Boolean   @default(false)
+  isPersonal            Boolean     @default(false)
   // Wallet "count your cash" corrections: personal prepaid expenses recording
   // the counted-vs-computed diff, listed separately in the wallet detail.
-  isWalletAdjustment    Boolean   @default(false)
+  isWalletAdjustment    Boolean     @default(false)
   // Audit: who typed it in (entered-by != payer is normal), who last edited.
-  enteredBy             Member    @relation("ExpenseEnteredBy", fields: [enteredById], references: [id], onDelete: Restrict)
+  enteredBy             Member      @relation("ExpenseEnteredBy", fields: [enteredById], references: [id], onDelete: Restrict)
   enteredById           String
-  updatedBy             Member?   @relation("ExpenseUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  updatedBy             Member?     @relation("ExpenseUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
   updatedById           String?
   // Soft delete: cancelled expenses leave all settlement/wallet math but
   // stay in feeds, flagged. No hard delete path.
   cancelledAt           DateTime?
-  cancelledBy           Member?   @relation("ExpenseCancelledBy", fields: [cancelledById], references: [id], onDelete: SetNull)
+  cancelledBy           Member?     @relation("ExpenseCancelledBy", fields: [cancelledById], references: [id], onDelete: SetNull)
   cancelledById         String?
   // Object path of the receipt photo in the `receipts` storage bucket, keyed
   // by group (`<groupId>/<uuid>.jpg`). Null for a hand-typed expense. Only
@@ -281,12 +314,25 @@ model Expense {
   // The bucket is private; reads go through a short-lived signed URL minted
   // after a group-membership check.
   receiptImagePath      String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  // The checkpoint that froze this expense, or null while it is still live.
+  // Non-null means the group has settled a period containing it: its
+  // conversion is pinned (the rates live on its `funding` rows), and it can
+  // no longer be edited or cancelled directly — only through a retroactive
+  // change request every worse-off member consents to.
+  //
+  // RESTRICT rather than SetNull: dropping a checkpoint must never silently
+  // unfreeze settled money. Group deletion still works because
+  // `deleteGroupRows` removes expenses BEFORE the group cascades its
+  // checkpoints away.
+  frozenAt              Checkpoint? @relation("ExpenseFrozenAt", fields: [frozenAtCheckpointId], references: [id], onDelete: Restrict)
+  frozenAtCheckpointId  String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
 
-  items        ExpenseItem[]
-  participants ExpenseParticipant[]
-  funding      ExpenseFunding[]
+  items         ExpenseItem[]
+  participants  ExpenseParticipant[]
+  funding       ExpenseFunding[]
+  retroRequests RetroChangeRequest[]
 
   @@index([groupId, timestamp])
   // Supports the root-redirect query (src/app/page.tsx): the group whose
@@ -294,6 +340,7 @@ model Expense {
   // desc filtered through `enteredBy: { userId }` — runs on every signed-in
   // hit to `/`.
   @@index([enteredById, createdAt])
+  @@index([frozenAtCheckpointId])
 }
 
 // Where one expense's money came from. ALWAYS at least one row, and the
@@ -344,6 +391,25 @@ model ExpenseFunding {
   // from pay-as-you-go. NOT a market-rate override: it is a number the app
   // cannot look up, which is exactly why the user is asked for it.
   ownRateSnapshot     Decimal? @db.Decimal(24, 10)
+  // ---- Freeze (set together, or all null) --------------------------------
+  // What this portion converted at when its checkpoint was drawn, kept as an
+  // EXACT rational in minor units (settlement minor per foreign minor) —
+  // numerator / denominator, the engine's own `Rate` shape.
+  //
+  // Not a Decimal: an average cost is sum(paid)/sum(received), a rational
+  // that Decimal(24,10) cannot hold exactly, and rounding it here would move
+  // the very numbers this column exists to pin.
+  frozenRateNum       BigInt?
+  frozenRateDen       BigInt?
+  // The rate source that was ACTUALLY applied (WALLET_AVG_COST, ...). The
+  // UI shows a "frozen" chip instead, but the truth is kept: which rate
+  // priced settled money is exactly what an audit has to be able to answer.
+  frozenSource        String?
+  // This portion in settlement minor units, rounded once, as it stood at
+  // freeze time. Redundant with the rate above by construction — and that is
+  // the point: re-deriving it must reproduce this number, which is an
+  // invariant the tests assert.
+  frozenAmount        BigInt?
 
   @@index([expenseId])
   @@index([walletId])
@@ -429,12 +495,29 @@ model RateCache {
 
 // A checkpoint is a boundary timestamp, not a range: an expense belongs to
 // the nearest checkpoint whose timestamp is >= the expense timestamp.
+//
+// It is also a BARRIER, not a snapshot. Creating one freezes every expense
+// before it (see `Expense.frozenAtCheckpointId` and the freeze columns on
+// `ExpenseFunding`): the converted amounts settled at that moment stop
+// depending on anything entered afterwards, so a backdated top-up can never
+// move a number the group has already paid each other on.
+//
+// No balance total is stored here on purpose. A stored total would fight
+// with soft delete and per-expense edits, both of which exist; the freeze is
+// therefore held per funding portion, and the balance is re-derived from
+// those frozen rates every time.
 model Checkpoint {
-  id        String   @id @default(cuid())
-  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  groupId   String
-  name      String
-  timestamp DateTime
+  id          String   @id @default(cuid())
+  group       Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId     String
+  name        String
+  timestamp   DateTime
+  createdAt   DateTime @default(now())
+  // Who drew the barrier. Null once that member row is gone.
+  createdBy   Member?  @relation("CheckpointCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+
+  frozenExpenses Expense[] @relation("ExpenseFrozenAt")
 
   @@unique([groupId, timestamp])
 }
@@ -467,4 +550,109 @@ model ReceiptScan {
   createdAt      DateTime @default(now())
 
   @@index([userId, createdAt])
+}
+
+/**
+ * A proposal to change something a checkpoint has already settled.
+ * The consent set is every member the change would leave WORSE OFF by at
+ * least one minor unit of the settlement currency; nobody else is asked, and
+ * a proposal that leaves nobody worse off never becomes a row here at all —
+ * it is applied outright and audited as AUTO_APPROVED.
+ * ONE pending request per group, enforced by a partial unique index rather
+ * than by a read-then-write (see the migration). The reason is in the spec:
+ * the diff shown to approvers must be the diff that gets applied, and two
+ * proposals in flight would each invalidate the other's arithmetic.
+ */
+model RetroChangeRequest {
+  id             String            @id @default(cuid())
+  group          Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId        String
+  expense        Expense           @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  expenseId      String
+  kind           RetroChangeKind
+  status         RetroChangeStatus @default(PENDING)
+  requestedBy    Member            @relation("RetroRequestedBy", fields: [requestedById], references: [id], onDelete: Cascade)
+  requestedById  String
+  /**
+   * EDIT only: the derived write rows (`DerivedExpenseWrite`), bigints as
+   * decimal strings. Stored rather than re-derived so the rows that were
+   * priced are the rows that get written.
+   */
+  proposal       Json?
+  /**
+   * Per member, `after - before` in settlement minor units as a decimal
+   * string. Negative = worse off. Frozen at request time: it is what the
+   * approvers were shown, and the audit entry repeats it.
+   */
+  balanceDiff    Json
+  /**
+   * Which checkpoints hold expenses this change repriced.
+   */
+  checkpointIds  String[]
+  createdAt      DateTime          @default(now())
+  /**
+   * createdAt + RETRO_CHANGE_EXPIRY_HOURS; evaluated lazily on read.
+   */
+  expiresAt      DateTime
+  /**
+   * When the non-responders were nudged. Null until a read notices the
+   * 24-hour mark. With no push channel the nudge is in-app — the request says
+   * it is overdue and who it is waiting on — so this column exists to keep it
+   * from being "sent" again on every render.
+   */
+  reminderSentAt DateTime?
+  decidedAt      DateTime?
+
+  responses RetroChangeResponse[]
+
+  @@index([groupId, status])
+  @@index([expenseId])
+}
+
+/**
+ * One stakeholder's seat at a request. A row exists for every member in the
+ * consent set from the moment the request is made — `response` null is "has
+ * not answered yet", which is exactly what the audit entry has to be able to
+ * report as "no response".
+ */
+model RetroChangeResponse {
+  request     RetroChangeRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  requestId   String
+  member      Member             @relation("RetroStakeholder", fields: [memberId], references: [id], onDelete: Cascade)
+  memberId    String
+  response    RetroResponse?
+  respondedAt DateTime?
+
+  @@id([requestId, memberId])
+  @@index([memberId])
+}
+
+/**
+ * The append-only log. There is no update path and no delete path anywhere in
+ * the application — rows are written once, by `appendAuditEvent`, and read.
+ * Written for EVERY terminal outcome of a retroactive change, refusals
+ * included: a rejected or expired request is a thing the group decided, and a
+ * log that only recorded the changes that went through would be a record of
+ * agreement rather than a record of what happened.
+ */
+model AuditEvent {
+  id      String   @id @default(cuid())
+  group   Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  groupId String
+  /**
+   * RETRO_CHANGE_APPROVED | ..._AUTO_APPROVED | ..._REJECTED | ..._EXPIRED
+   */
+  kind    String
+  /**
+   * Who caused it. Null for an expiry, which nobody performed.
+   */
+  actor   Member?  @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  actorId String?
+  /**
+   * The whole entry: change payload, checkpoints, stakeholders, diff.
+   */
+  payload Json
+  at      DateTime @default(now())
+
+  @@index([groupId, at])
 }

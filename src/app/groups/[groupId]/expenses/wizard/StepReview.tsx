@@ -296,17 +296,6 @@ export function StepReview({ state, patch, data, math, market }: StepProps) {
           </CardContent>
         </Card>
       ) : null}
-
-      <div className="flex flex-col gap-1.5 text-sm">
-        <Label htmlFor="note">{t('note')}</Label>
-        <Input
-          id="note"
-          value={state.note}
-          onChange={(e) => patch({ note: e.target.value })}
-          className="h-11"
-          data-testid="note"
-        />
-      </div>
     </div>
   )
 }

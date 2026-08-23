@@ -52,9 +52,13 @@ export interface FormWallet {
 }
 
 /**
- * A parse carried over from the chat composer's handoff link
+ * A parse carried over from a handoff link
  * (`?draftAmount=&draftNote=&draftCurrency=`), resolved and validated by
- * `new/page.tsx` (see `new/prefill.ts`'s `resolvePrefill`).
+ * `new/page.tsx` (see `new/prefill.ts`'s `resolvePrefill`). NOTHING IN THE
+ * APP PRODUCES SUCH A LINK any more — the chat composer that did went on
+ * 2026-08-21 — so this path is reachable only by typing the query string.
+ * It is kept because the draft-vs-handoff precedence below is tangled with
+ * a fixed timezone bug, not because anything needs it.
  *
  * `amount` is the only field gated on validity: a `draftAmount` that fails
  * `parseAmountToMinor` drops `amount` alone, not the whole prefill — currency

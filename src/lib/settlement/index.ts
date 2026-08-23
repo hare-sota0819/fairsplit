@@ -3,6 +3,7 @@ export { consumedShares } from './consumed'
 export {
   convertExpense,
   convertFunding,
+  displayRateSource,
   fundingSources,
   resolveRate,
   resolveSourceRate,

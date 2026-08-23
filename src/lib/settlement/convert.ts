@@ -9,6 +9,7 @@ import type {
   RateMode,
   RateResolution,
   RateResult,
+  RateSource,
   SettlementContext,
   WalletId,
 } from './types'
@@ -124,6 +125,20 @@ export function resolveSourceRate(
   mode: RateMode,
   context: SettlementContext,
 ): RateResolution {
+  // A checkpoint has settled this portion: the rate is pinned and nothing
+  // entered since is allowed to reach it. This has to come FIRST — every
+  // branch below reads live data (the wallet's top-ups, the group's mode),
+  // and live data is exactly what a barrier exists to keep out.
+  if (funding.frozen !== undefined) {
+    return {
+      rate: funding.frozen.rate,
+      source: funding.frozen.source,
+      frozen: true,
+      ...(funding.walletId === null
+        ? {}
+        : { walletLabel: context.walletsById.get(funding.walletId)?.label }),
+    }
+  }
   if (
     mode === 'AVG_COST' &&
     funding.walletId === null &&
@@ -237,7 +252,27 @@ export function resolveRate(
   return {
     rate: blendedRate(portions, expense.amount),
     source: 'SPLIT_FUNDING',
+    // Same rule as `convertExpense`: every portion, or it is not frozen.
+    ...(sources.every((source) => source.frozen !== undefined)
+      ? { frozen: true }
+      : {}),
   }
+}
+
+/**
+ * The chip value for a resolution: 'FROZEN' when a checkpoint pinned it,
+ * otherwise the source that applied.
+ *
+ * Two facts, one chip. The user needs to know the number cannot move; the
+ * record needs to know which rate produced it. Splitting them here rather
+ * than overwriting `source` at freeze time keeps both — and keeps
+ * `rateChip.FROZEN` a display key with no storage meaning.
+ */
+export function displayRateSource(resolution: {
+  source: RateSource
+  frozen?: boolean
+}): RateSource {
+  return resolution.frozen === true ? 'FROZEN' : resolution.source
 }
 
 export interface ConvertedPortion {
@@ -303,5 +338,17 @@ export function convertExpense(
     currency: context.settlementCurrency,
     source: single?.source ?? 'SPLIT_FUNDING',
     walletLabel: single?.walletLabel,
+    // A split-funded expense counts as frozen only when EVERY portion is —
+    // which is the only state a checkpoint can leave it in, since it freezes
+    // whole expenses. Deriving it rather than assuming it means a
+    // half-written freeze shows up as unfrozen instead of silently claiming
+    // finality it does not have.
+    //
+    // Omitted rather than set to false when it is not frozen: this object is
+    // compared structurally all over the tests, and a live conversion is the
+    // same fact it has always been.
+    ...(portions.every((portion) => portion.resolution.frozen === true)
+      ? { frozen: true }
+      : {}),
   }
 }

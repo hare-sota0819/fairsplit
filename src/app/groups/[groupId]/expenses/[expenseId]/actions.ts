@@ -2,6 +2,7 @@
 
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { isFrozenExpense } from '@/lib/checkpoint-freeze'
 import { requireGroupMember } from '@/lib/membership'
 import { prisma } from '@/lib/prisma'
 import { formatMinor, parseAmountToMinor } from '@/lib/format'
@@ -34,6 +35,11 @@ export async function setActualCharged(
   })
   if (!expense) {
     notFound()
+  }
+  // The bank figure IS the rate in AVG_COST mode, so writing one onto a
+  // settled expense would reprice a period the group has already paid on.
+  if (isFrozenExpense(expense)) {
+    return { error: (await getTranslations('expenses'))('frozenError') }
   }
   const group = await prisma.group.findUniqueOrThrow({
     where: { id: groupId },

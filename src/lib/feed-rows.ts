@@ -2,6 +2,7 @@ import type { FeedRowView } from '@/components/ExpenseFeed'
 import { toEngineExpense } from '@/lib/engine-map'
 import { feedShareFor } from '@/lib/feed-share'
 import type { loadGroupData } from '@/lib/group-data'
+import { rateChipCopy } from '@/lib/rate-chip'
 import { convertExpense } from '@/lib/settlement'
 
 /**
@@ -85,11 +86,10 @@ export function buildFeedRows(
         ? t('feedEvenSplit', { count: share.evenSplitOf.among })
         : null,
       cancelled,
-      chip: showChip
-        ? source === 'WALLET_AVG_COST' && converted?.walletLabel
-          ? tChip('withLabel', { label: converted.walletLabel })
-          : tChip(source!)
-        : null,
+      chip:
+        showChip && converted !== null
+          ? rateChipCopy(converted, tChip).label
+          : null,
       // "What did I have again?" is answered by my own lines. The units
       // stated are the ones I took, not what the line held — a beer ×2 out
       // of six is what I drank.

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useActionState, useState } from 'react'
+import { useActionState, useRef, useState } from 'react'
 import { SubmitButton } from '@/components/SubmitButton'
 import { Input } from '@/components/ui/input'
 import {
@@ -238,6 +238,63 @@ export function MemberRow({
       </SubmitButton>
       {state.error ? (
         <span role="alert" className="text-destructive">
+          {state.error}
+        </span>
+      ) : null}
+    </form>
+  )
+}
+
+/**
+ * "Add someone" — one name field. Deliberately a separate form from the
+ * per-member rename rows above it: a rename posts a `memberId`, this posts
+ * none, and merging them would make an empty field mean two things.
+ */
+export function AddMemberForm({
+  action,
+  groupId,
+  labels,
+}: {
+  action: Action
+  groupId: string
+  labels: { name: string; submit: string; hint: string }
+}) {
+  const router = useRouter()
+  const formRef = useRef<HTMLFormElement>(null)
+  const [state, formAction, pending] = useActionState<
+    SettingsFormState,
+    FormData
+  >(async (prev, formData) => {
+    const result = await action(prev, formData)
+    if (result.saved) {
+      // Empty the field again: the name that was just added is now a row in
+      // the list above, and leaving it sitting in the box is how you add
+      // the same person twice.
+      formRef.current?.reset()
+      router.refresh()
+    }
+    return result
+  }, {})
+  return (
+    <form ref={formRef} action={formAction} className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <input type="hidden" name="groupId" value={groupId} />
+        <Input
+          name="name"
+          aria-label={labels.name}
+          placeholder={labels.name}
+          required
+          maxLength={100}
+          className="h-11 min-w-0 flex-1"
+          data-testid="add-member-name"
+        />
+        <SubmitButton pending={pending} size="sm" testId="add-member-submit">
+          {labels.submit}
+        </SubmitButton>
+      </div>
+      <p className="text-xs text-muted-foreground">{labels.hint}</p>
+      {state.error ? (
+        <span role="alert" className="text-sm text-destructive">
           {state.error}
         </span>
       ) : null}

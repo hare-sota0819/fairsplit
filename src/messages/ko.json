@@ -85,8 +85,8 @@
       "groupBody": "초대 링크를 누르면 친구 모임으로 바로 들어가요. 직접 만들 땐 모임 이름, 정산 통화, 여행지만 정하면 돼요.",
       "walletTitle": "지갑을 만들고 충전하기",
       "walletBody": "환전한 현금, 트래블카드, 선불카드가 각각 하나의 지갑이에요. 메뉴의 '지갑과 충전'에서 만들고, 충전을 기록해 두면 내 환율이 그대로 반영돼요.",
-      "chatTitle": "지출 입력하기",
-      "chatBody": "메뉴의 '직접 입력하기'에서 금액, 낸 사람, 참여한 사람을 차례로 고르면 돼요. 영수증 사진도 여기서 찍을 수 있고, 품명과 금액이 줄줄이 올라와요.",
+      "entryTitle": "지출 입력하기",
+      "entryBody": "홈화면에 입력칸이 바로 있어요. 금액, 낸 사람, 참여한 사람을 차례로 고르면 되고, 화면을 벗어나지 않아요. 영수증 사진도 여기서 찍을 수 있고, 품명과 금액이 줄줄이 올라와요.",
       "assignTitle": "누가 뭘 먹었는지 체크하기",
       "assignBody": "품목마다 먹은 사람을 체크해요. 수량도 나눌 수 있어요. 아무도 체크하지 않은 품목은 그 지출에 참여한 사람들이 나눠 내요.",
       "settleTitle": "정산 보기",
@@ -107,6 +107,7 @@
     "signIn": "로그인",
     "signOut": "로그아웃",
     "newGroup": "새 모임",
+    "manageGroup": "모임 관리",
     "tabs": {
       "status": "정산 현황",
       "me": "내 지출",
@@ -117,9 +118,12 @@
       "history": "지출 내역",
       "manualEntry": "직접 입력하기",
       "invite": "함께할 사람 초대하기",
-      "allGroups": "모임 전체 보기",
+      "allGroups": "내 모임",
       "switchGroup": "모임 전환",
-      "currentGroup": "현재 모임"
+      "currentGroup": "현재 모임",
+      "checkpoints": "체크포인트",
+      "modeCompare": "모드 비교",
+      "changes": "변경 요청"
     },
     "account": "계정",
     "accountMenu": "내 계정",
@@ -199,7 +203,7 @@
   "empty": {
     "inviteTitle": "다른 사람 초대하기",
     "noSpending": "아직 없어요. 지출이 생기면 셈이 여기 모아둘게요.",
-    "statusAlone": "아직 나 혼자예요. 메뉴의 '함께할 사람 초대하기'에서 초대 링크를 보내면 여기에 정산 현황이 나타나요."
+    "statusAlone": "아직 나 혼자예요. 오른쪽 위 계정 메뉴에서 초대 링크를 보내거나, '모임 관리'에서 이름만 넣어 추가하면 여기에 정산 현황이 나타나요."
   },
   "errors": {
     "notFound": {
@@ -274,7 +278,8 @@
       "question": "이번 여행에 쓸 현금을 환전했거나 트래블카드를 충전하셨나요? 한 번만 기록해두면 잔액과 실제 환율을 계속 따라가요.",
       "log": "지갑 만들기",
       "skip": "건너뛰기"
-    }
+    },
+    "beforeCheckpoint": "이 기록은 이미 정산이 끝난 구간에는 영향을 주지 않아요."
   },
   "wallet": {
     "title": "지갑",
@@ -373,8 +378,11 @@
       "ACTUAL_CHARGED": "결제한 사람의 카드에 실제로 청구된 금액을 써요.",
       "MARKET_FALLBACK": "그 지갑에 충전 기록이 아직 없어서 시장 환율로 계산했어요.",
       "OWN_EXCHANGE_RATE": "직접 알려주신 환전 환율로 환산했어요. 미리 바꿔뒀지만 지갑은 따로 만들지 않은 돈이에요.",
-      "SPLIT_FUNDING": "두 군데 이상에서 나갔어요. 부분마다 자기 환율로 환산해서, 전체를 아우르는 환율 하나는 없어요."
-    }
+      "SPLIT_FUNDING": "두 군데 이상에서 나갔어요. 부분마다 자기 환율로 환산해서, 전체를 아우르는 환율 하나는 없어요.",
+      "FROZEN": "체크포인트에서 정산이 끝난 금액이에요. 구간이 닫힐 때 고정돼서, 이후에 입력한 어떤 것도 이 금액을 움직이지 못해요."
+    },
+    "FROZEN": "고정됨",
+    "frozenOriginal": "{source} 기준으로 환산했어요."
   },
   "expenses": {
     "new": {
@@ -395,7 +403,8 @@
       "payer": "결제자",
       "payerMe": "{name} (나)",
       "when": "날짜와 시간",
-      "note": "메모 (선택)",
+      "note": "무엇에 썼나요?",
+      "notePlaceholder": "밥, 숙소, 택시",
       "participants": "함께 나눌 사람",
       "personal": "개인 지출 (모임과 정산하지 않음)",
       "actualCharged": "카드 실제 청구액 ({settlement}, 선택)",
@@ -620,187 +629,11 @@
       "keepPhotoNote": "사진은 그대로 있어요 — 항목은 직접 입력하면 돼요.",
       "manualEntry": "직접 입력하기",
       "retry": "다시 시도"
-    }
-  },
-  "chat": {
-    "placeholder": "편하게 말하듯 적어보세요",
-    "send": "보내기",
-    "confirmTitle": "이 지출을 저장할까요?",
-    "descriptionLabel": "제목",
-    "paidBy": "{name}님이 결제",
-    "perPerson": "1인당 {amount}",
-    "everyone": "전체",
-    "save": "저장",
-    "openForm": "전체 입력폼 열기",
-    "askAmount": "얼마였나요?",
-    "askAmountSubmit": "확인",
-    "rateUnavailable": "지금은 환율을 못 가져왔어요. 전체 입력폼에서 마무리해 주세요.",
-    "multiAmountNotice": "여러 항목이 있는 것 같아요. 영수증을 찍어 보내시거나, 전체 입력폼에서 항목별로 적어 주세요.",
-    "duplicateAsk": "비슷한 지출이 있어요. 그래도 저장할까요?",
-    "cancel": "취소",
-    "greeting": "오늘 어떤 지출이 있었나요?",
-    "greetingHint": "예: “점심 12000, 민수랑 나”처럼 적어보세요.",
-    "poke": {
-      "p0": "무엇을 도와드릴까요?",
-      "p1": "계산은 셈에게 맡겨 주세요.",
-      "p2": "오늘 쓴 돈, 편하게 말해 주세요.",
-      "p3": "정산할 준비는 언제든 되어 있어요."
     },
-    "savedSummary": "적어뒀어요. 자세한 내역은 지출 내역에서 볼 수 있어요.",
-    "attach": "영수증 사진 첨부",
-    "scan": {
-      "reading": "영수증을 읽고 있어요…",
-      "imageAlt": "영수증 사진",
-      "viewPhoto": "사진 보기",
-      "closePhoto": "닫기",
-      "notAReceipt": "영수증이 아닌 것 같아요.",
-      "retryHint": "다른 사진을 보내시거나, 직접 입력해 주세요.",
-      "totalOnlyNotice": "항목은 읽지 못해서 영수증에 적힌 총액만 사용했어요.",
-      "sumMismatchNotice": "항목 합계가 영수증 총액과 달라서, 영수증에 적힌 총액을 사용했어요.",
-      "notConfigured": "이 서버에는 사진 인식이 아직 설정되어 있지 않아요. 직접 입력해 주세요.",
-      "dailyLimit": "오늘 쓸 수 있는 {limit}번을 모두 사용했어요. 직접 입력해 주세요.",
-      "tooLarge": "사진이 너무 커요. 더 작은 사진을 보내거나 직접 입력해 주세요.",
-      "failed": "영수증을 읽지 못했어요. 다른 사진을 보내거나 직접 입력해 주세요.",
-      "offline": "영수증을 읽는 중에 연결이 끊겼어요. 다시 시도하거나 직접 입력해 주세요.",
-      "photoKept": "스캔은 실패했지만 사진은 저장됐어요."
-    },
-    "items": {
-      "title": "누가 뭘 먹었나요?",
-      "summary": "품목 {count}개 · 총 {total}",
-      "confirm": "확인",
-      "autoTitle": "{name} 외 {count}건",
-      "priceAsk": "얼마였나요?",
-      "priceMissing": "가격이 비어 있는 품목이 {count}개 있어요. 품목을 눌러 가격을 적어 주세요.",
-      "priceMissingError": "모든 품목의 가격을 적어야 저장할 수 있어요."
-    },
-    "funding": {
-      "label": "결제 수단",
-      "onTheSpot": "현장에서 결제",
-      "wallet": "{label} 지갑에서"
-    },
-    "chipSeed": {
-      "myBalance": "얼마 내면 돼?",
-      "groupTotal": "우리 총 얼마 썼어?",
-      "mySpending": "내가 낸 거 얼마야",
-      "wallet": "현금 얼마 남았어?",
-      "help": "도움말",
-      "pairwise": "{name}한테 얼마 줘야 돼?"
-    },
-    "history": {
-      "loadEarlier": "이전 대화 보기",
-      "retentionNotice": "대화는 최근 {cap}개까지 보관돼요. 더 오래된 대화는 자동으로 정리돼요.",
-      "photoPlaceholder": "사진"
-    },
-    "persist": {
-      "pending": "대화 기록에 저장 중이에요",
-      "failed": "셈이 대화 기록을 저장하지 못했어요",
-      "retry": "다시 시도",
-      "explainer": "메시지 옆에 시계 아이콘이 보이는 동안은 아직 대화 기록에 저장 중이에요. 사라지기 전에는 앱을 종료하거나 새로고침하지 말아 주세요."
-    },
-    "edit": {
-      "whichOne": "이 중 어느 지출이에요?",
-      "noneFound": "말씀하신 지출을 못 찾았어요. 최근 지출이에요 — 이 중에 있나요?",
-      "apply": "네, 해주세요",
-      "confirmAdd": "{name}님을 {note}에 추가할까요?",
-      "confirmRemove": "{name}님을 {note}에서 뺄까요?",
-      "confirmAmount": "{note} 금액을 {amount}(으)로 바꿀까요?",
-      "confirmCancel": "{note} 취소할까요?",
-      "done": "{note} 수정했어요.",
-      "doneCancelled": "{note} 취소했어요.",
-      "notFound": "그 지출을 찾지 못했어요.",
-      "cancelledAlready": "이미 취소된 지출이라 바꿀 게 없어요.",
-      "notMember": "이 모임에 없는 분이에요.",
-      "lastParticipant": "지출은 최소 한 명은 나눠야 해요. 이분은 뺄 수 없어요.",
-      "failed": "잠시 문제가 있었어요. 다시 시도해 주세요.",
-      "badAmount": "금액을 다시 한번 말씀해 주세요.",
-      "currencyBlocked": "저장된 통화는 바꿀 수 없어요. 금액만 바꾸거나, 새 지출로 올려 주세요.",
-      "currencySwap": {
-        "question": "{note} · {from} → {to}, 이렇게 바꿀까요? 저장된 통화는 바꿀 수 없어서, 지금 지출은 취소하고 새 통화로 다시 올려요.",
-        "detail": "결제자·참여자·시각·메모는 그대로 두고, 새 지출로 다시 계산돼요.",
-        "done": "{note} 취소하고 새 통화로 다시 올렸어요.",
-        "rateUnavailable": "지금은 환율을 못 가져와서 아무것도 바꾸지 않았어요. 잠시 뒤에 다시 시도해 주세요."
-      },
-      "tooComplex": "품목이나 분할 결제가 있는 지출이라 채팅에서는 못 바꿔요. 전체 입력폼에서 수정해 주세요."
-    },
-    "wallet": {
-      "title": "지갑을 만들까요?",
-      "currencyLabel": "통화",
-      "typeLabel": "종류",
-      "typeCash": "현금",
-      "typeCard": "충전식 카드",
-      "typePrepaid": "기타 선불",
-      "labelLabel": "이름",
-      "labelPlaceholder": "예: 엔화 현금",
-      "autoLabel": "{currency} {type}",
-      "create": "만들기",
-      "needCurrency": "어떤 통화 지갑인지 골라주세요."
-    },
-    "panel": {
-      "historyTitle": "지출 내역",
-      "mineTitle": "내가 낸 지출",
-      "mySpendingTitle": "내가 쓴 금액",
-      "close": "패널 닫기",
-      "openFull": "전체 화면으로 보기",
-      "loadMore": "더 보기",
-      "empty": "아직 아무것도 없어요.",
-      "count": "{count}건",
-      "total": "합계",
-      "evenAmong": "{count}명이 똑같이 나눔",
-      "itemised": "항목별"
-    },
-    "batch": {
-      "title": "저장하기 전에 확인해요",
-      "summary": "{rows}줄을 읽었어요. 확인을 누르기 전까지는 아무것도 저장되지 않아요.",
-      "checksumMismatch": "합계는 {declared}인데, 줄을 더하면 {sum}이에요.",
-      "checksumOk": "합계 {declared}와 줄 합계가 맞아요.",
-      "checksumExcluded": "다른 통화인 {count}줄은 합계에서 빠졌어요.",
-      "status": {
-        "completed": "준비됨",
-        "ask": "확인 필요",
-        "unread": "못 읽음",
-        "total": "합계",
-        "scope": "전체 적용"
-      },
-      "amountLabel": "금액",
-      "payerLabel": "결제한 사람",
-      "descriptionLabel": "내용",
-      "payerUnset": "누가 냈는지 물어보기",
-      "merge": "아래 줄과 합치기",
-      "split": "다시 나누기",
-      "confirm": "{count, plural, =0 {저장할 줄이 없어요} other {#줄 저장하기}}",
-      "skipped": "{count}줄은 그대로 남겨둬요. 없어지지 않아요.",
-      "checksumUnreadable": "합계 줄의 금액을 읽지 못해서, 비교할 수 없어요.",
-      "checksumUnparsable": "금액을 읽지 못한 줄이 {count}개 있어요.",
-      "checksumNotAllReady": "합계는 맞지만, 더해진 줄 중 {count}개는 아직 열려 있어요.",
-      "payerUnknown": "이 그룹에 없는 사람 ({id})",
-      "asks": {
-        "amount": "금액이 필요해요",
-        "payer": "결제한 사람이 필요해요",
-        "participants": "함께 나눌 사람이 필요해요",
-        "counterparty": "상대방이 필요해요",
-        "interpretation": "어떻게 읽을지 골라야 해요"
-      },
-      "participantsLabel": "함께 나눌 사람",
-      "asksUnanswerable": "(여기서는 답할 수 없어요)",
-      "memberUnknown": "이 그룹에 없는 사람 ({id})",
-      "mergeBlocked": "합칠 수 없어요: 이 줄과 다음 줄 사이에 경계가 없어요.",
-      "scopeApplied": "모든 줄에 적용했어요 ({scope}).",
-      "scopeRevoke": "해제하기",
-      "scopeRestore": "다시 적용하기",
-      "scopeRevoked": "해제했어요 — 이 줄은 이제 다른 줄에 적용되지 않아요.",
-      "scopeKind": {
-        "payer": "결제자",
-        "split": "나누기"
-      },
-      "unreadReason": {
-        "no-amount": "이 줄에는 금액이 없어요.",
-        "unparsed": "금액은 있지만 지출로 읽지 못했어요.",
-        "cross-row-reference": "다른 줄을 가리키고 있어서 혼자서는 읽을 수 없어요.",
-        "residual-arithmetic": "나머지를 말하고 있어서 금액으로 읽지 않았어요.",
-        "spans-rows": "여러 줄에 걸쳐 있어요."
-      },
-      "itemUnpriced": "가격 없음"
-    }
+    "frozenNotice": "이미 정산이 끝난 구간에 있는 지출이라, 여기에서는 수정하거나 취소할 수 없어요.",
+    "frozenError": "체크포인트에서 고정된 지출이라 바로 바꿀 수 없어요.",
+    "requestChange": "변경 요청하기",
+    "proposeNotice": "정산이 끝난 지출이에요. 저장하면 바로 바뀌지 않고 요청으로 올라가요. 손해를 보는 분들이 모두 동의해야 반영돼요."
   },
   "balance": {
     "receivable": "받을 돈",
@@ -839,7 +672,12 @@
     "enteredByShort": "{name}님이 입력",
     "cancelledBy": "{name}님이 정산에서 뺌",
     "recalcBanner": "{name}님의 환전 기록을 반영했어요. 주고받을 돈이 바뀌었어요.",
-    "recalcDismiss": "닫기"
+    "recalcDismiss": "닫기",
+    "mySpendingTitle": "내 소비",
+    "spendingToggle": "내 소비 펼치기",
+    "spendingMore": "더보기",
+    "statusDetail": "자세히 보기",
+    "addExpense": "지출 추가"
   },
   "history": {
     "title": "지출 내역",
@@ -864,6 +702,83 @@
     "pairSettled": "{other}님과는 주고받을 게 없어요",
     "pairNone": "모두와 주고받을 게 없어요.",
     "pairLegend": "→ 보낼 돈 · ← 받을 돈"
+  },
+  "checkpoints": {
+    "title": "체크포인트",
+    "intro": "체크포인트는 정산 구간을 닫아요. 그 앞의 지출은 환산 금액이 그대로 고정돼서, 이후에 무엇을 입력해도 숫자가 움직이지 않아요.",
+    "createHeading": "체크포인트 만들기",
+    "name": "이름",
+    "namePlaceholder": "3일차 정산",
+    "when": "닫는 시점",
+    "submit": "체크포인트 만들기",
+    "submitting": "고정하는 중",
+    "warning": "이 시점까지의 지출은 지금 적용되는 환율로 고정되고, 이후에는 바로 수정하거나 취소할 수 없어요.",
+    "frozen": "지출 {count}건을 고정했어요.",
+    "listHeading": "지금까지 만든 것",
+    "empty": "아직 체크포인트가 없어요. 확정된 구간도 없어요.",
+    "frozenCount": "고정된 지출 {count}건",
+    "drawnBy": "{name} 님이 만들었어요",
+    "errors": {
+      "invalidInput": "이름과 닫는 시점을 모두 입력해 주세요.",
+      "duplicateTimestamp": "같은 시점의 체크포인트가 이미 있어요.",
+      "nothingToFreeze": "그 시점 앞에 고정할 지출이 없어요."
+    }
+  },
+  "changes": {
+    "title": "변경 요청",
+    "intro": "정산이 끝난 구간도 고칠 수 있어요. 다만 손해를 보는 사람 모두가 동의해야 해요.",
+    "badge": "대기 중인 변경 {count}건",
+    "pendingHeading": "답변을 기다리는 중",
+    "nonePending": "기다리는 변경이 없어요. 잔액 화면의 숫자가 확정된 값이에요.",
+    "kind": {
+      "EDIT": "{name} 님이 “{expense}” 를 고치려고 해요.",
+      "CANCEL": "{name} 님이 “{expense}” 를 취소하려고 해요.",
+      "RESTORE": "{name} 님이 “{expense}” 를 되살리려고 해요."
+    },
+    "worseBy": "{amount} 손해",
+    "betterBy": "{amount} 이득",
+    "answerApproved": "{name} 님 동의함",
+    "answerRejected": "{name} 님 거절함",
+    "answerWaiting": "{name} 님 답변 대기 중",
+    "answerNoResponse": "{name} 님 답변 없음",
+    "reminded": "알림 보냄",
+    "approve": "동의해요",
+    "reject": "거절할래요",
+    "submitting": "보내는 중",
+    "youAnswered": "답변하셨어요. 요청받은 모두가 동의하면 반영돼요.",
+    "notAsked": "이 변경은 손해가 없어서 따로 여쭤보지 않았어요.",
+    "requestChange": "변경 요청하기",
+    "requestCancel": "취소 요청하기",
+    "requestRestore": "되살리기 요청하기",
+    "opened": "요청했어요. 손해를 보는 분들이 모두 동의하면 반영돼요.",
+    "appliedNoConsent": "반영했어요. 손해 보는 사람이 없어서 동의를 받을 필요가 없었어요.",
+    "historyHeading": "처리된 요청",
+    "historyEmpty": "아직 처리된 요청이 없어요.",
+    "auditCheckpoints": "영향받은 체크포인트 {count}개",
+    "auditNoStakeholders": "동의를 받을 사람이 없었어요",
+    "outcome": {
+      "RETRO_CHANGE_APPROVED": "{name} 님의 변경이 동의를 받아 반영됐어요.",
+      "RETRO_CHANGE_AUTO_APPROVED": "{name} 님의 변경이 바로 반영됐어요. 손해 보는 사람이 없었어요.",
+      "RETRO_CHANGE_REJECTED": "{name} 님의 변경이 거절됐어요.",
+      "RETRO_CHANGE_EXPIRED": "{name} 님의 변경이 답변 없이 기한이 지나 거절됐어요."
+    },
+    "errors": {
+      "invalidInput": "변경 내용을 읽을 수 없어요.",
+      "anotherPending": "다른 변경이 대기 중이에요. 한 번에 하나만 열 수 있어요.",
+      "notPending": "이미 처리된 요청이에요.",
+      "notStakeholder": "이 변경에 대해 여쭤본 대상이 아니에요."
+    }
+  },
+  "modeCompare": {
+    "title": "모드 비교",
+    "intro": "같은 지출을 두 방식으로 정산해서 보여줘요. 지갑 속 돈이 실제로 들어간 비용 기준과, 지출을 입력할 때 저장한 market 환율 기준이에요.",
+    "avgCost": "평균 단가",
+    "market": "Market",
+    "difference": "차이",
+    "member": "멤버",
+    "current": "이 그룹은 {mode} 모드로 정산해요.",
+    "empty": "아직 비교할 지출이 없어요.",
+    "note": "여기서는 어떤 숫자도 바뀌지 않아요. 모드 변경은 그룹 설정에서 할 수 있어요."
   },
   "myspending": {
     "title": "내 지출",
@@ -890,6 +805,10 @@
     "exchangeRecords": "내 환전 기록",
     "members": "멤버",
     "rename": "이름 변경",
+    "addMember": "사람 추가",
+    "addMemberName": "이름",
+    "addMemberSubmit": "추가하기",
+    "addMemberHint": "가입하지 않아도 돼요. 이름만 넣으면 바로 함께 나눌 수 있고, 나중에 초대 링크로 그 자리를 이어받을 수 있어요.",
     "leftBadge": "나감",
     "saved": "저장했어요.",
     "danger": {

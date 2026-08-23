@@ -24,9 +24,8 @@ export async function Header() {
   )
   return (
     <HeaderFrame signedIn={Boolean(session?.user)}>
-      {/* Sticky (owner, 2026-08-14: the menu scrolled away with long chat
-          transcripts): pinned to the viewport top, above page content and
-          the composer dock (z-10). The top safe-area inset lives HERE, not
+      {/* Sticky (owner, 2026-08-14: the menu scrolled away on long
+          screens): pinned to the viewport top, above page content (z-10). The top safe-area inset lives HERE, not
           on <body> — a stuck header sits at viewport y=0, so ITS padding is
           what keeps the notch/status bar off the controls (see layout.tsx's
           body comment). Chrome is typography on the desk (docs/BRAND.md v2
@@ -44,8 +43,9 @@ export async function Header() {
               /*
                * ONE control, not three. "New group", "Account" and "Sign out"
                * used to sit side by side at equal weight, and none of them told
-               * you whose account you were in. Everything moved behind the
-               * avatar — see AccountMenu.
+               * you whose account you were in. Everything that CHANGES the
+               * account or the group moved behind the avatar — see
+               * AccountMenu; the text index on the left is reading only.
                */
               <AccountMenu
                 name={session.user.name?.trim() ?? ''}
@@ -54,7 +54,8 @@ export async function Header() {
                   menu: t('accountMenu'),
                   settings: t('accountSettings'),
                   newGroup: t('newGroup'),
-                  switchGroup: t('sidebar.switchGroup'),
+                  manageGroup: t('manageGroup'),
+                  invite: t('sidebar.invite'),
                   switchAccount: t('switchAccount'),
                   signOut: t('signOut'),
                 }}

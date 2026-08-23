@@ -1,13 +1,13 @@
 /**
  * The expense CREATE argument, in one place — and pure, so it can be pinned.
  *
- * There are two callers, and there must never be a third shape between them:
- * the wizard/chat save (`saveExpense`, expenses/actions.ts) and the chat's
- * currency swap (`applyCurrencyChange`, chat-edit-actions.ts), which cancels
- * an expense and re-creates it in the currency the user asked for. The swap
- * re-creating the row by hand is exactly how a "new" expense would quietly
- * miss a column the save path fills — so it does not: both build their create
- * argument here, and `expense-create.test.ts` pins every field of it.
+ * The wizard's save (`saveExpense`, expenses/actions.ts) builds its create
+ * argument here, and `expense-create.test.ts` pins every field of it. The
+ * second caller this was written to keep in step — the chat's currency swap,
+ * which cancelled an expense and re-created it in another currency — went
+ * with the chat programme on 2026-08-21. The pin stays: re-creating an
+ * expense row by hand is exactly how a "new" expense quietly misses a column
+ * the save path fills, and the retroactive-change flow does that too.
  *
  * The rate that prices a new expense used to live here too; it moved to
  * `expense-snapshot-rate.ts` (review round 1) precisely so this module could

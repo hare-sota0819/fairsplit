@@ -41,6 +41,12 @@ export type RateSource =
   // rate to name. Each portion converted at its own; the breakdown lists
   // them. Never render a rate figure beside this one.
   | 'SPLIT_FUNDING'
+  // DISPLAY ONLY, and never stored as an applied source: the expense sits
+  // before a checkpoint, so its conversion is pinned and no later top-up can
+  // move it. `RateResolution.source` still names the rate that ACTUALLY
+  // priced the money (which is what an audit needs); `displayRateSource`
+  // turns a frozen resolution into this value for the chip.
+  | 'FROZEN'
 
 /** Exact rational amount in minor units: num / den (den > 0; num signed). */
 export interface Ratio {
@@ -167,6 +173,30 @@ export interface FundingSourceInput {
    * own cost.
    */
   ownRateSnapshot?: string
+  /**
+   * Set once a checkpoint has frozen this portion. It OVERRIDES every rule
+   * in `resolveSourceRate` — that is the whole point of a barrier: an average
+   * cost that moves because someone logged a forgotten pre-trip exchange must
+   * not reprice money the group has already handed each other.
+   */
+  frozen?: FrozenRate
+}
+
+/**
+ * A funding portion's conversion, pinned by a checkpoint.
+ *
+ * The RATE is what is load-bearing: shares are allocated from the exact
+ * rational and rounded once each, so pinning the rate reproduces every
+ * per-member figure, not just the receipt total. `settlementAmount` is the
+ * total that pinning produced, carried alongside so a caller can assert the
+ * two still agree rather than trusting that they do.
+ */
+export interface FrozenRate {
+  rate: Rate
+  /** The source that actually applied — never 'FROZEN'. */
+  source: RateSource
+  /** The portion in settlement minor units, rounded once, at freeze time. */
+  settlementAmount: bigint
 }
 
 export interface ExpenseInput {
@@ -215,11 +245,19 @@ export interface RateResolution {
   source: RateSource
   /** The wallet the rate came from, for "your Travel Wallet rate" copy. */
   walletLabel?: string
+  /**
+   * The rate came off a checkpoint freeze rather than being resolved now.
+   * `source` still names the rate that actually applied; the chip layer
+   * calls `displayRateSource` to show FROZEN instead.
+   */
+  frozen?: boolean
 }
 
 export interface ConvertedMoney extends Money {
   source: RateSource
   walletLabel?: string
+  /** See `RateResolution.frozen`. */
+  frozen?: boolean
 }
 
 export interface Transfer {

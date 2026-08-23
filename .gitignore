@@ -42,6 +42,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# assistant/harness artifacts — never commit
+
 # keep the env template
 !.env.example
 
@@ -50,6 +52,12 @@ next-env.d.ts
 /*.mp4
 /*.mov
 /KakaoTalk_*
+
+# Chat-log recovery working files. `chat-log-recovered.json` (the redacted
+# one) IS tracked; these two are not:
+#   *-review.local.json — rows whose redaction could not be proved complete
+#   *-raw.local.json    — `--raw` output, real member names, local only
+/test-fixtures/staging/*.local.json
 
 # real receipt photos used to calibrate the parser. They carry a real person's
 # purchases, timestamps, locations and partially-masked card numbers, so they
@@ -68,3 +76,11 @@ next-env.d.ts
 .playwright-cli/
 .exp/
 .kiwi-model/
+
+# Owner-supplied working material dropped in the repo root (design feedback
+# packets, reference video frames). Not product content and not reviewed, so
+# it must never enter a commit — a `git add -A` in the post-rulings patch
+# session swept these in once and the commits had to be rebuilt to get them
+# back out (docs/status/PATCH-STATUS.md). Ignored so it cannot happen again.
+/step 1 피드백/
+/디자인 영상 프레임 분석.zip

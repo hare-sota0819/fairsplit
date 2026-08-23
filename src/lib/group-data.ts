@@ -100,3 +100,6 @@ export async function loadGroupData(groupId: string) {
     mode: group.rateMode,
   }
 }
+
+/** Everything `loadGroupData` hands back, for callers that pass it around. */
+export type GroupData = Awaited<ReturnType<typeof loadGroupData>>
