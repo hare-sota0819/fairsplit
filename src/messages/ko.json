@@ -1,13 +1,13 @@
 {
   "app": {
-    "name": "FairSplit",
+    "name": "Sem",
     "tagline": "기록만 남기세요. 환율도 정산도 알아서 할게요."
   },
   "landing": {
-    "brand": "FairSplit",
+    "brand": "Sem",
     "tagline": "쓴 자리에서 정산",
     "scroll": "스크롤",
-    "copyright": "© 2026 FairSplit",
+    "copyright": "© 2026 Sem",
     "links": {
       "start": "무료로 시작",
       "signIn": "로그인",
@@ -95,7 +95,7 @@
       },
       "p1": "여행 카드는 날마다 다른 단가로 충전된다. 같은 ¥11,875도 지불자마다 실제 비용이 다르다.",
       "p2": {
-        "before": "FairSplit은 지불자의 ",
+        "before": "Sem은 지불자의 ",
         "strong": "평균단가",
         "after": " — 그 돈이 실제로 든 비용 — 로 환산한다. 시장 환율은 참고로만 보이고, 기준이 되지 않는다."
       },
@@ -281,7 +281,7 @@
     "preview": {
       "invited": "{name}님이 {groupName}에 초대했어요",
       "invitedNoName": "{groupName}에 초대받았어요",
-      "what": "FairSplit은 여행에서 쓴 돈을 나눠 계산해요. 환율은 내가 실제로 환전한 값 그대로요.",
+      "what": "Sem은 여행에서 쓴 돈을 나눠 계산해요. 환율은 내가 실제로 환전한 값 그대로요.",
       "signUp": "시작하고 참여하기",
       "haveAccount": "이미 계정이 있나요?",
       "signIn": "로그인"

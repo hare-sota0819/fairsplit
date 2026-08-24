@@ -1,13 +1,13 @@
 {
   "app": {
-    "name": "FairSplit",
+    "name": "Sem",
     "tagline": "Split group expenses fairly — at your own exchange rate."
   },
   "landing": {
-    "brand": "FairSplit",
+    "brand": "Sem",
     "tagline": "Settle as you spend",
     "scroll": "Scroll",
-    "copyright": "© 2026 FairSplit",
+    "copyright": "© 2026 Sem",
     "links": {
       "start": "Start free",
       "signIn": "Sign in",
@@ -95,7 +95,7 @@
       },
       "p1": "A travel card is loaded at different prices on different days. The same ¥11,875 costs each payer a different real amount.",
       "p2": {
-        "before": "FairSplit converts at the payer’s ",
+        "before": "Sem converts at the payer’s ",
         "strong": "average cost",
         "after": " — what the money actually cost them. The market rate stays visible for reference, never as the basis."
       },
@@ -116,7 +116,7 @@
     }
   },
   "guide": {
-    "title": "How to use FairSplit",
+    "title": "How to use Sem",
     "intro": "You record an expense in a few taps. A few more things worth knowing before you start.",
     "why": {
       "rateTitle": "It settles at what your money cost you",
@@ -281,7 +281,7 @@
     "preview": {
       "invited": "{name} invited you to {groupName}",
       "invitedNoName": "You are invited to {groupName}",
-      "what": "FairSplit splits a trip's expenses — at the rate your money actually cost you.",
+      "what": "Sem splits a trip's expenses — at the rate your money actually cost you.",
       "signUp": "Get started and join",
       "haveAccount": "Already have an account?",
       "signIn": "Sign in"
@@ -888,7 +888,7 @@
     "language": "Language",
     "localeKo": "한국어",
     "localeEn": "English",
-    "guide": "How to use FairSplit",
+    "guide": "How to use Sem",
     "groups": "Your groups",
     "signOutDesc": "You will need to sign in again on this device."
   },

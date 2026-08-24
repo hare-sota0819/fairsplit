@@ -16,10 +16,10 @@ async function signUp(page: Page, name: string, email: string): Promise<void> {
 }
 
 /** Multi-select toggles render as plain buttons carrying data-slot. */
+// Participants are check ROWS now (SPEC-INTERACTIONS §5), not toggle chips:
+// the whole row is the tap target and it carries `role="checkbox"`.
 const multiChip = (scope: Page | Locator, name: string) =>
-  scope
-    .locator('[data-slot=toggle-group-item]')
-    .filter({ hasText: new RegExp(`^${name}$`) })
+  scope.getByRole('checkbox', { name, exact: true })
 
 const fundingOption = (page: Page, label: string): Locator =>
   page.locator('[data-testid^="funding-"]').filter({ hasText: label })

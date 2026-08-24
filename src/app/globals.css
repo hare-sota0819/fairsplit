@@ -633,6 +633,21 @@
   animation: sem-word-3 4.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 
+/* TOUCH HAS NO HOVER (handoff global rules: on touch, the sink and the ink
+   inversion replace hover states). A tier-2 button whose only affordance is
+   a hover-grown underline would have none at all on a phone, so the rule
+   rests ON there — same for the destructive link. */
+@media (hover: none) {
+  [data-slot='button'][data-variant='outline']:not(:disabled),
+  [data-slot='button'][data-variant='secondary']:not(:disabled),
+  [data-slot='button'][data-variant='statement-secondary']:not(:disabled) {
+    background-size: 100% 1px;
+  }
+  [data-slot='button'][data-variant='destructive']:not(:disabled) {
+    text-decoration-line: underline;
+  }
+}
+
 /* Reduced motion: no rolls, no bars, no rows fading — every figure holds
    its finished frame (the markup's own resting state). */
 @media (prefers-reduced-motion: reduce) {

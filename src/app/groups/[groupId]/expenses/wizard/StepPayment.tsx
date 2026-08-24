@@ -4,8 +4,8 @@ import { useFormatter, useTranslations } from 'next-intl'
 import { NavLink } from '@/components/NavLoader'
 import type { FundingSource } from '@/lib/schemas/expense'
 import { Button } from '@/components/ui/button'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Card, CardContent } from '@/components/ui/card'
+import { CheckRow } from '@/components/ui/CheckRow'
 import { CreditCard, Landmark, Plus, Wallet } from 'lucide-react'
 import {
   deviatesBeyond,
@@ -536,33 +536,40 @@ export function StepPayment({
         ) : null}
       </fieldset>
 
+      {/* §5 — picking who was in on it is a list of rows, not a row of
+          chips: the whole row is the tap target and anyone left out greys
+          at once. The closing hairline is the list's own bottom rule. */}
       <fieldset className="flex flex-col gap-2 text-sm">
         <legend className="mb-1.5 font-medium">{t('participants')}</legend>
-        <ToggleGroup
-          type="multiple"
-          value={state.isPersonal ? [state.payerId] : state.participantIds}
-          onValueChange={(participantIds) => patch({ participantIds })}
-          variant="outline"
-          size="lg"
-          disabled={state.isPersonal}
-          className="flex-wrap justify-start"
-        >
-          {members.map((m) => (
-            <ToggleGroupItem key={m.id} value={m.id} className="h-11 px-4">
-              {m.name}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-        <label className="mt-1 flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={state.isPersonal}
-            onChange={(e) => patch({ isPersonal: e.target.checked })}
-            className="size-5 accent-[var(--primary)]"
-            data-testid="personal-toggle"
-          />
-          {t('personal')}
-        </label>
+        <div className="flex flex-col border-b border-[#e4e4e4]">
+          {members.map((m) => {
+            const chosen = state.isPersonal
+              ? m.id === state.payerId
+              : state.participantIds.includes(m.id)
+            return (
+              <CheckRow
+                key={m.id}
+                checked={chosen}
+                disabled={state.isPersonal}
+                onCheckedChange={(next) =>
+                  patch({
+                    participantIds: next
+                      ? [...state.participantIds, m.id]
+                      : state.participantIds.filter((id) => id !== m.id),
+                  })
+                }
+                label={m.name}
+              />
+            )
+          })}
+        </div>
+        <CheckRow
+          className="mt-1 border-t-0"
+          checked={state.isPersonal}
+          onCheckedChange={(isPersonal) => patch({ isPersonal })}
+          label={t('personal')}
+          testId="personal-toggle"
+        />
       </fieldset>
     </div>
   )

@@ -8,31 +8,32 @@ import { cn } from '@/lib/utils'
 
 /**
  * LOCAL MODIFICATION (see NOTICE): the shadcn preset marks the selected
- * state with `bg-muted`, which in this theme is the page background — on a
- * white card a selected chip was indistinguishable from an unselected one.
- * Selected toggles now take the accent.
+ * state with a fill. There are no fills here.
+ *
+ * SELECTION IS WHERE THE UNDERLINE IS (SPEC-INTERACTIONS §7): a selected
+ * toggle is ink with a 1px rule under it; an unselected one is #b8b8b8 with
+ * nothing, and hover only takes it half a step darker so the two never get
+ * confused. No box, no radius, no chip.
+ *
+ * Press is the ink sink, like every other control.
  */
-// Press recipe: same scale(0.97) + hover-mirrored :active as button.tsx (##
-// Press states, "Scale press" + the touch-derivation rule) — a toggle
-// always has (or is about to have) a fill, on or off. Radius: `rounded-sm`
-// (8px, the input/chip step — ## Radii & borders row 9; a toggle/chip is
-// not a primary tappable action, it's a filter/field-adjacent control).
 const toggleVariants = cva(
-  "group/toggle inline-flex items-center justify-center gap-1 rounded-sm text-sm font-medium whitespace-nowrap transition-[transform,background-color,color,border-color,box-shadow] duration-fast ease-swift outline-none hover:bg-muted hover:text-foreground active:translate-y-px active:bg-muted active:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-pressed:bg-primary aria-pressed:text-primary-foreground data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:hover:bg-primary data-[state=on]:hover:text-primary-foreground data-[state=on]:active:bg-primary data-[state=on]:active:text-primary-foreground dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/toggle inline-flex items-center justify-center gap-1 rounded-none border-0 bg-transparent text-[15.5px] font-normal whitespace-nowrap text-[#b8b8b8] transition-[transform,color,border-color] duration-fast ease-swift outline-none hover:text-[#565656] active:translate-y-px focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:text-[#c8c8c8] disabled:opacity-100 aria-invalid:text-destructive aria-pressed:text-foreground data-[state=on]:border-b data-[state=on]:border-foreground data-[state=on]:text-foreground data-[state=on]:hover:text-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
+      // Both variants read the same now: the outline had a border to mark a
+      // chip, and chips are gone.
       variant: {
-        default: 'bg-transparent',
-        outline: 'border border-input bg-transparent hover:bg-muted active:bg-muted',
+        default: '',
+        outline: '',
       },
+      // No heights and no side padding: an option is a word. The vertical
+      // padding is the tap zone, and it puts the selected rule 6px under
+      // the text — §7's sliding underline, standing still.
       size: {
-        default:
-          'h-8 min-w-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
-        // Radius override removed: the base's rounded-sm (8px) is already
-        // the sharp target — the old min(--radius-md,12px) clamp (11.2px)
-        // would have read LARGER than the default it's meant to shrink.
-        sm: "h-7 min-w-7 px-2.5 text-[0.8rem] has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: 'h-9 min-w-9 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
+        default: 'py-2.5 pb-1.5',
+        sm: 'py-2 pb-1.5 text-[14px]',
+        lg: 'py-3 pb-1.5',
       },
     },
     defaultVariants: {

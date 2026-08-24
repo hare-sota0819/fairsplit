@@ -1,6 +1,5 @@
 'use client'
 
-import { Check } from 'lucide-react'
 import { useTransition } from 'react'
 import { setLocaleAction } from '@/i18n/actions'
 import { LOCALES, type Locale } from '@/i18n/locale'
@@ -50,10 +49,17 @@ export function LanguageChoice({
             data-testid={`locale-${locale}`}
             className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted disabled:opacity-60"
           >
-            <span>{labels[locale]}</span>
-            {current === locale ? (
-              <Check aria-hidden="true" className="size-5 text-primary" />
-            ) : null}
+            {/* Selection is where the underline is (§7) — never a
+                checkmark icon, which this grammar does not have. */}
+            <span
+              className={
+                current === locale
+                  ? 'border-b border-foreground pb-[3px] text-foreground'
+                  : 'text-[#b8b8b8]'
+              }
+            >
+              {labels[locale]}
+            </span>
           </button>
         </li>
       ))}

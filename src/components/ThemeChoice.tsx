@@ -1,7 +1,6 @@
 'use client'
 
 import { useSyncExternalStore } from 'react'
-import { Check } from 'lucide-react'
 
 export type ThemePreference = 'system' | 'light' | 'dark'
 
@@ -109,10 +108,17 @@ export function ThemeChoice({
             data-testid={`theme-${option}`}
             className="flex min-h-14 w-full items-center justify-between gap-3 px-5 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted active:translate-y-px active:bg-muted"
           >
-            <span>{labels[option]}</span>
-            {preference === option ? (
-              <Check aria-hidden="true" className="size-5 text-primary" />
-            ) : null}
+            {/* Selection is where the underline is (§7) — never a
+                checkmark icon, which this grammar does not have. */}
+            <span
+              className={
+                preference === option
+                  ? 'border-b border-foreground pb-[3px] text-foreground'
+                  : 'text-[#b8b8b8]'
+              }
+            >
+              {labels[option]}
+            </span>
           </button>
         </li>
       ))}

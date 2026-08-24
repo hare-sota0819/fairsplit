@@ -51,13 +51,22 @@ export async function createWallet(
   await expect(page.getByTestId('exchange-rate')).toBeVisible()
 }
 
-/** Leave the wizard for the wallet list without recording anything. */
+/**
+ * Leave the wizard for the wallet list without recording anything.
+ *
+ * `isVisible()` does not wait, so the screen has to be settled BEFORE it is
+ * asked — otherwise a call straight after `goto` reads "no link", skips the
+ * click and then waits out the clock on a list it never opened. Waiting for
+ * either the link or the list first makes the branch a real either/or.
+ */
 export async function showWallets(page: Page): Promise<void> {
   const link = page.getByTestId('show-wallets')
+  const again = page.getByTestId('topup-again')
+  await expect(link.or(again).first()).toBeVisible()
   if (await link.isVisible().catch(() => false)) {
     await link.click()
   }
-  await expect(page.getByTestId('topup-again')).toBeVisible()
+  await expect(again).toBeVisible()
 }
 
 /** Land on the wallet list. The screen opens on the wizard, not the list. */

@@ -2,8 +2,10 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'FairSplit',
-    short_name: 'FairSplit',
+    // The wordmark is ALWAYS the Latin "Sem", in every locale (owner,
+    // 2026-08-24) — never the Korean 셈, which is prose only.
+    name: 'Sem',
+    short_name: 'Sem',
     description: 'Split group expenses fairly — at your own exchange rate.',
     start_url: '/',
     display: 'standalone',

@@ -106,15 +106,21 @@ export function SubmitButton({
       <LoadingOverlay caption={overlayCaption ?? t('saving')} id={motif} />
     ) : null
 
-  // The primary commit plays the full three acts on its own frame.
+  // The primary commit plays the full three acts on its own frame — but
+  // only when it IS the form's primary action.
   //
-  // `variant="default"` ONLY. The auth screens' `statement` rows came from
-  // the batch-3 drop verbatim (a bordered text row with a trailing arrow)
-  // and already read in this grammar; taking them over with the commit bar
-  // would undo a design the owner has already signed off. They take the
-  // secondary path below, which still gives them the shuttle and the
-  // double rule.
-  if (variant === 'default') {
+  // `variant="default"` and a full-width size. The bar is full-width by
+  // definition (§4), so putting it on a `size="sm"` control — a rename
+  // sitting beside its own text field — would eat the whole row and
+  // squash the field to nothing. Those take the text path below, which
+  // still gives them the shuttle and the double rule.
+  //
+  // `statement` is excluded too: the auth screens' rows came from the
+  // batch-3 drop verbatim and already read in this grammar; taking them
+  // over with the commit bar would undo a design already signed off.
+  const isPrimaryCommit =
+    variant === 'default' && (size === 'hero' || size === 'touch')
+  if (isPrimaryCommit) {
     return (
       <button
         type="submit"

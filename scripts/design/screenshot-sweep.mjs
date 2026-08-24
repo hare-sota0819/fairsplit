@@ -135,16 +135,7 @@ async function joinGroup(page, invitePath, displayName) {
   await page.goto(`${BASE_URL}${invitePath}`)
   await page.getByLabel('Your display name in this group').fill(displayName)
   await page.getByRole('button', { name: 'Join group' }).click()
-  await page.getByTestId('chat-input').waitFor()
-}
-
-/** One expense via chat: type it, wait for the confirm card, save it. */
-async function addChatExpense(page, sentence) {
-  await page.getByTestId('chat-input').fill(sentence)
-  await page.getByTestId('chat-send').click()
-  await page.getByTestId('chat-confirm-card').waitFor()
-  await page.getByTestId('chat-confirm-save').click()
-  await page.getByTestId('chat-saved-summary').first().waitFor()
+  await page.getByTestId('account-menu').waitFor()
 }
 
 /** One expense via the full manual wizard; returns the created expense's URL. */
@@ -271,15 +262,14 @@ async function sweep() {
     memberCtxs.push({ name, ctx, page })
   }
 
-  // owner's page is still sitting on /invite from the invite-link grab
-  // above — chat-input only exists on the group home route.
+  // owner's page is still sitting on /invite from the invite-link grab above.
   await owner.goto(groupUrl)
-  await owner.getByTestId('chat-input').waitFor()
 
-  // Two expenses via chat (also gives us a real saved-summary + a live
-  // in-bubble card to screenshot mid-flow), two via the wizard.
-  await addChatExpense(owner, '점심 12000원')
-  await addChatExpense(memberCtxs[0].page, '택시 8500원')
+  // Four expenses through the wizard. They used to come two-by-two from the
+  // chat composer; the chat programme was removed on 2026-08-22 and the
+  // wizard is the only entry there is.
+  await addWizardExpense(owner, groupUrl, '12000')
+  await addWizardExpense(memberCtxs[0].page, groupUrl, '8500')
   const expenseUrl = await addWizardExpense(owner, groupUrl, '32000')
   await addWizardExpense(memberCtxs[1].page, groupUrl, '5400')
 
@@ -301,13 +291,15 @@ async function sweep() {
   await withDarkTwin(browser, ownerStateKo, '/guide', 'guide')
 
   const groupPath = new URL(groupUrl).pathname
-  await withDarkTwin(browser, ownerStateKo, groupPath, 'group-home-empty-composer')
+  await withDarkTwin(browser, ownerStateKo, groupPath, 'group-home')
 
-  // Composer with an unsent confirm-card open (chat-only, not yet saved).
-  await withDarkTwin(browser, ownerStateKo, groupPath, 'group-home-confirm-card-open', async (page) => {
-    await page.getByTestId('chat-input').fill('저녁 15000원')
-    await page.getByTestId('chat-send').click()
-    await page.getByTestId('chat-confirm-card').waitFor()
+  // The wizard, step by step: it is where most of the app's controls live,
+  // so it is where a control change has to be looked at.
+  await withDarkTwin(browser, ownerStateKo, `${groupPath}/expenses/new`, 'wizard-1-amount')
+  await withDarkTwin(browser, ownerStateKo, `${groupPath}/expenses/new`, 'wizard-2-payment', async (page) => {
+    await page.getByTestId('amount').fill('32000')
+    await page.getByTestId('wizard-next').click()
+    await page.getByTestId('participants-legend-probe').or(page.getByTestId('wizard-next')).first().waitFor()
   })
 
   await withDarkTwin(browser, ownerStateKo, `${groupPath}/status`, 'status')

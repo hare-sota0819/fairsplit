@@ -52,7 +52,7 @@ test('landing, invite preview, guide after sign-up, and the guide from Account',
   await host.getByTestId('account-guide').click()
   await expect(host).toHaveURL(/\/guide/)
   await expect(
-    host.getByRole('heading', { name: 'How to use FairSplit' }),
+    host.getByRole('heading', { name: 'How to use Sem' }),
   ).toBeVisible()
   // Pins the guide to the entry step it actually documents, so a
   // regression back to the removed chat copy fails this test.

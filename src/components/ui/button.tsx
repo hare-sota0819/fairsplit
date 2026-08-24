@@ -5,75 +5,100 @@ import { Slot } from 'radix-ui'
 import { cn } from '@/lib/utils'
 
 /*
- * PRESS RECIPE — THE INK SINK.
+ * BUTTONS ARE TEXT, NEVER BOXES (SPEC-INTERACTIONS §1).
  *
- * Every control, filled or text, sinks 1px on press: `translateY(1px)`.
- * scale() is banned outright (handoff 2026-08-24 global rules) — a page
- * does not zoom under a finger, it takes the ink. Touch devices have no
- * hover, so the sink plus (on the mobile commit bar) ink inversion is the
- * whole of the press feedback there.
+ * The four tiers are carried by size, ink and what the underline does —
+ * there is no fill, no border and no radius on any of them. The ONE filled
+ * surface left in the app is the mobile commit bar (§4), which SubmitButton
+ * draws itself.
  *
- * Focus keeps border-ring + ring; border-color stays in the transition list
- * so focus/invalid tween instead of snapping.
+ *   1 default            16px ink, a FIXED 1px underline 3px under the text,
+ *                        and a trailing arrow whose gap opens on hover.
+ *   2 outline/secondary  15px meta grey; the underline GROWS from the left
+ *                        on hover and the ink darkens to full.
+ *   3 ghost              13.5px faint grey, colour only. No underline, ever.
+ *   - disabled           15px #c8c8c8, no underline, cursor default.
+ *   - destructive (§2)   the app's one chromatic colour, as a text link:
+ *                        the underline appears on HOVER only, and is pinned
+ *                        on inside a confirm dialog (`data-fixed-rule`).
+ *
+ * PRESS IS THE INK SINK. `translateY(1px)` on every control, filled or not;
+ * scale() is banned outright. Touch has no hover, so `@media (hover:none)`
+ * in globals.css rests tier 2's underline ON — otherwise a control whose
+ * only affordance is a hover state has none at all on a phone.
+ *
+ * MECHANICS. Tier 1's underline is `text-decoration`, not a border, so it
+ * hugs the text at any padding. Tier 2's has to animate its width, which a
+ * text-decoration cannot, so it is a 1px background gradient positioned
+ * `left bottom 7px` — the tiers all carry a uniform 10px of vertical
+ * padding for the tap zone, which puts that exactly 3px under the text.
  */
+
+/** Every variant that renders as text rather than as a box. */
+const TEXT_TIERS = [
+  'default',
+  'outline',
+  'secondary',
+  'ghost',
+  'destructive',
+  'statement',
+  'statement-secondary',
+  'statement-tertiary',
+] as const
+
+/** Every size that is a run of text rather than a square icon well. */
+const TEXT_SIZES = [
+  'default',
+  'xs',
+  'sm',
+  'lg',
+  'touch',
+  'hero',
+  'text',
+] as const
+
+/** Tier 2's underline: a 1px ink gradient, 0%→100% wide over .35s. */
+const GROWING_RULE =
+  'bg-[linear-gradient(var(--foreground),var(--foreground))] bg-[length:0%_1px] bg-[position:left_bottom_7px] bg-no-repeat hover:bg-[length:100%_1px]'
+
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-[transform,background-color,color,border-color,box-shadow] duration-fast ease-swift outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-[transform,background-size,background-color,color,border-color,box-shadow] duration-fast ease-swift outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
+        // Tier 1 — the primary action.
         default:
-          'bg-primary text-primary-foreground hover:bg-primary/80 active:bg-primary/80',
-        outline:
-          'border-border-strong bg-background hover:bg-muted hover:text-foreground active:bg-muted active:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 dark:active:bg-input/50',
-        secondary:
-          'bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] active:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground',
+          'text-base text-foreground underline decoration-1 underline-offset-[3px] aria-expanded:text-foreground',
+        // Tier 2 — a secondary action, and the "not selected" half of a
+        // two-button choice: the underline is the whole difference.
+        outline: `text-[15px] text-[#8a8a8a] hover:text-foreground aria-expanded:text-foreground ${GROWING_RULE}`,
+        secondary: `text-[15px] text-[#8a8a8a] hover:text-foreground aria-expanded:text-foreground ${GROWING_RULE}`,
+        // Tier 3 — dismiss, close, "not now".
         ghost:
-          'hover:bg-muted hover:text-foreground active:bg-muted active:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 dark:active:bg-muted/50',
-        /*
-         * DESTRUCTIVE (SPEC-INTERACTIONS §2) — the app's only chromatic
-         * colour, and it is a TEXT LINK, never a fill: colour is the warning,
-         * so no icon and no tinted box. The 1px underline appears on hover
-         * only; a confirm dialog's destructive action pins it on with
-         * `data-fixed-rule` (see §9).
-         */
+          'text-[13.5px] text-[#a8a8a8] hover:text-[#565656] aria-expanded:text-[#565656]',
+        // §2 — the app's only chromatic colour. Colour IS the warning, so
+        // no icon and no tinted box; the rule shows on hover, and stays on
+        // inside a confirm.
         destructive:
-          'rounded-none border-0 border-b border-transparent bg-transparent px-0 font-normal text-destructive transition-[border-color,color,transform] hover:border-b-destructive active:border-b-destructive data-[fixed-rule]:border-b-destructive',
+          'text-[15px] text-destructive decoration-1 underline-offset-[3px] hover:underline data-[fixed-rule]:underline',
         link: 'text-primary underline-offset-4 hover:underline active:underline',
-        /*
-         * THE FOUR-TIER TEXT HIERARCHY (SPEC-INTERACTIONS §1). Text only,
-         * never boxes; the tier is carried by size, ink and what the
-         * underline does.
-         *
-         * 1 · statement — primary: 16px ink, a FIXED 1px underline 3px
-         *   below the text, and a trailing arrow whose gap grows 8px→14px
-         *   on hover (the gap transition lives on the call site's flex row;
-         *   `SubmitButton` and the arrow helper below apply it).
-         */
+        // The explicit tier names, for call sites that want to pin a tier
+        // regardless of what the action means structurally.
         statement:
-          'rounded-none border-0 border-b border-foreground px-0 pb-[3px] text-base font-normal text-foreground disabled:cursor-default disabled:border-b-transparent disabled:text-[15px] disabled:text-[#c8c8c8] disabled:opacity-100',
-        /*
-         * 2 · statement-secondary — 15px meta grey; the underline GROWS from
-         *   the left on hover (background-size 0%→100% of a 1px gradient)
-         *   and the ink darkens to full.
-         */
-        'statement-secondary':
-          'rounded-none border-0 bg-[linear-gradient(var(--foreground),var(--foreground))] bg-[length:0%_1px] bg-[position:left_bottom] bg-no-repeat px-0 pb-[3px] text-[15px] font-normal text-[#8a8a8a] transition-[background-size,color,transform] duration-[350ms] hover:bg-[length:100%_1px] hover:text-foreground disabled:cursor-default disabled:bg-none disabled:text-[#c8c8c8] disabled:opacity-100',
-        /* 3 · statement-tertiary — 13.5px faint grey, colour only. No
-         *   underline, ever. */
-        'statement-tertiary':
-          'rounded-none border-0 px-0 text-[13.5px] font-normal text-[#a8a8a8] transition-[color,transform] duration-[250ms] hover:text-[#565656]',
+          'text-base text-foreground underline decoration-1 underline-offset-[3px]',
+        'statement-secondary': `text-[15px] text-[#8a8a8a] hover:text-foreground ${GROWING_RULE}`,
+        'statement-tertiary': 'text-[13.5px] text-[#a8a8a8] hover:text-[#565656]',
       },
       size: {
-        default:
-          'h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: 'h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
-        touch: 'h-11 gap-2 rounded-xl px-4 text-sm',
-        hero: 'h-13 w-full gap-2 rounded-xl px-5 text-base font-semibold',
-        // STATEMENT companion size: content-height text control with a
-        // comfortable tap zone supplied by line-height + py, not a fill box.
-        text: 'h-auto gap-2 rounded-none px-0 py-2 text-base',
+        default: 'gap-1.5',
+        xs: "gap-1 text-xs [&_svg:not([class*='size-'])]:size-3",
+        sm: "gap-1 [&_svg:not([class*='size-'])]:size-3.5",
+        lg: 'gap-1.5',
+        touch: 'gap-2',
+        // The full-width primary row. It keeps its width and its centring;
+        // what it loses is the fill.
+        hero: 'w-full gap-2',
+        text: 'gap-2',
         icon: 'size-8',
         'icon-xs':
           "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
@@ -82,6 +107,25 @@ const buttonVariants = cva(
         'icon-lg': 'size-9',
       },
     },
+    compoundVariants: [
+      {
+        variant: [...TEXT_TIERS],
+        size: [...TEXT_SIZES],
+        // The geometry reset: no box, no radius, no fill, and a uniform
+        // 10px of vertical padding that both supplies the tap zone and puts
+        // tier 2's underline exactly 3px under the text.
+        className:
+          'h-auto rounded-none border-0 bg-transparent px-0 py-2.5 font-normal shadow-none disabled:cursor-default disabled:text-[15px] disabled:text-[#c8c8c8] disabled:no-underline disabled:bg-none disabled:opacity-100',
+      },
+      {
+        // An icon-only control is bare chrome: no fill, no border, no
+        // radius — just the glyph, greying to ink on hover.
+        variant: [...TEXT_TIERS],
+        size: ['icon', 'icon-xs', 'icon-sm', 'icon-lg'],
+        className:
+          'rounded-none border-0 bg-transparent text-[#8a8a8a] shadow-none hover:text-foreground',
+      },
+    ],
     defaultVariants: {
       variant: 'default',
       size: 'default',
@@ -90,8 +134,7 @@ const buttonVariants = cva(
 )
 
 /**
- * The trailing arrow of a primary action (SPEC-INTERACTIONS §1). The gap it
- * sits in grows 8px→14px on hover over .3s, on the one easing.
+ * The trailing arrow of a primary action (SPEC-INTERACTIONS §1).
  *
  * `aria-hidden` on purpose: the arrow is punctuation, not part of the
  * button's name, so "Save" stays "Save" to a screen reader and to a test.
