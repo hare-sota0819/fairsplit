@@ -2,29 +2,59 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
+/**
+ * FIELDS ARE UNDERLINES, NOT BOXES (FIXES §4).
+ *
+ * The bordered, rounded, ring-focused box is gone. A field is a run of text
+ * sitting on a 1px #d8d8d8 hairline; focusing it draws the ink line in over
+ * the top from the left (the reference's "잉크가 스밈"), which is both the
+ * focus affordance and the only chrome the control has. Radius 0, no fill,
+ * no shadow, no ring — the page is the surface.
+ *
+ * MECHANICS. Two stacked 1px background gradients: the ink one starts at 0%
+ * wide and grows to 100% on focus, the grey one is always full width. A
+ * border cannot animate its width, which is why this is a background and
+ * not a `border-bottom`.
+ */
+const FIELD_RULE =
+  'bg-[linear-gradient(var(--foreground),var(--foreground)),linear-gradient(#d8d8d8,#d8d8d8)] ' +
+  'bg-[position:left_bottom,left_bottom] bg-[length:0%_1px,100%_1px] bg-no-repeat ' +
+  'focus-visible:bg-[length:100%_1px,100%_1px] ' +
+  'aria-invalid:bg-[linear-gradient(var(--destructive),var(--destructive)),linear-gradient(var(--destructive),var(--destructive))] ' +
+  'aria-invalid:bg-[length:100%_1px,100%_1px]'
+
 function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
   return (
     <input
       type={type}
       data-slot="input"
       className={cn(
-        // Focus ring per PITCH_TEARDOWN.md ## Press states: `--dur-fast`
-        // covers "press feedback, colour swaps, focus rings" as one
-        // cluster. `border-input` (not `--border`) already clears the 3:1
-        // UI floor even on a tinted ground (checked: 3.29-3.35:1 against
-        // this palette's --secondary/--muted), so no border-strong swap is
-        // needed here. `box-shadow` joins the transition list so the
-        // focus ring (a ring-* box-shadow, not an outline) actually
-        // animates in instead of snapping.
-        // Radius: `rounded-sm` (## Radii & borders row 9 — inputs/chips get
-        // the sharp 4-8px step, `--radius-sm` = 8px exactly; the app had
-        // been shipping this inverted, at the 16px "pill" step).
-        'h-8 w-full min-w-0 rounded-sm border border-input bg-transparent px-2.5 py-1 text-base transition-[border-color,background-color,box-shadow] duration-fast outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40',
+        'w-full min-w-0 rounded-none border-0 px-0 py-[9px] text-base text-foreground outline-none',
+        'transition-[background-size] duration-[250ms] ease-swift',
+        FIELD_RULE,
+        'placeholder:text-[#c8c8c8]',
+        'file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground',
+        'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
+        'md:text-sm',
         className,
       )}
       {...props}
     />
   )
 }
+
+/**
+ * The same underline, for the native `<select>`s the app uses instead of a
+ * listbox (the phone's own picker beats a Radix one). They sat in the same
+ * rounded box `Input` just left behind, and a boxed select next to an
+ * underlined field reads as two different design systems in one form.
+ * `min-h-11` keeps the 44px tap target the box used to supply.
+ */
+export const SELECT_FIELD = cn(
+  'w-full min-h-11 appearance-none cursor-pointer rounded-none border-0 px-0 py-[9px] text-base text-foreground outline-none',
+  'transition-[background-size] duration-[250ms] ease-swift',
+  FIELD_RULE,
+  'disabled:cursor-default disabled:opacity-50',
+)
 
 export { Input }

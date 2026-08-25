@@ -1,12 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useFormStatus } from 'react-dom'
 import { cn } from '@/lib/utils'
-import { LoadingOverlay } from './LoadingOverlay'
 import { DoubleRule, LoadingRule, MiniShuttle } from './motion/rules'
-import { nextLoader } from './loaders'
 import { ARROW_ROW, Button } from './ui/button'
 
 type ButtonProps = React.ComponentProps<typeof Button>
@@ -39,10 +37,9 @@ const DONE_HOLD_MS = 1600
  * Secondary tiers keep their existing skin and get the same grammar in
  * miniature: a hairline shuttle while running, the double rule on success.
  *
- * IT ALSO RAISES THE LOADING OVERLAY when asked. Saving an expense is the
- * one moment that genuinely needs it — a server round trip you cannot take
- * back. `overlay={false}` for the small in-place saves (a rename, a toggle)
- * where taking the screen would be heavier than the action.
+ * NO OVERLAY, EVER (FIXES §1). A save used to take the whole screen; the
+ * three acts above ARE the save's feedback, and covering the form you just
+ * filled in to say so is louder than the action.
  */
 export function SubmitButton({
   children,
@@ -52,8 +49,6 @@ export function SubmitButton({
   testId,
   variant = 'default',
   size = 'touch',
-  overlay = false,
-  overlayCaption,
   className,
   ...props
   // `asChild` is refused outright: a submit control is a <button>, and the
@@ -62,9 +57,6 @@ export function SubmitButton({
   pending?: boolean
   busyLabel?: string
   testId?: string
-  /** Raise the full-screen indicator while this action runs. */
-  overlay?: boolean
-  overlayCaption?: string
 }) {
   const status = useFormStatus()
   const t = useTranslations('loading')
@@ -87,24 +79,11 @@ export function SubmitButton({
   }, [pending])
   const done = closed && !pending
 
-  // Redrawn per save, for the same reason as NavLoader's overlay: drawn once
-  // on mount, a button would show the same figure for its whole life.
-  // `pending` is the POINT of this dependency, not an accident: it is what
-  // draws a new figure when a navigation starts. Without it the memo never
-  // recomputes and the figure is fixed for the element's whole life.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const motif = useMemo(() => nextLoader(), [pending])
-
   const label = pending
     ? (busyLabel ?? t('writing'))
     : done
       ? t('written')
       : children
-
-  const raisedOverlay =
-    overlay && pending ? (
-      <LoadingOverlay caption={overlayCaption ?? t('saving')} id={motif} />
-    ) : null
 
   // The primary commit plays the full three acts on its own frame — but
   // only when it IS the form's primary action.
@@ -168,7 +147,6 @@ export function SubmitButton({
             {pending ? <LoadingRule /> : <DoubleRule />}
           </span>
         ) : null}
-        {raisedOverlay}
       </button>
     )
   }
@@ -187,7 +165,6 @@ export function SubmitButton({
       {pending ? <MiniShuttle /> : null}
       {label}
       {done ? <DoubleRule className="w-6" /> : null}
-      {raisedOverlay}
     </Button>
   )
 }

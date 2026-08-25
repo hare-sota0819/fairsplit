@@ -1,21 +1,20 @@
 'use client'
 
-import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { createPortal } from 'react-dom'
-import { nextTip } from './loaders/config'
 import { RouteLoader, type LoaderId } from './loaders'
 
 /**
- * The one loading overlay, used both while a link is pending and while a
- * server action is saving.
+ * The one loading overlay, for route transitions and cold starts.
  *
- * IT DOES NOT BLANK THE SCREEN. It used to paint `bg-background/92` plus a
- * blur plus the page texture, which erased everything behind it — for a save
- * that lasts under a second, that reads as the app throwing your work away
- * and starting over. Now it is a scrim: the page stays faintly visible
- * underneath so you can see you are still where you were, and only the motif
- * and its caption are fully legible on top.
+ * IT SITS ON PAPER (FIXES §1). The dark scrim is gone: a wait is not a
+ * modal, and dimming the page to write a ledger on top of it made a
+ * half-second navigation read as the app leaving. The overlay now paints
+ * the page's own background and draws the motif in ink, exactly as the
+ * loader reference does.
+ *
+ * SAVES DO NOT USE IT AT ALL. The commit button's own three acts are the
+ * only feedback a server action gets (SPEC-INTERACTIONS §3/§4).
  *
  * PORTALLED TO <body> ON PURPOSE (Phase 4A). `position: fixed` resolves
  * against the nearest ancestor with a transform, filter or backdrop-filter,
@@ -27,27 +26,17 @@ export function LoadingOverlay({
   caption,
   id,
 }: {
-  /** What is loading. Kept for the accessible name; a tip is what is shown. */
+  /** What is loading. The accessible name; the visible line is fixed. */
   caption: string
   id?: LoaderId
 }) {
   const t = useTranslations('loading')
-  // A waiting second is a second you can use. The tip is drawn once per
-  // overlay, so it does not shuffle under the reader's eyes.
-  const [tip] = useState(nextTip)
   if (typeof document === 'undefined') {
     return null
   }
   return createPortal(
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-scrim">
-      {/* Always the light-on-dark pair: the scrim darkens whatever theme is
-          underneath, so the indicator must not follow the theme. */}
-      <RouteLoader
-        caption={t(`tips.${tip}`)}
-        label={caption}
-        id={id}
-        onScrim
-      />
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
+      <RouteLoader caption={t('general')} label={caption} id={id} />
     </div>,
     document.body,
   )

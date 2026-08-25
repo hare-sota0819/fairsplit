@@ -19,6 +19,7 @@ import { NumberField } from './NumberField'
 import { RatePreview } from './RatePreview'
 import { SplitFunding } from './SplitFunding'
 import type { StepProps } from './StepProps'
+import { SELECT_FIELD } from '@/components/ui/input'
 
 export { fundingKey }
 
@@ -256,7 +257,7 @@ export function StepPayment({
               },
             })
           }}
-          className="h-11 w-full rounded-lg border border-input bg-transparent px-3 text-base outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          className={SELECT_FIELD}
           data-testid="payer-select"
         >
           {members.map((m) => (

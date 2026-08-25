@@ -391,29 +391,7 @@
     "withMember": "Opening your shared history…",
     "saving": "Saving…",
     "writing": "Writing it in…",
-    "written": "Written in",
-    "tips": {
-      "0": "Split by item when one of you skipped the wine.",
-      "1": "Log a cash exchange once and every cash expense uses your real rate.",
-      "2": "A travel card is a wallet — top it up and watch it drain.",
-      "3": "Tap a person to see only what the two of you shared.",
-      "4": "Photograph the receipt before the table clears it away.",
-      "5": "Enter the amount in the currency you actually paid.",
-      "6": "Someone else can add the expense they paid for.",
-      "7": "Cancelled an expense by mistake? Restore is one tap.",
-      "8": "Your share is what you ate. What you fronted is what you paid.",
-      "9": "Rounding always favours whoever paid.",
-      "10": "Set the trip's country and the currency follows.",
-      "11": "The market rate is the bank's starting point, not its price.",
-      "12": "Correct a card expense once your statement posts.",
-      "13": "Nothing is settled until you settle it — these are estimates.",
-      "14": "Personal expenses stay yours and split with nobody.",
-      "15": "Rename yourself per group; other people see that name.",
-      "16": "Hide your wallet if the balance is nobody's business.",
-      "17": "A quantity of three, taken one each, is three shares.",
-      "18": "Untaken items are shared out, never dropped.",
-      "19": "Leaving a group keeps the history for everyone else."
-    }
+    "written": "Written in"
   },
   "rateChip": {
     "WALLET_AVG_COST": "wallet rate",

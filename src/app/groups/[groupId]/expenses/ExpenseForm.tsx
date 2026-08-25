@@ -10,9 +10,13 @@ import {
 } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { SubmitButton } from '@/components/SubmitButton'
-import { Button, buttonVariants } from '@/components/ui/button'
+import {
+  ActionArrow,
+  ARROW_ROW,
+  Button,
+  buttonVariants,
+} from '@/components/ui/button'
 import { fromLocalInputValue, toLocalInputValue } from '@/lib/datetime'
 import {
   draftKey as buildDraftKey,
@@ -565,12 +569,11 @@ function Wizard({
                 >
                   <span
                     aria-hidden="true"
+                    // Active segment ink, the rest of the track a #e4e4e4
+                    // hairline (FIXES §4) — the rail no longer fades the
+                    // reached-but-not-current steps to a third shade.
                     className={`block h-px w-full transition-colors ${
-                      index <= state.step
-                        ? 'bg-primary'
-                        : reachable
-                          ? 'bg-primary/30'
-                          : 'bg-border'
+                      index <= state.step ? 'bg-foreground' : 'bg-[#e4e4e4]'
                     }`}
                   />
                 </button>
@@ -597,7 +600,11 @@ function Wizard({
       {state.step === 4 ? <StepReview {...stepProps} /> : null}
 
       {result.duplicate ? (
-        <div className="rounded-xl bg-notice-soft p-4 text-sm" role="alert">
+        <div
+          // A statement line, not a tinted card (FIXES §2).
+          className="border-y border-[#141414] py-3 text-sm text-foreground"
+          role="alert"
+        >
           <p>
             {t('duplicate', {
               title: result.duplicate.title,
@@ -625,17 +632,21 @@ function Wizard({
         </p>
       ) : null}
 
-      <div className="flex items-center gap-2">
+      {/* LEFT-ALIGNED WITH THE FIELDS (FIXES §4), not a centred pair of
+          full-width bars. "Next" is a §1 primary — ink, a fixed underline,
+          and an arrow whose gap opens on hover; disabled it is 15px #c8c8c8
+          with no underline, which `buttonVariants` already draws. The save
+          on the last step keeps the full-width commit bar: that IS the
+          mobile primary of SPEC-INTERACTIONS §4. */}
+      <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
         {state.step > 0 ? (
           <Button
             type="button"
             variant="outline"
-            size="hero"
+            size="text"
             onClick={() => patch({ step: state.step - 1 })}
-            className="flex-1 gap-1"
             data-testid="wizard-back"
           >
-            <ChevronLeft aria-hidden="true" className="size-4" />
             {tCommon('back')}
           </Button>
         ) : null}
@@ -644,8 +655,6 @@ function Wizard({
             pending={pending}
             busyLabel={t('saving')}
             size="hero"
-            className="flex-[2]"
-            overlay
             testId="save-expense"
           >
             {t('save')}
@@ -653,14 +662,15 @@ function Wizard({
         ) : (
           <Button
             type="button"
-            size="hero"
+            size="text"
             disabled={blocked}
             onClick={() => goTo(state.step + 1)}
-            className="flex-[2] gap-1"
             data-testid="wizard-next"
           >
-            {tCommon('next')}
-            <ChevronRight aria-hidden="true" className="size-4" />
+            <span className={ARROW_ROW}>
+              {tCommon('next')}
+              {blocked ? null : <ActionArrow />}
+            </span>
           </Button>
         )}
       </div>

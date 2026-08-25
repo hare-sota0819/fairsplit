@@ -1,7 +1,6 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { LogOut, Plus, Settings, UserRoundCog, UserRoundPlus, Users } from 'lucide-react'
 import { signOutAction, switchAccountAction } from '@/app/account/actions'
 import {
   DropdownMenu,
@@ -26,9 +25,21 @@ import {
  * same way `NavIndex` does it — no server data is needed to know which
  * group you are looking at.
  *
- * The avatar is the first letter of your name. There is no avatar pipeline
- * in this app, and a letter that is actually yours beats a stock silhouette.
+ * TEXT ONLY (FIXES §3). Every icon is gone — a menu of six lines does not
+ * need six pictograms to be read, and the pictograms were the last
+ * decorative element in the chrome. The surface is white, one 1px #dcdcdc
+ * border, radius 0, no shadow; hairlines separate the GROUPS, not the rows.
+ * The trigger is the bare initial: no box, no inversion, a secondary link's
+ * underline on hover.
  */
+
+/** One menu row: 14.5px ink, 12px of vertical padding, #f2f2f2 on hover. */
+const ROW =
+  'h-auto rounded-none px-4 py-3 text-[14.5px] text-foreground focus:bg-muted data-[highlighted]:bg-muted'
+
+/** The rule between groups of rows. `--border` is this app's hairline. */
+const GROUP_RULE = 'mx-0 my-0 bg-border'
+
 export function AccountMenu({
   name,
   email,
@@ -57,23 +68,30 @@ export function AccountMenu({
       <DropdownMenuTrigger
         aria-label={labels.menu}
         data-testid="account-menu"
-        className="flex size-8 items-center justify-center border border-border-strong text-[13px] text-primary uppercase outline-none transition-colors duration-fast hover:bg-primary hover:text-primary-foreground focus-visible:bg-primary focus-visible:text-primary-foreground"
+        // A §1 secondary link wearing a single letter: the underline grows
+        // from the left on hover, and nothing boxes it in.
+        className="inline-flex h-11 items-center bg-[linear-gradient(var(--foreground),var(--foreground))] bg-[length:0%_1px] bg-[position:left_bottom_11px] bg-no-repeat px-2 text-[15px] text-foreground uppercase transition-[background-size] duration-fast ease-swift outline-none select-none hover:bg-[length:100%_1px] active:translate-y-px"
       >
         <span aria-hidden="true">{initial}</span>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>
+      <DropdownMenuContent
+        align="end"
+        // White surface, 1px #dcdcdc, radius 0, no shadow (§3).
+        className="rounded-none border border-border bg-popover p-0 shadow-none ring-0"
+      >
+        <DropdownMenuLabel className="px-4 py-3">
           <span className="flex min-w-0 flex-col">
-            <span className="truncate text-sm font-medium" data-testid="menu-name">
+            <span
+              className="truncate text-[14.5px] text-foreground"
+              data-testid="menu-name"
+            >
               {name}
             </span>
-            <span className="truncate text-xs text-muted-foreground">
-              {email}
-            </span>
+            <span className="truncate text-[12px] text-[#8a8a8a]">{email}</span>
           </span>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className={GROUP_RULE} />
 
         {/* Managing THIS group: renaming it, adding someone by name,
             leaving it — all of that is the settings screen, and the invite
@@ -81,50 +99,52 @@ export function AccountMenu({
         {groupId ? (
           <>
             <DropdownMenuItem
+              className={ROW}
               data-testid="menu-manage-group"
               onSelect={() => router.push(`/groups/${groupId}/settings`)}
             >
-              <Users aria-hidden="true" className="size-4 text-chevron" />
               {labels.manageGroup}
             </DropdownMenuItem>
             <DropdownMenuItem
+              className={ROW}
               data-testid="menu-invite"
               onSelect={() => router.push(`/groups/${groupId}/invite`)}
             >
-              <UserRoundPlus aria-hidden="true" className="size-4 text-chevron" />
               {labels.invite}
             </DropdownMenuItem>
           </>
         ) : null}
         <DropdownMenuItem
+          className={ROW}
           data-testid="menu-new-group"
           onSelect={() => router.push('/groups/new')}
         >
-          <Plus aria-hidden="true" className="size-4 text-chevron" />
           {labels.newGroup}
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className={GROUP_RULE} />
 
         <DropdownMenuItem
+          className={ROW}
           data-testid="menu-account"
           onSelect={() => router.push('/account')}
         >
-          <Settings aria-hidden="true" className="size-4 text-chevron" />
           {labels.settings}
         </DropdownMenuItem>
         <DropdownMenuItem
+          className={ROW}
           data-testid="menu-switch-account"
           onSelect={() => void switchAccountAction()}
         >
-          <UserRoundCog aria-hidden="true" className="size-4 text-chevron" />
           {labels.switchAccount}
         </DropdownMenuItem>
+        {/* Signing out is not destructive — nothing is lost by it — so it
+            stays grey rather than taking the app's one chromatic colour. */}
         <DropdownMenuItem
+          className={`${ROW} text-[#8a8a8a]`}
           data-testid="menu-signout"
           onSelect={() => void signOutAction()}
         >
-          <LogOut aria-hidden="true" className="size-4 text-chevron" />
           {labels.signOut}
         </DropdownMenuItem>
       </DropdownMenuContent>

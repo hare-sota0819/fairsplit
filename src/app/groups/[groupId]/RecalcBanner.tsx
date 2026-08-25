@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react'
 import { Spinner } from '@/components/loaders'
-import { Button } from '@/components/ui/button'
 
 /**
  * "Someone's exchange records moved the numbers." Dismissing is a one-way,
@@ -37,31 +36,35 @@ export function RecalcBanner({
   }
   return (
     <div
-      className="rounded-xl bg-notice-soft p-4 text-sm text-foreground"
+      // A STATEMENT LINE, NOT A COLOURED CARD (FIXES §2). The beige fill was
+      // the only chromatic surface left outside the destructive red, and a
+      // notice does not need a colour to be a notice: two ink rules and the
+      // sentence between them say it in the app's own voice.
+      className="border-y border-[#141414] bg-transparent py-3"
       data-testid="recalc-banner"
     >
-      <p>{message}</p>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        disabled={pending}
-        aria-busy={pending}
-        onClick={() =>
-          startTransition(async () => {
-            const formData = new FormData()
-            formData.set('groupId', groupId)
-            await action(formData)
-            setDismissed(true)
-            onDismissed?.()
-          })
-        }
-        className="mt-2 -ml-2.5"
-        data-testid="recalc-dismiss"
-      >
-        {pending ? <Spinner /> : null}
-        {dismissLabel}
-      </Button>
+      <p className="text-sm text-foreground">{message}</p>
+      <div className="mt-2 flex justify-end">
+        <button
+          type="button"
+          disabled={pending}
+          aria-busy={pending}
+          onClick={() =>
+            startTransition(async () => {
+              const formData = new FormData()
+              formData.set('groupId', groupId)
+              await action(formData)
+              setDismissed(true)
+              onDismissed?.()
+            })
+          }
+          className="inline-flex items-center gap-2 text-[13px] text-[#a8a8a8] transition-colors duration-fast ease-swift outline-none select-none hover:text-[#565656] active:translate-y-px disabled:cursor-default"
+          data-testid="recalc-dismiss"
+        >
+          {pending ? <Spinner /> : null}
+          {dismissLabel}
+        </button>
+      </div>
     </div>
   )
 }

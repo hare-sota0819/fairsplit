@@ -13,10 +13,3 @@ export const ACTIVE_LOADERS: LoaderId[] = LOADER_IDS
 export function nextLoader(): LoaderId {
   return ACTIVE_LOADERS[Math.floor(Math.random() * ACTIVE_LOADERS.length)]
 }
-
-/** Which tip to show, by index — the caller resolves it through i18n. */
-export const TIP_COUNT = 20
-
-export function nextTip(): number {
-  return Math.floor(Math.random() * TIP_COUNT)
-}

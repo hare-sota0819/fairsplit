@@ -503,7 +503,7 @@ export function ReceiptScan({
               className={`rounded-lg border p-3 text-sm ${
                 check.canSave
                   ? 'border-border text-muted-foreground'
-                  : 'border-destructive bg-destructive/5 text-destructive'
+                  : 'border-destructive text-destructive'
               }`}
               data-testid="scan-check"
               data-status={check.status}

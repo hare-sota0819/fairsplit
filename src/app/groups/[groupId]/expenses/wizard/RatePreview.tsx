@@ -50,7 +50,7 @@ export function RatePreview({
           </span>
         ) : null}
         <ul
-          className="flex flex-col gap-0.5 text-xs text-muted-foreground"
+          className="flex flex-col gap-0.5 text-[12px] text-[#a8a8a8]"
           data-testid="rate-portions"
         >
           {math.portions.map((portion) => (
@@ -73,7 +73,7 @@ export function RatePreview({
   const bankBilled = math.rateSource === 'ACTUAL_CHARGED'
   if (math.effectiveRate === null && !bankBilled) {
     return marketLoading ? (
-      <span className="flex items-center gap-2 text-sm text-muted-foreground">
+      <span className="flex items-center gap-2 text-[12px] text-[#a8a8a8]">
         <Spinner /> {t('rateLoading')}
       </span>
     ) : (
@@ -132,7 +132,7 @@ export function RatePreview({
           </span>
         ) : null}
         {bankBilled ? null : (
-          <span className="text-muted-foreground">
+          <span className="text-[12px] text-[#a8a8a8]">
             {t('ratePreview', {
               unit,
               currency,
@@ -144,13 +144,13 @@ export function RatePreview({
       </span>
       {sourceLabel ? (
         <span
-          className="text-xs font-medium text-foreground"
+          className="text-[12px] text-[#a8a8a8]"
           data-testid="rate-source-label"
         >
           {sourceLabel}
         </span>
       ) : null}
-      <span className="text-xs text-muted-foreground">
+      <span className="text-[12px] text-[#a8a8a8]">
         {bankBilled ? (
           <span>{tChip('explain.ACTUAL_CHARGED')}</span>
         ) : math.rateSource === 'WALLET_AVG_COST' ||
@@ -169,7 +169,7 @@ export function RatePreview({
       {math.rateSource === 'WALLET_AVG_COST' ||
       math.rateSource === 'OWN_EXCHANGE_RATE' ||
       bankBilled ? null : (
-        <p className="text-xs leading-relaxed text-muted-foreground">
+        <p className="text-[12px] leading-relaxed text-[#a8a8a8]">
           {t('rateBasis')}
         </p>
       )}

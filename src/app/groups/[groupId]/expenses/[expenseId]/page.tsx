@@ -176,7 +176,10 @@ export default async function ExpenseDetailPage({
 
       {expense.marketRateProvisional ? (
         <div
-          className="rounded-xl bg-notice-soft p-4 text-sm text-notice"
+          // A statement line, not a tinted card (FIXES §2). The warning
+          // HUE stays: the owner ruled on 2026-08-24 that --notice keeps
+          // its colour; §2 removed the surface, not the signal.
+          className="border-y border-[#141414] py-3 text-sm text-notice"
           data-testid="provisional-rate-banner"
         >
           {converted.walletLabel
@@ -187,7 +190,9 @@ export default async function ExpenseDetailPage({
 
       {cancelled ? (
         <div
-          className="rounded-xl bg-negative-soft p-4 text-sm text-negative"
+          // A statement line (FIXES §2) — the tinted surface goes, the
+          // warning hue stays (owner's 2026-08-24 call on --negative).
+          className="border-y border-[#141414] py-3 text-sm text-negative"
           data-testid="cancelled-banner"
         >
           {t('cancelledBanner', {

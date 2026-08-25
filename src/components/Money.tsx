@@ -3,7 +3,10 @@ import { cn } from '@/lib/utils'
 /**
  * The one way money reaches the screen.
  *
- * Two rules the design brief is strict about:
+ * Three rules the design brief is strict about:
+ *  - NEWSREADER, the serif (SPEC-INTERACTIONS fonts; FIXES acceptance list
+ *    "amounts everywhere: Newsreader"). It is also what draws the won sign
+ *    correctly — the sans fallback renders ₩ with the crossed W;
  *  - tabular numerals, so columns of figures line up and a changing amount
  *    does not make the row jitter;
  *  - a balance's direction is NEVER carried by colour alone. Every signed
@@ -22,10 +25,11 @@ export function Money({
   return (
     <span
       className={cn(
-        'tabular-nums',
-        size === 'hero' && 'text-4xl font-bold',
-        size === 'lg' && 'text-xl font-semibold',
-        size === 'md' && 'font-medium',
+        // The face ships at 400/500 only, and a ledger figure is never
+        // bolded — the size carries the weight instead.
+        'font-heading tabular-nums',
+        size === 'hero' && 'text-4xl',
+        size === 'lg' && 'text-xl',
         className,
       )}
     >

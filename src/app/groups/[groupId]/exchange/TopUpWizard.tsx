@@ -5,7 +5,7 @@ import { useActionState, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, Landmark, Plus, Wallet } from 'lucide-react'
 import { SubmitButton } from '@/components/SubmitButton'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Input, SELECT_FIELD } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toLocalDateKey, toLocalInputValue } from '@/lib/datetime'
 import { minorToDecimalInput, parseAmountToMinor } from '@/lib/format'
@@ -18,8 +18,7 @@ import {
   type WalletView,
 } from './actions'
 
-const SELECT_CLASS =
-  'h-11 rounded-lg border border-input bg-transparent px-3 text-base outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50'
+const SELECT_CLASS = SELECT_FIELD
 
 const KIND_ICON = {
   CASH: Landmark,

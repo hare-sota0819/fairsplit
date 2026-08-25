@@ -17,7 +17,7 @@ export async function Header() {
     <NavLink
       href="/"
       caption={tLoading('general')}
-      className="text-[13px] leading-[1.6] text-foreground transition-colors duration-fast hover:text-muted-foreground"
+      className="text-[15px] leading-[1.6] text-foreground transition-colors duration-fast hover:text-muted-foreground"
     >
       {tApp('name')}
     </NavLink>
@@ -29,8 +29,9 @@ export async function Header() {
           on <body> — a stuck header sits at viewport y=0, so ITS padding is
           what keeps the notch/status bar off the controls (see layout.tsx's
           body comment). Chrome is typography on the desk (docs/BRAND.md v2
-          §2c/§2d): one dark rule below, no fill difference, no shadow. */}
-      <header className="sticky top-0 z-20 border-b border-border-strong bg-background">
+          §2c/§2d): ONE 1px HAIRLINE below (FIXES §6) — not the heavier
+          rule it used to draw — no fill difference, no shadow. */}
+      <header className="sticky top-0 z-20 border-b border-border bg-background">
         <div className="flex items-center justify-between px-5 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3">
           <div className="flex items-center gap-1">
             {/* The in-place text index (v2 §3) — signed-in only; a stranger

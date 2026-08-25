@@ -8,7 +8,7 @@ import { Money } from '@/components/Money'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { Input, SELECT_FIELD } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   formatMinor,
@@ -38,8 +38,7 @@ export type { AdjustmentView, TopUpView, WalletView }
 
 const WALLET_TYPES = ['CASH', 'TRAVEL_CARD', 'OTHER_PREPAID'] as const
 
-const SELECT_CLASS =
-  'h-11 rounded-lg border border-input bg-transparent px-3 text-base outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50'
+const SELECT_CLASS = SELECT_FIELD
 
 /** Fill placeholders of pre-translated templates. */
 const fill = (template: string, vars: Record<string, string>): string =>

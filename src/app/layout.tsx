@@ -9,9 +9,12 @@ import './globals.css'
 
 /*
  * Statement type system (handoff SPEC.md §3):
- * - Newsreader = display + money figures ONLY (Latin subset; Hangul falls
- *   through to Pretendard via --font-heading's stack — Korean must never
- *   render in a serif).
+ * - Newsreader = display + money figures ONLY (Latin + latin-ext; Hangul
+ *   falls through to Pretendard via --font-heading's stack — Korean must
+ *   never render in a serif). LATIN-EXT IS THE WON SIGN: U+20A9 sits in
+ *   that subset's U+20A0-20AB range, and without it ₩ fell out of the
+ *   serif to whatever sans the device had, which draws the crossed W the
+ *   design brief rejects (FIXES §5).
  * - Pretendard Variable = all UI/body text, loaded as a CDN stylesheet
  *   below (it is not on Google Fonts; the variable woff2 is dynamically
  *   subset per script, so Hangul + ₩ always render).
@@ -19,7 +22,7 @@ import './globals.css'
  */
 const newsreader = Newsreader({
   variable: '--font-newsreader',
-  subsets: ['latin'],
+  subsets: ['latin', 'latin-ext'],
   style: ['normal', 'italic'],
   weight: ['400', '500'],
 })

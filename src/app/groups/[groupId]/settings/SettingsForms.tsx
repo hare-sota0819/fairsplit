@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useActionState, useRef, useState } from 'react'
 import { SubmitButton } from '@/components/SubmitButton'
-import { Input } from '@/components/ui/input'
+import { Input, SELECT_FIELD } from '@/components/ui/input'
 import { Segmented } from '@/components/ui/Segmented'
 import {
   DestinationPicker,
@@ -79,7 +79,7 @@ export function GroupSettingsForm({
           name="currency"
           defaultValue={initial.currency}
           disabled={currencyLocked}
-          className="h-11 w-full rounded-lg border border-input bg-transparent px-3 text-base outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
+          className={SELECT_FIELD}
         >
           {CURATED_CURRENCIES.map((code) => (
             <option key={code} value={code}>

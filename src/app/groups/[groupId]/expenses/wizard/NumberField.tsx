@@ -53,6 +53,7 @@ export function NumberField({
   testId,
   className = '',
   inputClassName = '',
+  labelClassName = '',
   required,
   ariaLabel,
 }: {
@@ -68,12 +69,18 @@ export function NumberField({
   testId?: string
   className?: string
   inputClassName?: string
+  /** The step-1 caption treatment (FIXES §4), where the caller wants it. */
+  labelClassName?: string
   required?: boolean
   ariaLabel?: string
 }) {
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      {label ? <Label htmlFor={id}>{label}</Label> : null}
+      {label ? (
+        <Label htmlFor={id} className={labelClassName}>
+          {label}
+        </Label>
+      ) : null}
       <span className="relative flex items-center">
         <Input
           id={id}

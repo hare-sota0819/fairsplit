@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useActionState } from 'react'
 import { SubmitButton } from '@/components/SubmitButton'
 import { buttonVariants } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Input, SELECT_FIELD } from '@/components/ui/input'
 import {
   DestinationPicker,
   type DestinationLabels,
@@ -46,7 +46,7 @@ export function GroupForm({
           id="currency"
           name="currency"
           defaultValue="KRW"
-          className="h-11 w-full rounded-lg border border-input bg-transparent px-3 text-base outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
+          className={SELECT_FIELD}
         >
           {CURATED_CURRENCIES.map((code) => (
             <option key={code} value={code}>

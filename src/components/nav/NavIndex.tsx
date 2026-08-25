@@ -223,8 +223,10 @@ export function NavIndex({ children }: { children?: React.ReactNode }) {
         }
       }}
     >
-      {/* The mark: three short hairlines. Fades out while the list is up;
-          stays in the layout so nothing shifts. */}
+      {/* The mark: three HAIRLINES, 17/17/12px at 1px, #b4b4b4 (FIXES §6).
+          The 2px bars it replaced were the last drawn "icon" in the chrome.
+          Fades out while the list is up; stays in the layout so nothing
+          shifts. */}
       <button
         type="button"
         aria-label={t('sidebar.open')}
@@ -243,9 +245,9 @@ export function NavIndex({ children }: { children?: React.ReactNode }) {
           markHidden ? 'opacity-0' : 'opacity-100',
         )}
       >
-        <span aria-hidden="true" className="block h-0.5 w-4 bg-primary" />
-        <span aria-hidden="true" className="block h-0.5 w-4 bg-primary" />
-        <span aria-hidden="true" className="block h-0.5 w-4 bg-primary" />
+        <span aria-hidden="true" className="block h-px w-[17px] bg-[#b4b4b4]" />
+        <span aria-hidden="true" className="block h-px w-[17px] bg-[#b4b4b4]" />
+        <span aria-hidden="true" className="block h-px w-[12px] bg-[#b4b4b4]" />
       </button>
       {/* The wordmark sits beside the mark and fades with it: the links
           take exactly the place the two occupied. */}

@@ -28,18 +28,11 @@ export function RouteLoader({
   caption,
   label,
   id,
-  onScrim = false,
 }: {
   caption: string
-  /** Accessible name when the visible line is a tip rather than a status. */
+  /** Accessible name, when the visible caption is the fixed loading line. */
   label?: string
   id?: LoaderId
-  /**
-   * Sitting on the dark scrim rather than on the page. The scrim dims
-   * whatever theme is underneath it, so the indicator has to stop following
-   * the theme and commit to light-on-dark.
-   */
-  onScrim?: boolean
 }) {
   const { Art } = LOADERS[id ?? LOADER_IDS[0]] ?? LOADERS[LOADER_IDS[0]]
   return (
@@ -51,21 +44,15 @@ export function RouteLoader({
       // w-full + a max width on the caption: without them the caption is
       // sized by its own text inside a centred column and a long line is
       // clipped at both edges rather than wrapping.
-      className={`flex w-full flex-1 flex-col items-center justify-center gap-5 px-8 py-10 ${
-        onScrim ? 'text-scrim-foreground' : 'text-primary'
-      }`}
+      className="flex w-full flex-1 flex-col items-center justify-center gap-5 px-8 py-10 text-primary"
     >
       {/* The ledger writing itself (registry.tsx) — monochrome ink; its
           voice is the caption. */}
-      <Art onScrim={onScrim} />
+      <Art />
       <span
-        // Caption: 13.5px meta grey on paper (SPEC-LOADERS §A). On the
-        // scrim it stays a shade heavier so it survives the dimmed page.
-        className={`max-w-xs text-center text-balance ${
-          onScrim
-            ? 'text-base font-medium text-scrim-foreground'
-            : 'text-[13.5px] text-[#8a8a8a]'
-        }`}
+        // Caption: 13.5px meta grey on paper (SPEC-LOADERS §A). There is no
+        // scrim variant any more — a loader is always ink on paper.
+        className="max-w-xs text-center text-balance text-[13.5px] text-[#8a8a8a]"
       >
         {caption}
       </span>

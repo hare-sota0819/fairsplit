@@ -19,6 +19,7 @@ import {
   type WizardState,
 } from './math'
 import { NumberField } from './NumberField'
+import { SELECT_FIELD } from '@/components/ui/input'
 
 const KIND_ICON = {
   CASH: Landmark,
@@ -33,8 +34,7 @@ type Editing =
   | { kind: 'EXTRA'; key: number }
   | null
 
-const DIALOG_SELECT_CLASS =
-  'h-11 w-full rounded-lg border border-input bg-transparent px-3 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50'
+const DIALOG_SELECT_CLASS = SELECT_FIELD
 
 const ANSWER_CLASS =
   'flex flex-col gap-0.5 rounded-xl border border-border px-4 py-3 text-left transition-[background-color,color,transform] duration-fast ease-swift hover:bg-muted/60 active:translate-y-px active:bg-muted/60'
@@ -137,11 +137,7 @@ export function SplitFunding({
   const clearTill = () =>
     patch({ topUpAmount: '', topUpRate: '', topUpPaid: '' })
 
-  const openExtra = (
-    source: FundingSource,
-    amount: bigint,
-    memberId = '',
-  ) => {
+  const openExtra = (source: FundingSource, amount: bigint, memberId = '') => {
     const key = state.nextKey
     patch({
       nextKey: key + 1,
@@ -549,14 +545,19 @@ export function SplitFunding({
                   ? walletsOfFunder(editingExtra.memberId).length === 0
                   : mine.length === 0) ||
                 editingExtra.source.kind === 'PREPAID_NO_WALLET' ? (
-                  <option value="PREPAID_NO_WALLET">{t('sourceOwnRate')}</option>
+                  <option value="PREPAID_NO_WALLET">
+                    {t('sourceOwnRate')}
+                  </option>
                 ) : null}
               </select>
             </div>
-            {editingExtra.source.kind === 'PREPAID_NO_WALLET' && math.foreign ? (
+            {editingExtra.source.kind === 'PREPAID_NO_WALLET' &&
+            math.foreign ? (
               <RateField
                 value={editingExtra.ownRate}
-                onChange={(ownRate) => patchExtra(editingExtra.key, { ownRate })}
+                onChange={(ownRate) =>
+                  patchExtra(editingExtra.key, { ownRate })
+                }
                 auto={null}
                 label={t('ownRateAnchor', { unit, currency })}
                 autoLine=""

@@ -5,6 +5,7 @@ import { useLocale } from 'next-intl'
 import { useState } from 'react'
 import { countryName } from '@/lib/country-name'
 import { DESTINATIONS, destinationFor, flagEmoji } from '@/lib/destinations'
+import { SELECT_FIELD } from '@/components/ui/input'
 
 export interface DestinationLabels {
   /** "Where are you going?" */
@@ -66,10 +67,7 @@ export function DestinationPicker({
     }))
     .sort((a, b) => a.shown.localeCompare(b.shown, locale))
 
-  const selectClass =
-    'h-11 w-full rounded-lg border border-input bg-transparent px-3 text-base ' +
-    'outline-none transition-[color,box-shadow] focus-visible:border-ring ' +
-    'focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
+  const selectClass = SELECT_FIELD
 
   return (
     <div className="flex flex-col gap-3 text-sm">
@@ -89,8 +87,7 @@ export function DestinationPicker({
           <option value="">{labels.countryNone}</option>
           {localisedDestinations.map((destination) => (
             <option key={destination.code} value={destination.code}>
-              {flagEmoji(destination.code)}{' '}
-              {destination.shown}
+              {flagEmoji(destination.code)} {destination.shown}
             </option>
           ))}
         </select>
