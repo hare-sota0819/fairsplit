@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { openNav } from './nav'
+import { inviteJoinPath, openNav } from './nav'
 import { createWallet, recordTopUp } from './wallet-flow'
 
 const uniqueEmail = (tag: string): string =>
@@ -93,7 +93,7 @@ test('a member leaves, the creator deletes, and dead ends offer a way back', asy
   // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await pageA.goto(`${groupUrl}/invite`)
-  const invitePath = await pageA.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(pageA)
 
   const contextB = await browser.newContext()
   const pageB = await contextB.newPage()
@@ -221,7 +221,7 @@ test('a member who left can rejoin through the invite link', async ({
   // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await pageA.goto(`${groupUrl}/invite`)
-  const invitePath = await pageA.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(pageA)
 
   const contextB = await browser.newContext()
   const pageB = await contextB.newPage()

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { createWallet, openWallets, recordTopUp } from './wallet-flow'
+import { inviteJoinPath } from './nav'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -77,7 +78,7 @@ test('the feed is my own share, and a wallet correction never appears in it', as
   await expect(pageA.getByTestId('home')).toBeVisible()
   const groupUrl = pageA.url().replace(/\?.*$/, '')
   await pageA.goto(`${groupUrl}/invite`)
-  const invitePath = await pageA.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(pageA)
 
   const contextB = await browser.newContext()
   const pageB = await contextB.newPage()

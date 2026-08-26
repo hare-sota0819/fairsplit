@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { inviteJoinPath } from './nav'
 
 const uniqueEmail = (tag: string): string =>
   `e2e-${tag}-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}@example.com`
@@ -44,7 +45,7 @@ test('signup, group create, and join via invite link', async ({ browser }) => {
   // lives on /invite now, not on home.
   const groupUrl = pageA.url()
   await pageA.goto(`${groupUrl}/invite`)
-  const invitePath = await pageA.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(pageA)
   expect(invitePath).toMatch(/^\/join\//)
 
   // The group list is the only way back to a group from a device that has

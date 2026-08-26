@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { createWallet, recordTopUp, showWallets, startTopUp } from './wallet-flow'
+import { inviteJoinPath } from './nav'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -89,7 +90,7 @@ test('wallets: two pots at two rates, pay-as-you-go, overdraft, recalc, cancel, 
   await expect(pageA.getByTestId('home')).toBeVisible()
   const groupUrl = pageA.url()
   await pageA.goto(`${groupUrl}/invite`)
-  const invitePath = await pageA.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(pageA)
 
   const contextB = await browser.newContext()
   const pageB = await contextB.newPage()
@@ -293,11 +294,11 @@ test('wallets: two pots at two rates, pay-as-you-go, overdraft, recalc, cancel, 
   // every day — the dedicated /invite screen (sidebar menu) is its home;
   // settings keeps at most a link out to it (T7 intake: settings used to
   // duplicate the whole invite block, deduped down to one link).
-  await expect(pageA.getByTestId('invite-link')).toHaveCount(0)
+  await expect(pageA.getByTestId('invite-url')).toHaveCount(0)
   await pageA.goto(`${groupUrl}/settings`)
   await expect(pageA.getByTestId('settings-invite-link')).toBeVisible()
   await pageA.getByTestId('settings-invite-link').click()
-  await expect(pageA.getByTestId('invite-link')).toBeVisible()
+  await expect(pageA.getByTestId('invite-url')).toBeVisible()
 
   // Per-person balances moved to /status (Task 5, app-shell restructure);
   // Alice's own row states her net, and expanding it names who it is with.

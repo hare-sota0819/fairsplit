@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
+import { inviteJoinPath } from './nav'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -77,7 +78,7 @@ test('izakaya wizard: unit price x qty, per-person quantity, unassigned charge',
   await expect(pageA.getByTestId('home')).toBeVisible()
   const groupUrl = pageA.url()
   await pageA.goto(`${groupUrl}/invite`)
-  const invitePath = await pageA.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(pageA)
 
   const others: { page: Page; close: () => Promise<void> }[] = []
   for (const name of ['Bob', 'Carol']) {

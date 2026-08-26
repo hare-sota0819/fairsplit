@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { createWallet, recordTopUp } from './wallet-flow'
+import { inviteJoinPath } from './nav'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -50,7 +51,7 @@ test('a receipt two people fronted credits both of them', async ({
   await expect(alice.getByTestId('home')).toBeVisible()
   const groupUrl = alice.url()
   await alice.goto(`${groupUrl}/invite`)
-  const invitePath = await alice.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(alice)
 
   const contextB = await browser.newContext()
   const bob = await contextB.newPage()

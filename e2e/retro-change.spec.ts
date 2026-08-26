@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { addFundedWallet } from './wallet-flow'
+import { inviteJoinPath } from './nav'
 
 /**
  * The seam between the two halves of checkpoint finality.
@@ -83,7 +84,7 @@ test('a settled expense is corrected by asking, not by refusing', async ({
   const groupUrl = alice.url()
 
   await alice.goto(`${groupUrl}/invite`)
-  const invitePath = await alice.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(alice)
 
   const contextB = await browser.newContext()
   const bob = await contextB.newPage()
@@ -206,7 +207,7 @@ test('a refusal is recorded, and changes nothing', async ({ browser }) => {
   const groupUrl = alice.url()
 
   await alice.goto(`${groupUrl}/invite`)
-  const invitePath = await alice.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(alice)
 
   const contextB = await browser.newContext()
   const bob = await contextB.newPage()

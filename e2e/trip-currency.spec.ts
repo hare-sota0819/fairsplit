@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { createWallet, showWallets } from './wallet-flow'
+import { inviteJoinPath } from './nav'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -122,7 +123,7 @@ test('the phone walkthrough: JPY trip currency end to end', async ({
   // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await pageA.goto(`${groupUrl}/invite`)
-  const invitePath = await pageA.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(pageA)
 
   const contextB = await browser.newContext()
   const pageB = await contextB.newPage()
@@ -340,7 +341,7 @@ test('assignment step: the >10 filter keeps ticks intact, and Done wraps around'
   // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await ownerPage.goto(`${groupUrl}/invite`)
-  const invitePath = await ownerPage.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(ownerPage)
 
   for (let i = 1; i <= 10; i += 1) {
     const context = await browser.newContext()

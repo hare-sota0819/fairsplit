@@ -1,10 +1,9 @@
 import { InviteLink } from '@/components/InviteLink'
 
 /**
- * Heading, explanation and the copyable invite link/code. Home's
- * alone-only block and the dedicated `/invite` screen both render this
- * (home gates it on `alone`; `/invite` always shows it), so the two can
- * never diverge.
+ * Heading, explanation and the copyable invite link. Statement grammar
+ * (FIXES §2 family): no card, no ring, no fill — a micro-label, a meta
+ * sentence, and the link row on its own hairline.
  */
 export function InviteBlock({
   inviteCode,
@@ -20,17 +19,18 @@ export function InviteBlock({
   copiedLabel: string
 }) {
   return (
-    <section
-      className="flex flex-col gap-3 rounded-xl bg-card p-4 ring-1 ring-border-strong"
-      data-testid="invite-cta"
-    >
-      <h2 className="font-semibold">{title}</h2>
-      <p className="text-sm text-muted-foreground">{body}</p>
-      <InviteLink
-        inviteCode={inviteCode}
-        copyLabel={copyLabel}
-        copiedLabel={copiedLabel}
-      />
+    <section className="flex flex-col" data-testid="invite-cta">
+      <h2 className="text-xs font-normal uppercase tracking-[0.12em] text-[#a8a8a8]">
+        {title}
+      </h2>
+      <div className="mt-1">
+        <InviteLink
+          inviteCode={inviteCode}
+          copyLabel={copyLabel}
+          copiedLabel={copiedLabel}
+        />
+      </div>
+      <p className="mt-2 text-xs leading-5 text-[#a8a8a8]">{body}</p>
     </section>
   )
 }

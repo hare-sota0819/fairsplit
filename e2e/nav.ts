@@ -55,3 +55,17 @@ export async function goVia(page: Page, item: SidebarNavItem): Promise<void> {
   await page.getByTestId(`nav-${item}`).click()
   await page.waitForURL(new RegExp(`/${ROUTE_SEGMENT[item]}$`))
 }
+
+/**
+ * The join path off the invite screen. The invite row prints the URL with
+ * its protocol stripped (`localhost:3000/join/…`) and keeps the absolute
+ * one in `title`, so the path is read from the attribute rather than from
+ * the visible run of text. The attribute is the bare path until the client
+ * fills the host in, and resolving against a base covers both.
+ */
+export async function inviteJoinPath(page: Page): Promise<string> {
+  const row = page.getByTestId('invite-url')
+  await expect(row).toHaveAttribute('title', /\/join\//)
+  const href = (await row.getAttribute('title')) ?? ''
+  return new URL(href, 'http://localhost').pathname
+}

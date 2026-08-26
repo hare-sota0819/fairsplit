@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { inviteJoinPath } from './nav'
 
 /**
  * The path a friend actually walks: a link arrives, they find out what this
@@ -45,7 +46,7 @@ test('landing, invite preview, guide after sign-up, and the guide from Account',
   await expect(host.getByTestId('home')).toBeVisible()
   const groupUrl = host.url()
   await host.goto(`${groupUrl}/invite`)
-  const invitePath = await host.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(host)
 
   // The guide is reachable from Account for anyone who wants it again.
   await host.goto('/account')

@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { createWallet, recordTopUp } from './wallet-flow'
+import { inviteJoinPath } from './nav'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -64,7 +65,7 @@ test('rates: as-of date, wallet detour keeps the draft, unit-anchored override, 
   await expect(pageA.getByTestId('home')).toBeVisible()
   const groupUrl = pageA.url()
   await pageA.goto(`${groupUrl}/invite`)
-  const invitePath = await pageA.getByTestId('invite-link').innerText()
+  const invitePath = await inviteJoinPath(pageA)
 
   const contextB = await browser.newContext()
   const pageB = await contextB.newPage()

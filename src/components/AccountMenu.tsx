@@ -33,13 +33,6 @@ import {
  * underline on hover.
  */
 
-/** One menu row: 14.5px ink, 12px of vertical padding, #f2f2f2 on hover. */
-const ROW =
-  'h-auto rounded-none px-4 py-3 text-[14.5px] text-foreground focus:bg-muted data-[highlighted]:bg-muted'
-
-/** The rule between groups of rows. `--border` is this app's hairline. */
-const GROUP_RULE = 'mx-0 my-0 bg-border'
-
 export function AccountMenu({
   name,
   email,
@@ -75,12 +68,11 @@ export function AccountMenu({
         <span aria-hidden="true">{initial}</span>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        align="end"
-        // White surface, 1px #dcdcdc, radius 0, no shadow (§3).
-        className="rounded-none border border-border bg-popover p-0 shadow-none ring-0"
-      >
-        <DropdownMenuLabel className="px-4 py-3">
+      {/* The surface, the rows and the group rule are §3's, and they are
+          the DEFAULTS in ui/dropdown-menu.tsx — §4's currency picker opens
+          "the same bordered menu as §3", so there is one menu, not two. */}
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>
           <span className="flex min-w-0 flex-col">
             <span
               className="truncate text-[14.5px] text-foreground"
@@ -91,7 +83,7 @@ export function AccountMenu({
             <span className="truncate text-[12px] text-[#8a8a8a]">{email}</span>
           </span>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator className={GROUP_RULE} />
+        <DropdownMenuSeparator />
 
         {/* Managing THIS group: renaming it, adding someone by name,
             leaving it — all of that is the settings screen, and the invite
@@ -99,14 +91,12 @@ export function AccountMenu({
         {groupId ? (
           <>
             <DropdownMenuItem
-              className={ROW}
               data-testid="menu-manage-group"
               onSelect={() => router.push(`/groups/${groupId}/settings`)}
             >
               {labels.manageGroup}
             </DropdownMenuItem>
             <DropdownMenuItem
-              className={ROW}
               data-testid="menu-invite"
               onSelect={() => router.push(`/groups/${groupId}/invite`)}
             >
@@ -115,24 +105,21 @@ export function AccountMenu({
           </>
         ) : null}
         <DropdownMenuItem
-          className={ROW}
           data-testid="menu-new-group"
           onSelect={() => router.push('/groups/new')}
         >
           {labels.newGroup}
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator className={GROUP_RULE} />
+        <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          className={ROW}
           data-testid="menu-account"
           onSelect={() => router.push('/account')}
         >
           {labels.settings}
         </DropdownMenuItem>
         <DropdownMenuItem
-          className={ROW}
           data-testid="menu-switch-account"
           onSelect={() => void switchAccountAction()}
         >
@@ -141,7 +128,7 @@ export function AccountMenu({
         {/* Signing out is not destructive — nothing is lost by it — so it
             stays grey rather than taking the app's one chromatic colour. */}
         <DropdownMenuItem
-          className={`${ROW} text-[#8a8a8a]`}
+          className="text-[#8a8a8a]"
           data-testid="menu-signout"
           onSelect={() => void signOutAction()}
         >
