@@ -23,6 +23,7 @@ const eslintConfig = defineConfig([
     'patches/**',
     'patches2/**',
     'patches3/**',
+    'patches4/**',
     // Owner's design-review drops (design-tool canvas exports + their
     // runtime, e.g. `step 1 피드백/support.js`): reference material, not
     // product code.
