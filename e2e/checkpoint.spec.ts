@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { addFundedWallet, chooseWallet, recordTopUp } from './wallet-flow'
+import { openLedger } from './group-flow'
 
 /**
  * The whole promise of a checkpoint, end to end: once a period is settled,
@@ -29,14 +30,7 @@ test('a checkpoint settles a period, and a later top-up cannot move it', async (
   test.setTimeout(180_000)
   await signUp(page, 'Checkpoint E2E')
 
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration settles can
-  // lose the typed values. The documented workaround.
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill('Checkpoint Trip E2E')
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  await page.getByLabel('Your display name in this group').fill('Owner')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(page, 'Checkpoint Trip E2E')
   await expect(page.getByTestId('home')).toBeVisible()
   const groupUrl = page.url()
 

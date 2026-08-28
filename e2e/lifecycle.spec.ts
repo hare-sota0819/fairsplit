@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { inviteJoinPath, openNav } from './nav'
 import { createWallet, recordTopUp } from './wallet-flow'
+import { openLedger } from './group-flow'
 
 const uniqueEmail = (tag: string): string =>
   `e2e-${tag}-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}@example.com`
@@ -15,16 +16,7 @@ async function signUp(page: Page, name: string, email: string): Promise<void> {
 }
 
 async function createGroup(page: Page, name: string): Promise<string> {
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill(name)
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  await page.getByLabel('Your display name in this group').fill('Owner')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(page, name)
   await expect(page.getByRole('heading', { name })).toBeVisible()
   return page.url().replace(/\?.*$/, '')
 }
@@ -281,17 +273,7 @@ test('trip currency can be set, changed, and cleared in settings', async ({
 }) => {
   await signUp(page, 'Trip Currency E2E', uniqueEmail('tripcur'))
 
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill('Trip Currency E2E Group')
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  await page.getByTestId('trip-country').selectOption('JP')
-  await page.getByLabel('Your display name in this group').fill('Owner')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(page, 'Trip Currency E2E Group', { tripCountry: 'JP' })
   await expect(
     page.getByRole('heading', { name: 'Trip Currency E2E Group' }),
   ).toBeVisible()
@@ -354,17 +336,7 @@ test('a trip currency matching settlement is never preselected on the wallet for
 }) => {
   await signUp(page, 'Same Currency E2E', uniqueEmail('samecur'))
 
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill('Same Currency E2E Group')
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  await page.getByTestId('trip-country').selectOption('KR')
-  await page.getByLabel('Your display name in this group').fill('Owner')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(page, 'Same Currency E2E Group', { tripCountry: 'KR' })
   await expect(
     page.getByRole('heading', { name: 'Same Currency E2E Group' }),
   ).toBeVisible()

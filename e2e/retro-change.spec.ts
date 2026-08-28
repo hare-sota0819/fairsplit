@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { addFundedWallet } from './wallet-flow'
 import { inviteJoinPath } from './nav'
+import { openLedger } from './group-flow'
 
 /**
  * The seam between the two halves of checkpoint finality.
@@ -72,14 +73,7 @@ test('a settled expense is corrected by asking, not by refusing', async ({
   const contextA = await browser.newContext()
   const alice = await contextA.newPage()
   await signUp(alice, 'Alice Retro', uniqueEmail('retro-a'))
-  await alice.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration settles can
-  // lose the typed values. The documented workaround.
-  await alice.waitForTimeout(1500)
-  await alice.getByLabel('Group name').fill('Retro Change E2E')
-  await alice.getByLabel('Settlement currency').selectOption('KRW')
-  await alice.getByLabel('Your display name in this group').fill('Alice')
-  await alice.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(alice, 'Retro Change E2E')
   await expect(alice.getByTestId('home')).toBeVisible()
   const groupUrl = alice.url()
 
@@ -197,12 +191,7 @@ test('a refusal is recorded, and changes nothing', async ({ browser }) => {
   const contextA = await browser.newContext()
   const alice = await contextA.newPage()
   await signUp(alice, 'Alice Reject', uniqueEmail('reject-a'))
-  await alice.goto('/groups/new')
-  await alice.waitForTimeout(1500)
-  await alice.getByLabel('Group name').fill('Retro Reject E2E')
-  await alice.getByLabel('Settlement currency').selectOption('KRW')
-  await alice.getByLabel('Your display name in this group').fill('Alice')
-  await alice.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(alice, 'Retro Reject E2E')
   await expect(alice.getByTestId('home')).toBeVisible()
   const groupUrl = alice.url()
 

@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { createWallet, openWallets, recordTopUp } from './wallet-flow'
+import { openLedger } from './group-flow'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -47,16 +48,7 @@ async function stubRates(page: Page): Promise<void> {
 async function setUp(page: Page): Promise<string> {
   await stubRates(page)
   await signUp(page, 'Alice E2E', uniqueEmail('alice'))
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill('Till E2E')
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  await page.getByLabel('Your display name in this group').fill('Alice')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(page, 'Till E2E')
   // Wait for the redirect before reading the URL, or `page.url()` is still
   // /groups/new and every path built from it 404s.
   await expect(page.getByRole('heading', { name: 'Till E2E' })).toBeVisible()

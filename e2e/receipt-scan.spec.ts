@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { openLedger } from './group-flow'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -84,16 +85,7 @@ test('scan a receipt: parsed items appear, the total check responds, and the exp
   })
 
   await signUp(page, 'Alice Scan', uniqueEmail('scan'))
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill('Receipt Scan E2E')
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  await page.getByLabel('Your display name in this group').fill('Alice')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(page, 'Receipt Scan E2E')
   // Home is the expense feed (chat removal, 2026-08-21): it being
   // there is proof the redirect landed.
   await expect(page.getByTestId('home')).toBeVisible()
@@ -182,16 +174,7 @@ test('a failed parse offers manual entry instead of trapping the user', async ({
   })
 
   await signUp(page, 'Bob Scan', uniqueEmail('scanfail'))
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill('Receipt Fail E2E')
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  await page.getByLabel('Your display name in this group').fill('Bob')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(page, 'Receipt Fail E2E')
   // Home is the expense feed (chat removal, 2026-08-21): it being
   // there is proof the redirect landed.
   await expect(page.getByTestId('home')).toBeVisible()
@@ -234,16 +217,7 @@ test('a receipt image is refused to anyone outside the group', async ({ browser 
   const ownerContext = await browser.newContext()
   const owner = await ownerContext.newPage()
   await signUp(owner, 'Owner Img', uniqueEmail('img-owner'))
-  await owner.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await owner.waitForTimeout(1500)
-  await owner.getByLabel('Group name').fill('Image ACL E2E')
-  await owner.getByLabel('Settlement currency').selectOption('KRW')
-  await owner.getByLabel('Your display name in this group').fill('Owner')
-  await owner.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(owner, 'Image ACL E2E')
   // Home is the expense feed (chat removal, 2026-08-21): it being
   // there is proof the redirect landed.
   await expect(owner.getByTestId('home')).toBeVisible()

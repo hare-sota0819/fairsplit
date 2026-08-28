@@ -218,8 +218,13 @@
   },
   "groups": {
     "new": {
-      "title": "모임 만들기",
+      "title": "새 모임",
+      "meta": "이름 하나면 장부가 열립니다. 나머지는 적으면서 정해져요.",
       "name": "모임 이름",
+      "namePlaceholder": "도쿄 3박",
+      "submit": "장부 열기",
+      "cancel": "돌아가기",
+      "me": "나",
       "currency": "정산 통화",
       "tripCountry": "어디로 가세요?",
       "tripCountryNone": "아직 안 정했어요",
@@ -228,9 +233,7 @@
       "tripHelp": "나라를 고르면 통화를 맞춰드려요. 지출을 넣을 때 기본값만 정하는 거라, 매번 다른 통화를 골라도 돼요.",
       "tripCurrencyNote": "현지에서 쓰는 돈은 {currency}, 지출도 이 통화가 기본이 돼요.",
       "rateModeAvg": "내 환율 (실제 환전한 값)",
-      "rateModeMarket": "시장 환율",
-      "displayName": "이 모임에서 쓸 내 이름",
-      "submit": "모임 만들기"
+      "rateModeMarket": "시장 환율"
     },
     "list": {
       "title": "내 모임",

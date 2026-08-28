@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { openLedger } from './group-flow'
 
 /**
  * Screenshot pass for the confirm screen. Not an assertion suite — it drives
@@ -95,16 +96,7 @@ test('confirm screen states at 390x844', async ({ page }) => {
   })
 
   await signUp(page, 'Shot User', uniqueEmail('shots'))
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill('Shots')
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  await page.getByLabel('Your display name in this group').fill('Shot')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(page, 'Shots')
   // Home is the expense feed (chat removal, 2026-08-21): it being
   // there is proof the redirect landed.
   await expect(page.getByTestId('home')).toBeVisible()

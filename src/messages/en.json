@@ -218,8 +218,13 @@
   },
   "groups": {
     "new": {
-      "title": "Create a group",
+      "title": "New group",
+      "meta": "A name is all it takes to open the ledger. The rest gets decided as you write.",
       "name": "Group name",
+      "namePlaceholder": "3 nights in Tokyo",
+      "submit": "Open the ledger",
+      "cancel": "Go back",
+      "me": "Me",
       "currency": "Settlement currency",
       "tripCountry": "Where are you going?",
       "tripCountryNone": "Not decided yet",
@@ -228,9 +233,7 @@
       "tripHelp": "Pick the country and we'll work out the currency. It only sets the default when you enter an expense — you can still choose any currency each time.",
       "tripCurrencyNote": "Money there is spent in {currency}, so that's what expenses will default to.",
       "rateModeAvg": "My exchange rate (average cost)",
-      "rateModeMarket": "Market rate",
-      "displayName": "Your display name in this group",
-      "submit": "Create group"
+      "rateModeMarket": "Market rate"
     },
     "list": {
       "title": "Your groups",

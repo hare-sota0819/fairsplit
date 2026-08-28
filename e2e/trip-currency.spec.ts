@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { createWallet, showWallets } from './wallet-flow'
 import { inviteJoinPath } from './nav'
+import { openLedger } from './group-flow'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -18,30 +19,19 @@ async function signUp(page: Page, name: string, email: string): Promise<void> {
 
 /**
  * Creates a KRW-settlement group, optionally bound for a country. The trip
- * CURRENCY is derived from that country — the form never asks for it.
+ * CURRENCY is derived from that country — nothing ever asks for it.
+ *
+ * The member's name is no longer chosen here: it comes from the account, so
+ * callers that used to pass `displayName` sign up under that name instead.
  */
 async function createGroup(
   page: Page,
   name: string,
-  options: { tripCountry?: string; displayName?: string } = {},
+  options: { tripCountry?: string } = {},
 ): Promise<string> {
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill(name)
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  if (options.tripCountry) {
-    await page.getByTestId('trip-country').selectOption(options.tripCountry)
-  }
-  await page
-    .getByLabel('Your display name in this group')
-    .fill(options.displayName ?? 'Owner')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  const groupUrl = await openLedger(page, name, options)
   await expect(page.getByRole('heading', { name })).toBeVisible()
-  return page.url().replace(/\?.*$/, '')
+  return groupUrl
 }
 
 /** Single-select toggle groups render as Radix radios. */
@@ -118,7 +108,6 @@ test('the phone walkthrough: JPY trip currency end to end', async ({
   await signUp(pageA, 'Alice E2E', uniqueEmail('alice'))
   const groupUrl = await createGroup(pageA, 'JPY Trip E2E', {
     tripCountry: 'JP',
-    displayName: 'Alice',
   })
   // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.

@@ -35,16 +35,12 @@ test('the app can be used end to end in Korean', async ({ page }) => {
   await page.getByRole('button', { name: '계정 만들기' }).click()
   await expect(page.getByTestId('account-menu')).toBeVisible()
 
+  // The create screen asks one question now (patches5). In Korean the
+  // settlement currency derives to KRW and the member name comes from the
+  // account, so the name really is the only answer given here.
   await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
   await page.getByLabel('모임 이름').fill('오사카 여행')
-  await page.getByLabel('정산 통화').selectOption('KRW')
-  await page.getByLabel('이 모임에서 쓸 내 이름').fill('소타')
-  await page.getByRole('button', { name: '모임 만들기' }).click()
+  await page.getByRole('button', { name: '장부 열기' }).click()
   // Home is the expense feed (chat removal, 2026-08-21): a brand-new group
   // shows its empty state — also proof the redirect landed, so no separate
   // wait is needed first.

@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 import { inviteJoinPath } from './nav'
+import { openLedger } from './group-flow'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -61,18 +62,11 @@ test('izakaya wizard: unit price x qty, per-person quantity, unassigned charge',
 }) => {
   const contextA = await browser.newContext()
   const pageA = await contextA.newPage()
-  await signUp(pageA, 'Alice E2E', uniqueEmail('alice'))
+  // The group calls this member by the ACCOUNT's name now (patches5):
+  // the create form no longer asks for a per-group display name.
+  await signUp(pageA, 'Alice', uniqueEmail('alice'))
 
-  await pageA.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await pageA.waitForTimeout(1500)
-  await pageA.getByLabel('Group name').fill('Izakaya E2E')
-  await pageA.getByLabel('Settlement currency').selectOption('KRW')
-  await pageA.getByLabel('Your display name in this group').fill('Alice')
-  await pageA.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(pageA, 'Izakaya E2E')
   // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await expect(pageA.getByTestId('home')).toBeVisible()
@@ -223,16 +217,7 @@ test('numeric inputs replace on focus, and a removed line can be undone', async 
   page,
 }) => {
   await signUp(page, 'Dana E2E', uniqueEmail('dana'))
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill('Inputs E2E')
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  await page.getByLabel('Your display name in this group').fill('Dana')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(page, 'Inputs E2E')
   // Read the URL only once the redirect has landed.
   await expect(page.getByTestId('home')).toBeVisible()
   const groupUrl = page.url()

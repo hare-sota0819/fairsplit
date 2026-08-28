@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { createWallet, openWallets, recordTopUp } from './wallet-flow'
 import { inviteJoinPath } from './nav'
+import { openLedger } from './group-flow'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -63,16 +64,7 @@ test('the feed is my own share, and a wallet correction never appears in it', as
   await stubRates(pageA)
   await signUp(pageA, 'Alice E2E', uniqueEmail('alice'))
 
-  await pageA.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await pageA.waitForTimeout(1500)
-  await pageA.getByLabel('Group name').fill('My Share E2E')
-  await pageA.getByLabel('Settlement currency').selectOption('KRW')
-  await pageA.getByLabel('Your display name in this group').fill('Alice')
-  await pageA.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(pageA, 'My Share E2E')
   // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await expect(pageA.getByTestId('home')).toBeVisible()

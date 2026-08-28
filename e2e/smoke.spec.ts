@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { inviteJoinPath } from './nav'
+import { openLedger } from './group-flow'
 
 const uniqueEmail = (tag: string): string =>
   `e2e-${tag}-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}@example.com`
@@ -28,16 +29,7 @@ test('signup, group create, and join via invite link', async ({ browser }) => {
   const aliceEmail = uniqueEmail('alice')
   await signUp(pageA, 'Alice E2E', aliceEmail)
 
-  await pageA.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await pageA.waitForTimeout(1500)
-  await pageA.getByLabel('Group name').fill('Japan Trip E2E')
-  await pageA.getByLabel('Settlement currency').selectOption('KRW')
-  await pageA.getByLabel('Your display name in this group').fill('Alice')
-  await pageA.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(pageA, 'Japan Trip E2E')
   await expect(
     pageA.getByRole('heading', { name: 'Japan Trip E2E' }),
   ).toBeVisible()

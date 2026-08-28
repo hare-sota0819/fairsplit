@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 import { createWallet, recordTopUp } from './wallet-flow'
 import { inviteJoinPath } from './nav'
+import { openLedger } from './group-flow'
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -36,16 +37,7 @@ test('a receipt two people fronted credits both of them', async ({
   const contextA = await browser.newContext()
   const alice = await contextA.newPage()
   await signUp(alice, 'Alice E2E', uniqueEmail('cofund-a'))
-  await alice.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await alice.waitForTimeout(1500)
-  await alice.getByLabel('Group name').fill('Co-funded E2E')
-  await alice.getByLabel('Settlement currency').selectOption('KRW')
-  await alice.getByLabel('Your display name in this group').fill('Alice')
-  await alice.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(alice, 'Co-funded E2E')
   // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await expect(alice.getByTestId('home')).toBeVisible()

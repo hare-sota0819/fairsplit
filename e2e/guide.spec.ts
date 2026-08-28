@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { inviteJoinPath } from './nav'
+import { openLedger } from './group-flow'
 
 /**
  * The path a friend actually walks: a link arrives, they find out what this
@@ -31,16 +32,7 @@ test('landing, invite preview, guide after sign-up, and the guide from Account',
   // Zero groups yet, so root's redirect chain lands on the list.
   await expect(host).toHaveURL(/\/groups$/)
 
-  await host.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await host.waitForTimeout(1500)
-  await host.getByLabel('Group name').fill('Guide Trip E2E')
-  await host.getByLabel('Settlement currency').selectOption('KRW')
-  await host.getByLabel('Your display name in this group').fill('Host')
-  await host.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(host, 'Guide Trip E2E')
   // Home is the expense feed (chat removal, 2026-08-21): the invite link
   // lives on /invite now, not on home.
   await expect(host.getByTestId('home')).toBeVisible()

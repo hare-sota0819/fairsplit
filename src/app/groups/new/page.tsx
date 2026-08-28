@@ -5,12 +5,13 @@ import { createGroup } from './actions'
 import { GroupForm } from './GroupForm'
 
 /**
- * /groups/new — one centered statement column (FIXES-DESKTOP §2): 514px,
- * serif 400 title, a meta sentence, then the form. The column is the page;
- * there is no card and nothing else on the desk.
+ * /groups/new — the whole screen asks one question (the mockup's "이름 하나면
+ * 장부가 열립니다"): a 514px statement column, serif 400 title, the meta
+ * sentence, one field, one primary action. Currency, member name and
+ * destination are derived or deferred — see actions.ts.
  */
 export default async function NewGroupPage() {
-  const user = await requireUser('/groups/new')
+  await requireUser('/groups/new')
   const t = await getTranslations('groups.new')
   const tCommon = await getTranslations('common')
   const tLoading = await getTranslations('loading')
@@ -27,24 +28,15 @@ export default async function NewGroupPage() {
       <h1 className="mt-8 font-heading text-2xl font-normal tracking-[-0.01em] text-foreground">
         {t('title')}
       </h1>
-      <div className="mt-12">
+      <p className="mt-2.5 text-sm leading-6 text-[#8a8a8a]">{t('meta')}</p>
+      <div className="mt-14">
         <GroupForm
           action={createGroup}
-          defaultDisplayName={user.name ?? ''}
           labels={{
             name: t('name'),
-            currency: t('currency'),
-            destination: {
-              country: t('tripCountry'),
-              countryNone: t('tripCountryNone'),
-              city: t('tripCity'),
-              cityNone: t('tripCityNone'),
-              help: t('tripHelp'),
-              currencyNote: t('tripCurrencyNote', { currency: '{currency}' }),
-            },
-            displayName: t('displayName'),
+            namePlaceholder: t('namePlaceholder'),
             submit: t('submit'),
-            cancel: tCommon('cancel'),
+            cancel: t('cancel'),
           }}
         />
       </div>

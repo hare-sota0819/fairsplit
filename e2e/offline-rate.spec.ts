@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { createWallet, recordTopUp } from './wallet-flow'
+import { openLedger } from './group-flow'
 
 /**
  * Recording an expense with the rate provider unreachable.
@@ -29,16 +30,7 @@ test('a wallet-funded expense saves with no market rate, and says the rate is st
   test.setTimeout(120_000)
   await signUp(page, 'Offline E2E')
 
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill('Offline Trip E2E')
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  await page.getByLabel('Your display name in this group').fill('Owner')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(page, 'Offline Trip E2E')
   // Home is the expense feed (chat removal, 2026-08-21): it being
   // there is proof the redirect landed.
   await expect(page.getByTestId('home')).toBeVisible()
@@ -80,16 +72,7 @@ test('a pay-as-you-go expense with no rate is still refused, because nothing can
   test.setTimeout(120_000)
   await signUp(page, 'Offline Card E2E')
 
-  await page.goto('/groups/new')
-  // docs/BUGS.md [2026-08-09]: filling this form before hydration
-  // settles can lose the typed values — DestinationPicker's country-name
-  // mismatch regenerates a subtree that takes sibling form state with it.
-  // The documented workaround (docs/BUGS.md [2026-08-09]).
-  await page.waitForTimeout(1500)
-  await page.getByLabel('Group name').fill('Offline Card E2E')
-  await page.getByLabel('Settlement currency').selectOption('KRW')
-  await page.getByLabel('Your display name in this group').fill('Owner')
-  await page.getByRole('button', { name: 'Create group' }).click()
+  await openLedger(page, 'Offline Card E2E')
   // Home is the expense feed (chat removal, 2026-08-21): it being
   // there is proof the redirect landed.
   await expect(page.getByTestId('home')).toBeVisible()
